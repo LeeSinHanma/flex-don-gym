@@ -1,4 +1,4 @@
-name: Ionic React CI
+name: Ionic React CI 
 
 on:
   push:
