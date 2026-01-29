@@ -1,12 +1,15 @@
 import React from "react";
 import { IonApp, IonRouterOutlet, IonSplitPane } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { Route, Redirect, Switch } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 import Menu from "./components/Menu";
 import Page from "./pages/Page";
 import App from "./App"; // QR Generator
 import LoginRegister from "./pages/LoginRegister";
+import MemberMenu from "./pages/Member";
+import WalkInMenu from "./pages/WalkIn";
+import PrepaidMenu from "./pages/Prepaid";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -14,20 +17,20 @@ const MainApp: React.FC = () => (
       <IonSplitPane contentId="main">
         <Menu />
         <IonRouterOutlet id="main">
-          <Switch>
+          <Routes>
             {/* Default redirect */}
-            <Route
-              exact
-              path="/"
-              render={() => <Redirect to="/folder/Inbox" />}
-            />
+            <Route path="/" element={<Navigate to="/folder/Inbox" replace />} />
             {/* Page route */}
-            <Route exact path="/folder/:name" component={Page} />
+            <Route path="/folder/:name" element={<Page />} />
             {/* QR Generator */}
-            <Route exact path="/generator" component={App} />
+            <Route path="/generator" element={<App />} />
             {/* Login/Register page */}
-            <Route exact path="/login" component={LoginRegister} />
-          </Switch>
+            <Route path="/login" element={<LoginRegister />} />
+            <Route path="/member" element={<MemberMenu />} />
+            <Route path="/walkin" element={<WalkInMenu />} />
+            <Route path="/prepaid" element={<PrepaidMenu />} />
+            <Route path="/menu" element={<Menu />} />
+          </Routes>
         </IonRouterOutlet>
       </IonSplitPane>
     </IonReactRouter>

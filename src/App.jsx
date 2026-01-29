@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import { Route, Switch, Redirect, useHistory } from "react-router-dom";
-import { QRCode } from "react-qr-code";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import QRCode from "react-qr-code";
 import "./App.css";
 import LoginRegister from "./pages/LoginRegister";
+import MenuButtons from "./pages/Menu";
+import MemberMenu from "./pages/Member";
+import WalkInMenu from "./pages/WalkIn";
+import PrepaidMenu from "./pages/Prepaid";
 
 const QRGenerator = () => {
   const [firstName, setFirstName] = useState("");
@@ -11,10 +15,11 @@ const QRGenerator = () => {
   const [qrValue, setQrValue] = useState("");
   const [qrVisible, setVisible] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const generateQrCodeHandler = () => {
     // Check for empty fields or invalid age
+
     if (!firstName || !lastName || !age || Number(age) <= 0) {
       alert("Complete All Fields");
       return;
@@ -75,10 +80,7 @@ const QRGenerator = () => {
       >
         Back to Generator
       </button>
-      <button
-        style={{ marginTop: "20px" }}
-        onClick={() => (window.location.href = "/login")}
-      >
+      <button style={{ marginTop: "20px" }} onClick={() => navigate("/login")}>
         Login
       </button>
     </div>
@@ -87,11 +89,15 @@ const QRGenerator = () => {
 
 const App = () => {
   return (
-    <Switch>
-      <Route path="/generator" component={QRGenerator} />
-      <Route path="/login" component={LoginRegister} />
-      <Redirect to="/generator" />
-    </Switch>
+    <Routes>
+      <Route path="*" element={<Navigate to="/generator" />} />
+      <Route path="/generator" element={<QRGenerator />} />
+      <Route path="/login" element={<LoginRegister />} />
+      <Route path="/menu" element={<MenuButtons />} />
+      <Route path="/member" element={<MemberMenu />} />
+      <Route path="/walkin" element={<WalkInMenu />} />
+      <Route path="/prepaid" element={<PrepaidMenu />} />
+    </Routes>
   );
 };
 
