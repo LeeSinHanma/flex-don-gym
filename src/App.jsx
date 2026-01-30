@@ -83,6 +83,9 @@ const QRGenerator = () => {
       <button style={{ marginTop: "20px" }} onClick={() => navigate("/login")}>
         Login
       </button>
+      <button style={{ marginTop: "20px" }} onClick={() => navigate("/pos")}>
+        POS
+      </button>
     </div>
   );
 };
