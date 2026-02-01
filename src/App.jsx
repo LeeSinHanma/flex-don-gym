@@ -14,17 +14,47 @@ const QRGenerator = () => {
 
   const history = useHistory();
 
-  const generateQrCodeHandler = () => {
-  const result = generateQrValue(firstName, lastName, age);
+  const generateQrCodeHandler = async () => {
+    const result = generateQrValue(firstName, lastName, age);
 
     if (result.error) {
       alert(result.error);
       return;
     }
 
-    setQrValue(result.value);
-    setVisible(true);
+    try {
+      // 🔐 LOGIN using FastAPI (query params)
+      const url = new URL(
+        "https://flexolutions-backend-dev.onrender.com/users/authenticate_user_endpoint_users_login_post"
+      );
+
+      url.searchParams.append("username", firstName); // example mapping
+      url.searchParams.append("password", lastName);  // example mapping
+
+      const response = await fetch(url.toString(), {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await response.json();
+      console.log("LOGIN RESPONSE:", data);
+
+      // store token
+      localStorage.setItem("token", data.access_token);
+
+      // 🔹 YOUR ORIGINAL CODE (unchanged)
+      setQrValue(result.value);
+      setVisible(true);
+
+    } catch (error) {
+      console.error(error);
+      alert("Unable to login");
+    }
   };
+
 
 
   return (
