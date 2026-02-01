@@ -5,7 +5,8 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { Navigate, Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
+
 import Menu from "./components/Menu";
 import Page from "./pages/Page";
 import LoginRegister from "./pages/EmployeePage/LoginRegister";
@@ -16,34 +17,18 @@ import PrepaidMenu from "./pages/EmployeePage/Prepaid";
 import QRScannerHome from "./pages/EmployeePage/QRScanner";
 import MemberStatusPage from "./pages/EmployeePage/MemberStatus";
 
-/* Core CSS required for Ionic components to work properly */
+/* Ionic CSS */
 import "@ionic/react/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";
 import "@ionic/react/css/typography.css";
-
-/* Optional CSS utils that can be commented out */
 import "@ionic/react/css/padding.css";
 import "@ionic/react/css/float-elements.css";
 import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
-
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
 import "@ionic/react/css/palettes/dark.system.css";
-
-/* Theme variables */
 import "./theme/variables.css";
 
 setupIonicReact();
@@ -54,16 +39,22 @@ const App: React.FC = () => {
       <IonReactRouter>
         <IonSplitPane contentId="main">
           <Menu />
+
           <IonRouterOutlet id="main">
-            <Route path="/" element={<Navigate to="/login" />} />
-            <Route path="/login" element={<LoginRegister />} />
-            <Route path="/menu" element={<MenuButtons />} />
-            <Route path="/member" element={<MemberMenu />} />
-            <Route path="/walkin" element={<WalkInMenu />} />
-            <Route path="/prepaid" element={<PrepaidMenu />} />
-            <Route path="/qr" element={<QRScannerHome />} />
-            <Route path="/memberstatus" element={<MemberStatusPage />} />
-            <Route path="/folder/:name" element={<Page />} />
+            {/* Redirect */}
+            <Route exact path="/">
+              <Redirect to="/login" />
+            </Route>
+
+            {/* Routes */}
+            <Route exact path="/login" component={LoginRegister} />
+            <Route exact path="/menu" component={MenuButtons} />
+            <Route exact path="/member" component={MemberMenu} />
+            <Route exact path="/walkin" component={WalkInMenu} />
+            <Route exact path="/prepaid" component={PrepaidMenu} />
+            <Route exact path="/qr" component={QRScannerHome} />
+            <Route exact path="/memberstatus" component={MemberStatusPage} />
+            <Route path="/folder/:name" component={Page} />
           </IonRouterOutlet>
         </IonSplitPane>
       </IonReactRouter>
