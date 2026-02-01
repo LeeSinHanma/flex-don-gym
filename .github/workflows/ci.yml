@@ -3,14 +3,22 @@ name: Ionic React CI
 on:
   push:
     branches:
-      - main
-      - staging
       - new-main
+      - 1devAsan/fullstack
+      - staging-branch
+      - 1testFabiana/tester
+      - 1testDoria/tester
+      - 1devWoulter/frontend
+      - 1devVelasco/frontend
   pull_request:
     branches:
-      - main
-      - staging
       - new-main
+      - 1devAsan/fullstack
+      - staging-branch
+      - 1testFabiana/tester
+      - 1testDoria/tester
+      - 1devWoulter/frontend
+      - 1devVelasco/frontend
 
 jobs:
   build:
@@ -32,7 +40,6 @@ jobs:
       - name: Run Unit Tests (Vitest)
         run: npm run test.unit -- --run
         continue-on-error: true
-
 
       - name: Build Ionic React (PWA)
         run: npm run build
