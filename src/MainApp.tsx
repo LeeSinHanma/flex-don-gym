@@ -20,13 +20,15 @@ const MainApp: React.FC = () => (
         <Menu />
 
         <IonRouterOutlet id="main">
-          {/* Redirect */}
-          <Route exact path="/">
-            <Redirect to="/folder/Inbox" />
-          </Route>
+          {/* Default redirect */}
+          <Route
+            exact
+            path="/"
+            render={() => <Redirect to="/folder/Inbox" />}
+          />
 
-          {/* Routes */}
-          <Route path="/folder/:name" component={Page} />
+          {/* Page routes */}
+          <Route exact path="/folder/:name" component={Page} />
           <Route exact path="/generator" component={App} />
           <Route exact path="/login" component={LoginRegister} />
           <Route exact path="/member" component={MemberMenu} />

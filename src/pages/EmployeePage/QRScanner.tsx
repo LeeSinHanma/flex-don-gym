@@ -1,11 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 
 const QRScannerHome: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
 
   return (
     <div className="main-pos-container">
@@ -16,7 +16,7 @@ const QRScannerHome: React.FC = () => {
             <Button
               className="btn add-member"
               type="button"
-              onClick={() => navigate("/menu")}
+              onClick={() => history.push("/menu")}
             >
               ADD NEW MEMBER
             </Button>

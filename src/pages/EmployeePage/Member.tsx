@@ -2,17 +2,17 @@ import React from "react";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import "./Member.css";
 const MemberMenu: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   return (
     <div className="member-menu-container">
       <div className="main-container">
         <div className="top-container">
           <BackButton
             className="btn btn-back"
-            onClick={() => navigate("/menu")}
+            onClick={() => history.push("/menu")}
           >
             back
           </BackButton>

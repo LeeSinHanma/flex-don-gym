@@ -2,11 +2,11 @@ import React from "react";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import "./Member.css";
 
 const WalkInMenu: React.FC = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   return (
     <div className="member-menu-container">
       <div className="main-container">
@@ -14,7 +14,7 @@ const WalkInMenu: React.FC = () => {
           <BackButton
             className="btn-back"
             type="submit"
-            onClick={() => navigate("/menu")}
+            onClick={() => history.push("/menu")}
           >
             back
           </BackButton>

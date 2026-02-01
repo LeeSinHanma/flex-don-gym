@@ -3,7 +3,7 @@ import "./LoginRegister.css";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 const LoginRegister: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,7 +12,7 @@ const LoginRegister: React.FC = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const navigate = useNavigate();
+  const history = useHistory();
 
   const handleSubmit = () => {
     if (!isLogin && password !== confirmPassword) {
@@ -39,7 +39,7 @@ const LoginRegister: React.FC = () => {
           <Button
             className="btn btn-signup"
             type="submit"
-            onClick={() => navigate("/menu")}
+            onClick={() => history.push("/menu")}
           >
             Sign in
           </Button>
