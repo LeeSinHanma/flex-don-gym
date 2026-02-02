@@ -4,6 +4,11 @@ import { QRCode } from "react-qr-code";
 import { generateQrValue } from "./logicHandlers/qrLogic";
 
 import "./App.css";
+import LoginRegister from "./pages/LoginRegister";
+import MenuButtons from "./pages/Menu";
+import MemberMenu from "./pages/Member";
+import WalkInMenu from "./pages/WalkIn";
+import PrepaidMenu from "./pages/Prepaid";
 
 const QRGenerator = () => {
   const [firstName, setFirstName] = useState("");
@@ -12,7 +17,7 @@ const QRGenerator = () => {
   const [qrValue, setQrValue] = useState("");
   const [qrVisible, setVisible] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const generateQrCodeHandler = async () => {
     const result = generateQrValue(firstName, lastName, age);
@@ -61,33 +66,60 @@ const QRGenerator = () => {
     <div className="container">
       <h1>Gym QR Code Generator 💪🏋️‍♂️</h1>
 
-      <input type="text" placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-      <input type="text" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-      <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
+      <input
+        type="text"
+        placeholder="First Name"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Last Name"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+      />
+      <input
+        type="number"
+        placeholder="Age"
+        value={age}
+        onChange={(e) => setAge(e.target.value)}
+      />
 
       <button onClick={generateQrCodeHandler}>Generate QR Code</button>
 
       {qrVisible && (
         <div className="qr-code-container">
           <QRCode value={qrValue} size={300} />
-          <p>Generated Code: <b>{qrValue}</b></p>
+          <p>
+            Generated Code: <b>{qrValue}</b>
+          </p>
         </div>
       )}
 
       <button style={{ marginTop: "20px" }} onClick={() => history.push("/generator")}>
         Back to Generator
       </button>
-
+      <button style={{ marginTop: "20px" }} onClick={() => navigate("/login")}>
+        Login
+      </button>
+      <button style={{ marginTop: "20px" }} onClick={() => navigate("/pos")}>
+        POS
+      </button>
     </div>
   );
 };
 
 const App = () => {
   return (
-    <Switch>
-      <Route path="/generator" component={QRGenerator} />
-      <Redirect to="/generator" />
-    </Switch>
+    <Routes>
+      <Route path="*" element={<Navigate to="/generator" />} />
+      <Route path="/generator" element={<QRGenerator />} />
+      <Route path="/login" element={<LoginRegister />} />
+      <Route path="/menu" element={<MenuButtons />} />
+      <Route path="/member" element={<MemberMenu />} />
+      <Route path="/walkin" element={<WalkInMenu />} />
+      <Route path="/prepaid" element={<PrepaidMenu />} />
+    </Routes>
   );
 };
 
