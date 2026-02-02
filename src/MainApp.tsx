@@ -12,6 +12,7 @@ import MemberMenu from "./pages/EmployeePage/Member";
 import WalkInMenu from "./pages/EmployeePage/WalkIn";
 import PrepaidMenu from "./pages/EmployeePage/Prepaid";
 import QRScannerHome from "./pages/EmployeePage/QRScanner";
+import QRGen from "./pages/QrGenPage/QrGen";
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
@@ -39,6 +40,7 @@ const MainApp: React.FC = () => (
             <Route exact path="/walkin" component={WalkInMenu} />
             <Route exact path="/prepaid" component={PrepaidMenu} />
             <Route exact path="/qr" component={QRScannerHome} />
+            <Route exact path="/qrGen" component={QRGen} />
             <Route exact path="/admin-page" component={StartingPageAdmin} />
             <Route exact path="/employee" component={EmployeeMenu} />
             <Route exact path="/admin" component={AdminMenu} />
