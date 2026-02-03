@@ -17,7 +17,7 @@ import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
 import MenuAdminButtons from "./pages/AdminPage/MenuAdmin";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
-import ProfileMemberPage from "./pages/EmployeePage/ProfileMember";
+import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -44,7 +44,11 @@ const MainApp: React.FC = () => (
             <Route exact path="/admin" component={AdminMenu} />
             <Route exact path="/menu-admin" component={MenuAdminButtons} />
             <Route exact path="/status-member" component={StatusMemberPage} />
-            <Route exact path="/status-member" component={ProfileMemberPage} />
+            <Route
+              exact
+              path="/manage-status"
+              component={ManageStatusMemPage}
+            />
 
             {/* QR Generator */}
             <Route exact path="/generator" component={App} />

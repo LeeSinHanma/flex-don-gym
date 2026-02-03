@@ -25,7 +25,7 @@ const StatusMemberPage: React.FC = () => {
         <div className="cards-container">
           <div
             className="status-card"
-            onClick={() => history.push("/profile-member")}
+            onClick={() => history.push("/manage-status")}
           >
             <div className="status-info">
               <div className="left-info">
