@@ -37,7 +37,7 @@ const StartingPageAdmin: React.FC = () => {
           <Button
             className="btn btn-signup"
             type="submit"
-            onClick={() => history.push("/menu-admin")}
+            onClick={() => history.push("/qr")}
           >
             Get started
           </Button>

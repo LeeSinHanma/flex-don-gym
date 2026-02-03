@@ -98,23 +98,6 @@ const QRGenerator = () => {
       >
         Get Started
       </button>
-
-      <button style={{ marginTop: "20px" }} onClick={() => history.push("/qr")}>
-        POS
-      </button>
-      <button
-        style={{ marginTop: "20px" }}
-        onClick={() => history.push("/status-member")}
-      >
-        Status
-      </button>
-
-      <button
-        style={{ marginTop: "20px" }}
-        onClick={() => history.push("/manage-status")}
-      >
-        Manage Status
-      </button>
     </div>
   );
 };
