@@ -3,6 +3,8 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory } from "react-router-dom";
+import { IonIcon } from "@ionic/react";
+import { arrowBackOutline } from "ionicons/icons";
 import "./Member.css";
 
 const PrepaidMenu: React.FC = () => {
@@ -16,7 +18,7 @@ const PrepaidMenu: React.FC = () => {
             type="submit"
             onClick={() => history.push("/menu")}
           >
-            back
+            <IonIcon icon={arrowBackOutline} />
           </BackButton>
           <h1>Walk-in</h1>
         </div>

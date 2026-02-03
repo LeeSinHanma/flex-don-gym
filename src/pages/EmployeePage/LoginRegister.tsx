@@ -4,6 +4,8 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resources/dondon-logo.png";
 
 const LoginRegister: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,7 +32,7 @@ const LoginRegister: React.FC = () => {
     <div className="login-register-container">
       <div className="main-container">
         <div className="image-group">
-          <img src="/dondon-logo.png" className="dondon-logo" alt="Logo" />
+          <IonImg src={dondonLogo} className="dondon-logo" alt="Logo" />
           <h1 className="gym-name">DONDON'S FITNESS GYM</h1>
         </div>
         <div className="button-group">

@@ -3,6 +3,8 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory } from "react-router-dom";
+import { IonIcon } from "@ionic/react";
+import { arrowBackOutline } from "ionicons/icons";
 import "./Member.css";
 
 const MemberMenu: React.FC = () => {
@@ -15,7 +17,7 @@ const MemberMenu: React.FC = () => {
             className="btn btn-back"
             onClick={() => history.push("/menu")}
           >
-            back
+            <IonIcon icon={arrowBackOutline} />
           </BackButton>
           <h1>Member</h1>
         </div>
