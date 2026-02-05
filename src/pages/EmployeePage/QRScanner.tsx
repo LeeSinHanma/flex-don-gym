@@ -9,7 +9,11 @@ const QRScannerHome: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
-    startQrScanner(() => {});
+    startQrScanner((decodedText) => {
+      console.log("SCANNED:", decodedText);
+      // example: navigate after scan
+      // history.push(`/member/${encodeURIComponent(decodedText)}`);
+    });
 
     return () => {
       stopQrScanner();
