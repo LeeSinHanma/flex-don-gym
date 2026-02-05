@@ -4,7 +4,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
-import { loginUser } from "../../logicHandlers/userServices";
+import { getUserType, loginUser } from "../../logicHandlers/userServices";
 
 const LoginRegister: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,6 +25,9 @@ const LoginRegister: React.FC = () => {
     try {
       const data = await loginUser(username, password);
       console.log("✅ Login success:", data);
+
+      const userType = await getUserType(username);
+      console.log("User type:", userType);
 
       history.push("/menu");
     } catch (error: any) {
