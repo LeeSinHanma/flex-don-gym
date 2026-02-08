@@ -1,5 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { searchOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
 
 const MemberProfilePage: React.FC = () => {
   const history = useHistory();
@@ -10,6 +12,7 @@ const MemberProfilePage: React.FC = () => {
         <div className="top-header">
           <h2>Manage Member</h2>
           <div className="search-bar">
+            <IonIcon icon={searchOutline} className="search-icon" />
             <input className="search-input" type="text" placeholder="Search" />
           </div>
         </div>

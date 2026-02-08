@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
@@ -9,6 +9,8 @@ import "./Member.css";
 
 const MemberMenu: React.FC = () => {
   const history = useHistory();
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="member-menu-container">
       <div className="main-container">
@@ -21,6 +23,7 @@ const MemberMenu: React.FC = () => {
           </BackButton>
           <h1>Member</h1>
         </div>
+
         <div className="form-container">
           <UsernameInput className="input-username" placeholder="Username" />
           <UsernameInput
@@ -29,13 +32,31 @@ const MemberMenu: React.FC = () => {
             type="number"
           />
         </div>
+
         <div className="bottom-container">
-          <Button className="btn-submit" type="submit">
+          <Button
+            className="btn-submit"
+            type="button"
+            onClick={() => setShowModal(true)}
+          >
             Add
           </Button>
         </div>
       </div>
+
+      {/* MODAL */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h2>Member Added</h2>
+            <p>This is the QR</p>
+
+            <Button onClick={() => setShowModal(false)}>Close</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
 export default MemberMenu;

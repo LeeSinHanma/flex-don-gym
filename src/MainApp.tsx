@@ -49,6 +49,7 @@ const MainApp: React.FC = () => (
               path="/manage-status"
               component={ManageStatusMemPage}
             />
+            <Route exact path="/pos" component={POSPageMenu} />
 
             {/* QR Generator */}
             <Route exact path="/generator" component={App} />

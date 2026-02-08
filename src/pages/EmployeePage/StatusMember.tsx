@@ -3,6 +3,8 @@ import { useHistory } from "react-router-dom";
 import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./StatusMember.css";
 import { Button } from "../../components/Reusable/Button";
+import { searchOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
@@ -13,6 +15,7 @@ const StatusMemberPage: React.FC = () => {
         <div className="top-header">
           <h2>Manage Member</h2>
           <div className="search-bar">
+            <IonIcon icon={searchOutline} className="search-icon" />
             <input className="search-input" type="text" placeholder="Search" />
           </div>
           <div className="nav-carousel">
@@ -42,7 +45,7 @@ const StatusMemberPage: React.FC = () => {
         <div className="pos-container">
           <div className="stat pos-nav-container">
             <div className="pos-container">
-              <h3>POS</h3>
+              <h3 onClick={() => history.push("/pos")}>POS</h3>
             </div>
             <div className="stat qr-container">
               <h3 onClick={() => history.push("/qr")}>QR Scanner</h3>
