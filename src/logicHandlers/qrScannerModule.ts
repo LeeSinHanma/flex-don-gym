@@ -22,8 +22,7 @@ export async function startQrScanner(
       { fps: 10, qrbox: 250 },
       (decodedText) => {
         onScan(decodedText);
-        // Optional: auto-stop after first scan
-        // stopQrScanner();
+        stopQrScanner();
       },
       (errorMessage) => {
         // This fires a lot while scanning; usually ignore

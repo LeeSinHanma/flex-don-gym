@@ -21,7 +21,6 @@ const LoginRegister: React.FC = () => {
       return;
     }
 
-    // Login flow with API call
     try {
       const data = await loginUser(username, password);
       console.log("✅ Login success:", data);

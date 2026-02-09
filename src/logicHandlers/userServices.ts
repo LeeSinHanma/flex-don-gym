@@ -39,6 +39,16 @@ export async function createUser(username: string, email: string,password: strin
   }
 }
 
+// ✅ GET /members/by-id/{member_id} ... get member info by member id (QR scanning)
+export async function getMemberByID(memberID: string | number): Promise<APIResponse> {
+  try {
+    const res = await api.get<APIResponse>(`/members/by-id/${encodeURIComponent(String(memberID))}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
 // ✅ POST /users/by-username/{username} ... get user role by username
 export async function getUserType(username: string): Promise<number> {
   try {

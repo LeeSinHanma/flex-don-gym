@@ -4,6 +4,7 @@ import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { useEffect } from "react";
 import { startQrScanner, stopQrScanner } from "../../logicHandlers/qrScannerModule";
+import { getMemberByID } from "../../logicHandlers/userServices";
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
@@ -11,8 +12,7 @@ const QRScannerHome: React.FC = () => {
   useEffect(() => {
     startQrScanner((decodedText) => {
       console.log("SCANNED:", decodedText);
-      // example: navigate after scan
-      // history.push(`/member/${encodeURIComponent(decodedText)}`);
+      getMemberByID(Number(decodedText));
     });
 
     return () => {
