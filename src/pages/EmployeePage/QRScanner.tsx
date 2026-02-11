@@ -11,8 +11,7 @@ const QRScannerHome: React.FC = () => {
 
   useEffect(() => {
     startQrScanner((decodedText) => {
-      console.log("SCANNED:", decodedText);
-      getMemberByID(Number(decodedText));
+       console.log("Member Details:", getMemberByID(Number(decodedText)));
     });
 
     return () => {
