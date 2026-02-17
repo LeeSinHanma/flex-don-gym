@@ -10,8 +10,15 @@ const QRScannerHome: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
-    startQrScanner((decodedText) => {
-       console.log("Member Details:", getMemberByID(Number(decodedText)));
+    startQrScanner(async (decodedText) => {
+      try {
+        const member = await getMemberByID(decodedText);
+
+        console.log("Member Details:", member);
+        console.log("Name:", member.first_name);
+      } catch (err: any) {
+        console.error("Failed to fetch member:", err.message);
+      }
     });
 
     return () => {
