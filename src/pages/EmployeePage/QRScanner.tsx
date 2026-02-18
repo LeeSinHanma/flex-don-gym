@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
+import PosNav from "../../components/Reusable/NavItems";
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
@@ -21,17 +22,13 @@ const QRScannerHome: React.FC = () => {
               ADD NEW MEMBER
             </Button>
           </div>
-          <div className="qr pos-nav-container">
-            <div className="pos-container">
-              <h3 onClick={() => history.push("/pos")}>POS</h3>
-            </div>
-            <div className="qr qr-container">
-              <h3 onClick={() => history.push("/")}>QR Scanner</h3>
-            </div>
-            <div className="qr status-container">
-              <h3 onClick={() => history.push("/status-member")}>Status</h3>
-            </div>
-          </div>
+          <PosNav
+            items={[
+              { label: "POS", path: "/pos" },
+              { label: "QR Scanner", path: "/qr" },
+              { label: "Status", path: "/status-member" },
+            ]}
+          />
         </div>
       </div>
     </div>

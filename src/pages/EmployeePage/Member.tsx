@@ -25,12 +25,14 @@ const MemberMenu: React.FC = () => {
         </div>
 
         <div className="form-container">
-          <UsernameInput className="input-username" placeholder="Username" />
+          <UsernameInput className="input-username" placeholder="Email" />
           <UsernameInput
             className="input-username"
-            placeholder="Age"
+            placeholder="Contact number"
             type="number"
           />
+          <UsernameInput className="input-username" placeholder="First name" />
+          <UsernameInput className="input-username" placeholder="Last name" />
         </div>
 
         <div className="bottom-container">

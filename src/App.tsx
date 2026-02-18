@@ -21,6 +21,10 @@ import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
+import PosPage from "./pages/EmployeePage/Pos";
+import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
+import PosItemPage from "./pages/EmployeePage/PosItem";
+
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -82,6 +86,14 @@ const App: React.FC = () => {
                 exact
                 path="/manage-status"
                 component={ManageStatusMemPage}
+              />
+
+              <Route exact path="/pos" component={PosPage} />
+              <Route exact path="/pos-item" component={PosItemPage} />
+              <Route
+                exact
+                path="/dashboard-opt"
+                component={DashboardOptionPage}
               />
 
               {/* QR Generator Route */}

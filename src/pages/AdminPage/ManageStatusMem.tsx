@@ -5,6 +5,7 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
+import PosNav from "../../components/Reusable/NavItems";
 import "./ManageStatusMem.css";
 
 const ManageStatusMemPage: React.FC = () => {
@@ -58,17 +59,13 @@ const ManageStatusMemPage: React.FC = () => {
         </div>
 
         <div className="pos-container">
-          <div className="pos-nav-container">
-            <div className="pos-container">
-              <h3>POS</h3>
-            </div>
-            <div className="qr-container">
-              <h3 onClick={() => history.push("/qr")}>QR Scanner</h3>
-            </div>
-            <div className="status-container">
-              <h3 onClick={() => history.push("/status-member")}>Status</h3>
-            </div>
-          </div>
+          <PosNav
+            items={[
+              { label: "POS", path: "/pos" },
+              { label: "QR Scanner", path: "/qr" },
+              { label: "Status", path: "/status-member" },
+            ]}
+          />
         </div>
       </div>
       {showModal && (

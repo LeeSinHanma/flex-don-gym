@@ -2,6 +2,7 @@ import React from "react";
 import { useHistory } from "react-router-dom";
 import { searchOutline } from "ionicons/icons";
 import { IonIcon } from "@ionic/react";
+import PosNav from "../components/Reusable/NavItems";
 
 const MemberProfilePage: React.FC = () => {
   const history = useHistory();
@@ -25,17 +26,13 @@ const MemberProfilePage: React.FC = () => {
         </div>
         <div className="history-details"></div>
         <div className="pos-container">
-          <div className="pos-nav-container">
-            <div className="pos-container">
-              <h3>POS</h3>
-            </div>
-            <div className="qr-container">
-              <h3 onClick={() => history.push("/qr")}>QR Scanner</h3>
-            </div>
-            <div className="status-container">
-              <h3 onClick={() => history.push("/status-member")}>Status</h3>
-            </div>
-          </div>
+          <PosNav
+            items={[
+              { label: "POS", path: "/pos" },
+              { label: "QR Scanner", path: "/qr" },
+              { label: "Status", path: "/status-member" },
+            ]}
+          />
         </div>
       </div>
     </div>

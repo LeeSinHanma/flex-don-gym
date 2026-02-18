@@ -18,6 +18,9 @@ import AdminMenu from "./pages/AdminPage/Admin";
 import MenuAdminButtons from "./pages/AdminPage/MenuAdmin";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
+import PosPage from "./pages/EmployeePage/Pos";
+import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
+import PosItemPage from "./pages/EmployeePage/PosItem";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -49,7 +52,13 @@ const MainApp: React.FC = () => (
               path="/manage-status"
               component={ManageStatusMemPage}
             />
-            <Route exact path="/pos" component={POSPageMenu} />
+            <Route exact path="/pos" component={PosPage} />
+            <Route exact path="/pos-item" component={PosItemPage} />
+            <Route
+              exact
+              path="/dashboard-opt"
+              component={DashboardOptionPage}
+            />
 
             {/* QR Generator */}
             <Route exact path="/generator" component={App} />
