@@ -1,17 +1,27 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
-import PosNav from "../../components/Reusable/NavItems";
+import { useEffect } from "react";
+import { startQrScanner, stopQrScanner } from "../../logicHandlers/qrScannerModule";
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
 
+  useEffect(() => {
+    startQrScanner(() => {});
+
+    return () => {
+      stopQrScanner();
+    };
+  }, []);
+
   return (
     <div className="main-pos-container">
       <div className="main-container">
-        <div className="qr-container"></div>
+        <div className="camera-container">
+          <div id="qr-reader" />
+        </div>
         <div className="menu-pos-container">
           <div className="add-member-container">
             <Button
@@ -22,13 +32,18 @@ const QRScannerHome: React.FC = () => {
               ADD NEW MEMBER
             </Button>
           </div>
-          <PosNav
-            items={[
-              { label: "POS", path: "/pos" },
-              { label: "QR Scanner", path: "/qr" },
-              { label: "Status", path: "/status-member" },
-            ]}
-          />
+          <div className="qr pos-nav-container">
+            <div className="pos-container">
+              <h3>POS</h3>
+            </div>
+            <div className="qr qr-container">
+              <h3 onClick={() => history.push("/")}>QR Scanner</h3>
+            </div>
+
+            <div className="qr status-container">
+              <h3 onClick={() => history.push("/status-member")}>Status</h3>
+            </div>
+          </div>
         </div>
       </div>
     </div>
