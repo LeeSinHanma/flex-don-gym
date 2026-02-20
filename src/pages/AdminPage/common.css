@@ -1,0 +1,217 @@
+/* Common Admin Page Styles */
+.admin-page {
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.admin-page ion-content {
+  --background: #f5f7fa;
+}
+
+.admin-page ion-header ion-toolbar {
+  --background: #ffffff;
+  --border-color: #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.admin-page ion-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1B2E4B;
+}
+
+/* Content Styling */
+.admin-page .ion-padding {
+  padding: 20px;
+}
+
+.admin-page ion-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  background: #ffffff;
+}
+
+.admin-page ion-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.admin-page ion-card-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.admin-page ion-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1B2E4B;
+}
+
+.admin-page ion-card-subtitle {
+  font-size: 14px;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.admin-page ion-card-content {
+  padding: 20px;
+}
+
+/* Buttons */
+.admin-page ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.admin-page ion-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Lists and Items */
+.admin-page ion-list {
+  background: transparent;
+}
+
+.admin-page ion-item {
+  --background: #ffffff;
+  --border-color: #e9ecef;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.admin-page ion-item:hover {
+  --background: #f8f9fa;
+  transform: translateX(4px);
+}
+
+/* Page Containers */
+.page-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Cards */
+ion-card {
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1B2E4B;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1B2E4B;
+}
+
+/* Buttons Common Styles */
+ion-button {
+  --border-radius: 8px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Floating Action Button */
+ion-fab-button {
+  --background: #1B2E4B;
+  --background-hover: #32445d;
+  --background-activated: #182842;
+  --box-shadow: 0 4px 12px rgba(27, 46, 75, 0.3);
+}
+
+/* Badges */
+ion-badge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Modals */
+ion-modal ion-toolbar {
+  --background: #1B2E4B;
+  --color: #ffffff;
+}
+
+ion-modal ion-title {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+ion-modal ion-button {
+  --color: #ffffff;
+}
+
+/* Searchbar */
+ion-searchbar {
+  --background: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --cancel-button-color: #1B2E4B;
+  --clear-button-color: #6c757d;
+  --color: #1B2E4B;
+  --icon-color: #6c757d;
+  --placeholder-color: #adb5bd;
+  padding: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 12px;
+  }
+
+  .admin-page .ion-padding {
+    padding: 12px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .page-container {
+    padding: 16px;
+  }
+
+  .admin-page .ion-padding {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .page-container {
+    padding: 24px;
+  }
+
+  .admin-page .ion-padding {
+    padding: 20px;
+  }
+}

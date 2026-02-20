@@ -1,206 +1,161 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  IonIcon,
-  IonContent,
   IonPage,
+  IonContent,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonIcon,
 } from "@ionic/react";
 import {
-  homeOutline,
   peopleOutline,
-  cubeOutline,
-  pricetagOutline,
-  settingsOutline,
+  checkmarkCircleOutline,
+  todayOutline,
+  cashOutline,
   statsChartOutline,
-  personOutline,
 } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
-import Header from "../../components/admincomponents/widgets/header";
-import SideNavBar from "../../components/admincomponents/widgets/sidenavbar";
-import Footer from "../../components/admincomponents/widgets/footer";
+import AdminHeader from "../../components/admincomponents/Layout/header";
 import "./dashboard.css";
 
-interface DashboardStats {
-  totalMembers: number;
-  activeTodayMembers: number;
-  totalEmployees: number;
-  monthlyRevenue: number;
-}
-
-interface DashboardItem {
-  id: number;
-  name: string;
-  status: "active" | "inactive" | "pending";
-  type: "member" | "employee";
-  joinDate?: string;
-  email?: string;
-}
-
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: string;
-  path: string;
-}
-
 const Dashboard: React.FC = () => {
-  const history = useHistory();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeMenuItem, setActiveMenuItem] = useState("dashboard");
-
-  // Menu items configuration
-  const menuItems: MenuItem[] = [
-    { id: "dashboard", label: "Dashboard", icon: homeOutline, path: "/dashboard" },
-    { id: "members", label: "Members", icon: peopleOutline, path: "/admin-page/members" },
-    { id: "employees", label: "Employees", icon: personOutline, path: "/admin-page/employees" },
-    { id: "products", label: "Products", icon: cubeOutline, path: "/admin-page/products" },
-    { id: "customers", label: "Customers", icon: statsChartOutline, path: "/admin-page/customers" },
-    { id: "equipment", label: "Equipment", icon: settingsOutline, path: "/admin-page/equipment" },
-    { id: "pricing", label: "Price Edit", icon: pricetagOutline, path: "/admin-page/priceedit" },
-    { id: "profile", label: "Profile", icon: personOutline, path: "/admin-page/profile" },
-  ];
-
-  // Mock data - replace with API calls
-  const [stats] = useState<DashboardStats>({
-    totalMembers: 156,
-    activeTodayMembers: 42,
-    totalEmployees: 8,
-    monthlyRevenue: 12500,
-  });
-
-
-
-  const handleNavigate = (path: string, itemId: string) => {
-    setActiveMenuItem(itemId);
-    setMenuOpen(false);
-    history.push(path);
+  const stats = {
+    totalMembers: 245,
+    activeMembers: 198,
+    todayCheckIns: 87,
+    revenue: 12450.0,
   };
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-
 
   return (
     <IonPage>
-      <Header menuOpen={menuOpen} toggleMenu={toggleMenu} title="Admin Dashboard" />
-
-      <IonContent>
-        <div className="dashboard-layout">
-          <SideNavBar
-            menuOpen={menuOpen}
-            activeMenuItem={activeMenuItem}
-            handleNavigate={handleNavigate}
-            menuItems={menuItems}
-            toggleMenu={toggleMenu}
-          />
-
-          {/* Main Content */}
-          <main className="dashboard-main">
-            <div className="dashboard-container">
-              {/* Welcome Banner */}
-              <div className="welcome-banner">
-                <div className="welcome-content">
-                  <h2>Welcome back, Admin!</h2>
-                  <p>Here's what's happening with your gym today.</p>
-                </div>
-                <div className="banner-decoration"></div>
-              </div>
-
-              {/* Stats Cards */}
-              <div className="stats-grid">
-                <div className="stat-card card-primary">
-                  <div className="stat-icon-wrapper">
-                    <IonIcon icon={peopleOutline} className="stat-icon" />
-                  </div>
-                  <div className="stat-info">
-                    <p className="stat-label">Total Members</p>
-                    <h3 className="stat-number">{stats.totalMembers}</h3>
-                    <span className="stat-change positive">+12% from last month</span>
-                  </div>
-                </div>
-
-                <div className="stat-card card-success">
-                  <div className="stat-icon-wrapper">
-                    <IonIcon icon={statsChartOutline} className="stat-icon" />
-                  </div>
-                  <div className="stat-info">
-                    <p className="stat-label">Active Today</p>
-                    <h3 className="stat-number">{stats.activeTodayMembers}</h3>
-                    <span className="stat-change positive">+5% from yesterday</span>
-                  </div>
-                </div>
-
-                <div className="stat-card card-info">
-                  <div className="stat-icon-wrapper">
-                    <IonIcon icon={personOutline} className="stat-icon" />
-                  </div>
-                  <div className="stat-info">
-                    <p className="stat-label">Total Employees</p>
-                    <h3 className="stat-number">{stats.totalEmployees}</h3>
-                    <span className="stat-change neutral">No change</span>
-                  </div>
-                </div>
-
-                <div className="stat-card card-warning">
-                  <div className="stat-icon-wrapper">
-                    <span className="stat-icon">💰</span>
-                  </div>
-                  <div className="stat-info">
-                    <p className="stat-label">Monthly Revenue</p>
-                    <h3 className="stat-number">${stats.monthlyRevenue.toLocaleString()}</h3>
-                    <span className="stat-change positive">+8% from last month</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Overview */}
-              <div className="content-section">
-                <div className="overview-section">
-                  <div className="metrics-grid">
-                    <div className="metric-card">
-                      <div className="metric-header">
-                        <h3>Gym Utilization</h3>
-                        <span className="metric-badge">Live</span>
-                      </div>
-                      <div className="metric-value">68%</div>
-                      <div className="metric-chart">
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{ width: "68%" }}></div>
-                        </div>
-                      </div>
-                      <p className="metric-description">Current capacity usage</p>
+      <AdminHeader title="Dashboard" />
+      <IonContent fullscreen className="dashboard-content">
+        <div className="dashboard-container">
+          {/* Stats Cards */}
+          <IonGrid>
+            <IonRow>
+              {/* Total Members */}
+              <IonCol size="12" sizeMd="6" sizeLg="3">
+                <IonCard className="stat-card">
+                  <IonCardContent>
+                    <div className="stat-icon-wrapper primary">
+                      <IonIcon
+                        icon={peopleOutline}
+                        style={{
+                          fontSize: "32px",
+                          color: "#1B2E4B",
+                          display: "block",
+                        }}
+                      />
                     </div>
-
-                    <div className="metric-card">
-                      <div className="metric-header">
-                        <h3>Avg. Daily Visits</h3>
-                      </div>
-                      <div className="metric-value">42</div>
-                      <div className="metric-trend">
-                        <span className="trend-up">↑ 15%</span> vs last week
-                      </div>
-                      <p className="metric-description">Check-ins per day</p>
+                    <div className="stat-content">
+                      <h3 className="stat-value">{stats.totalMembers}</h3>
+                      <p className="stat-label">Total Members</p>
                     </div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
 
-                    <div className="metric-card">
-                      <div className="metric-header">
-                        <h3>Growth Rate</h3>
-                      </div>
-                      <div className="metric-value">+12%</div>
-                      <div className="metric-trend">
-                        <span className="trend-up">↑ 3%</span> from last month
-                      </div>
-                      <p className="metric-description">Membership growth this month</p>
+              {/* Active Members */}
+              <IonCol size="12" sizeMd="6" sizeLg="3">
+                <IonCard className="stat-card">
+                  <IonCardContent>
+                    <div className="stat-icon-wrapper success">
+                      <IonIcon
+                        icon={checkmarkCircleOutline}
+                        style={{
+                          fontSize: "32px",
+                          color: "#2ECC71",
+                          display: "block",
+                        }}
+                      />
                     </div>
-                  </div>
-                </div>
+                    <div className="stat-content">
+                      <h3 className="stat-value">{stats.activeMembers}</h3>
+                      <p className="stat-label">Active Members</p>
+                    </div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+
+              {/* Today's Check-ins */}
+              <IonCol size="12" sizeMd="6" sizeLg="3">
+                <IonCard className="stat-card">
+                  <IonCardContent>
+                    <div className="stat-icon-wrapper warning">
+                      <IonIcon
+                        icon={todayOutline}
+                        style={{
+                          fontSize: "32px",
+                          color: "#F39C12",
+                          display: "block",
+                        }}
+                      />
+                    </div>
+                    <div className="stat-content">
+                      <h3 className="stat-value">{stats.todayCheckIns}</h3>
+                      <p className="stat-label">Today's Check-ins</p>
+                    </div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+
+              {/* Monthly Revenue */}
+              <IonCol size="12" sizeMd="6" sizeLg="3">
+                <IonCard className="stat-card">
+                  <IonCardContent>
+                    <div className="stat-icon-wrapper revenue">
+                      <IonIcon
+                        icon={cashOutline}
+                        style={{
+                          fontSize: "32px",
+                          color: "#2ECC71",
+                          display: "block",
+                        }}
+                      />
+                    </div>
+                    <div className="stat-content">
+                      <h3 className="stat-value">
+                        ${stats.revenue.toLocaleString()}
+                      </h3>
+                      <p className="stat-label">Monthly Revenue</p>
+                    </div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+
+          {/* Charts Section Placeholder */}
+          <IonCard className="charts-card">
+            <IonCardHeader>
+              <IonCardTitle>Analytics Overview</IonCardTitle>
+            </IonCardHeader>
+            <IonCardContent>
+              <div className="charts-placeholder">
+                <IonIcon
+                  icon={statsChartOutline}
+                  style={{
+                    fontSize: "64px",
+                    color: "#adb5bd",
+                    display: "block",
+                    margin: "0 auto 16px auto",
+                  }}
+                />
+                <p className="chart-placeholder-text">
+                  Charts and analytics will be displayed here
+                </p>
+                <p className="chart-placeholder-subtext">
+                  Membership trends, revenue analytics, and attendance patterns
+                </p>
               </div>
-            </div>
-          </main>
+            </IonCardContent>
+          </IonCard>
         </div>
       </IonContent>
-      <Footer />
     </IonPage>
   );
 };

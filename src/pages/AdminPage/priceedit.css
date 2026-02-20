@@ -1,0 +1,427 @@
+/* Price Edit Page Styles */
+
+/* Page Header Card */
+.pricing-header-card {
+  margin-bottom: 16px;
+}
+
+.pricing-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.pricing-subtitle {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+/* Section Labels */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1B2E4B;
+  margin: 24px 0 12px;
+  padding: 0 4px;
+}
+
+.promo-label {
+  color: #E74C3C;
+}
+
+.promo-label span {
+  color: #E74C3C;
+}
+
+.expired-badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Pricing Cards */
+.pricing-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  background: #ffffff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.pricing-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.inactive-card {
+  opacity: 0.6;
+}
+
+.expired-card {
+  border: 2px solid #E74C3C;
+}
+
+/* Card Header — standard (dark blue gradient) */
+.pricing-card-header {
+  text-align: center;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, #1B2E4B, #2C4A7C);
+  border-radius: 12px 12px 0 0;
+}
+
+/* Card Header — promo (red gradient) */
+.promo-header {
+  background: linear-gradient(135deg, #C0392B, #E74C3C);
+}
+
+.pricing-card-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.pricing-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;            /* FIX: explicit white so text is always visible */
+}
+
+.card-header-actions {
+  display: flex;
+  gap: 0;
+}
+
+.card-header-actions ion-button {
+  --padding-start: 4px;
+  --padding-end: 4px;
+}
+
+/* FIX: all text inside the colored header must be white */
+.pricing-card-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff !important;  /* force white — overrides Ionic default */
+  margin: 8px 0;
+}
+
+.pricing-description {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);  /* FIX: was inheriting dark color */
+  line-height: 1.5;
+}
+
+/* Expiry badge row inside promo header */
+.expiry-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.expiry-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.expiry-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Active toggle */
+.active-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 8px;
+}
+
+.active-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1B2E4B;
+}
+
+/* Expired warning inside card body */
+.expired-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(231, 76, 60, 0.08);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #E74C3C;
+  font-weight: 500;
+}
+
+/* Price Input */
+.price-input-item {
+  --background: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  margin-bottom: 12px;
+}
+
+.price-label {
+  font-weight: 600;
+  color: #6c757d;        /* FIX: was using --gym-text-secondary which wasn't defined */
+  font-size: 13px;
+}
+
+.price-input {
+  --background: #f5f7fa;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --color: #1B2E4B;      /* FIX: explicit text color so input text is visible */
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.price-display {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 800;
+  color: #1B2E4B;        /* FIX: was --gym-primary which wasn't defined */
+  padding: 16px 0;
+  border-top: 1px solid #e9ecef;
+  margin-top: 8px;
+}
+
+.update-expiry-btn {
+  margin-top: 12px;
+}
+
+/* Empty promo state */
+.empty-promo-card {
+  margin-bottom: 16px;
+}
+
+.empty-promo {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-promo-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+.empty-promo-sub {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+/* Actions Section */
+.pricing-actions {
+  margin: 24px 0;
+}
+
+.actions-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.action-buttons {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.unsaved-changes-text {
+  margin: 12px 0 0;
+  text-align: center;
+  color: #F39C12;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Summary Card */
+.summary-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f5f7fa;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.summary-item:hover {
+  background: #e9ecef;
+  transform: translateX(4px);
+}
+
+.summary-expired {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.summary-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-type {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1B2E4B;
+}
+
+.summary-promo-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.summary-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2ECC71;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #1B2E4B, #2C4A7C);
+  border-radius: 10px;
+  color: #ffffff;
+}
+
+.total-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.total-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Modal Form */
+.tier-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-item {
+  --background: #ffffff;
+  --border-color: #e9ecef;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --color: #1B2E4B;        /* FIX: input text visible */
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 8px;
+}
+
+.form-item ion-label {
+  font-weight: 600;
+  color: #1B2E4B;
+  font-size: 13px;
+}
+
+.form-item ion-input,
+.form-item ion-select {
+  --color: #1B2E4B;       /* FIX: text color inside inputs */
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+.promo-expiry-item {
+  border-color: #E74C3C;
+  background: rgba(231, 76, 60, 0.04);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.modal-actions ion-button {
+  flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pricing-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pricing-header-content ion-button {
+    width: 100%;
+  }
+
+  .price-display {
+    font-size: 28px;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-total {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1025px) {
+  .pricing-card {
+    margin-bottom: 0;
+  }
+}

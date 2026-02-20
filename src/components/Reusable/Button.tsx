@@ -1,18 +1,49 @@
-import React from "react";
+import React from 'react';
+import { IonButton, IonIcon } from '@ionic/react';
+import './Button.css';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface ButtonProps {
+  text: string;
   onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'light' | 'dark';
+  fill?: 'clear' | 'outline' | 'solid';
+  expand?: 'full' | 'block';
+  size?: 'small' | 'default' | 'large';
+  disabled?: boolean;
+  icon?: string;
+  iconSlot?: 'start' | 'end' | 'icon-only';
+  className?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  children,
+const Button: React.FC<ButtonProps> = ({
+  text,
   onClick,
-  className,
+  type = 'button',
+  color = 'primary',
+  fill = 'solid',
+  expand,
+  size = 'default',
+  disabled = false,
+  icon,
+  iconSlot = 'start',
+  className = '',
 }) => {
   return (
-    <button className={className} onClick={onClick}>
-      {children}
-    </button>
+    <IonButton
+      type={type}
+      color={color}
+      fill={fill}
+      expand={expand}
+      size={size}
+      disabled={disabled}
+      onClick={onClick}
+      className={`fdg-button ${className}`}
+    >
+      {icon && iconSlot !== 'icon-only' && <IonIcon slot={iconSlot} icon={icon} />}
+      {iconSlot === 'icon-only' ? <IonIcon icon={icon} /> : text}
+    </IonButton>
   );
 };
+
+export default Button;

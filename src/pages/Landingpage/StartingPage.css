@@ -1,0 +1,77 @@
+.starting-page {
+  --background: linear-gradient(135deg, var(--gym-primary, #1B2E4B) 0%, var(--gym-primary-light, #32445d) 100%);
+}
+
+.splash-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 60px 32px 40px;
+  text-align: center;
+}
+
+.logo-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-logo {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  margin-bottom: 24px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.app-title {
+  font-size: var(--fdg-font-xxl, 32px);
+  font-weight: var(--fdg-font-bold, 700);
+  color: white;
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+}
+
+.app-tagline {
+  font-size: var(--fdg-font-lg, 18px);
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: var(--fdg-font-normal, 400);
+}
+
+.cta-section {
+  width: 100%;
+  max-width: 400px;
+}
+
+.get-started-btn {
+  --background: white;
+  --color: var(--gym-primary, #1B2E4B);
+  --border-radius: var(--fdg-radius-lg, 12px);
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  font-weight: var(--fdg-font-bold, 700);
+  font-size: var(--fdg-font-lg, 18px);
+  height: 56px;
+  margin-bottom: 16px;
+}
+
+.version-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--fdg-font-sm, 14px);
+  margin: 0;
+}

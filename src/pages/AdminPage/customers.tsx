@@ -1,309 +1,470 @@
 import React, { useState } from "react";
 import {
-  IonIcon,
-  IonContent,
   IonPage,
+  IonContent,
+  IonSearchbar,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonButton,
+  IonIcon,
+  IonFab,
+  IonFabButton,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonCard,
+  IonCardContent,
+  IonCardTitle,
+  IonText,
+  IonBadge,
+  IonAvatar,
 } from "@ionic/react";
 import {
-  homeOutline,
-  peopleOutline,
-  cubeOutline,
-  pricetagOutline,
-  settingsOutline,
-  statsChartOutline,
-  personOutline,
   addOutline,
+  closeOutline,
+  personOutline,
+  trashOutline,
+  createOutline,
+  qrCodeOutline,
   searchOutline,
-    filterOutline,
-    mailOutline,
-    callOutline,
+  callOutline,
+  mailOutline,
 } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
-import Header from "../../components/admincomponents/widgets/header";
-import SideNavBar from "../../components/admincomponents/widgets/sidenavbar";
-import Footer from "../../components/admincomponents/widgets/footer";
-import "./dashboard.css";
-import "./members.css";
+import AdminHeader from "../../components/admincomponents/Layout/header";
+import "./customer.css";
+import "./common.css";
 
-interface Customer {
+interface Member {
   id: number;
   name: string;
   email: string;
   phone: string;
   membershipType: string;
+  status: "Active" | "Inactive" | "Expired";
   joinDate: string;
-  lastVisit: string;
-  totalSpent: number;
-  status: "active" | "inactive" | "prospect";
+  expiryDate: string;
 }
 
 const Customers: React.FC = () => {
-  const history = useHistory();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeMenuItem, setActiveMenuItem] = useState("customers");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  // Menu items configuration
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: homeOutline, path: "/dashboard" },
-    { id: "members", label: "Members", icon: peopleOutline, path: "/admin-page/members" },
-    { id: "employees", label: "Employees", icon: personOutline, path: "/admin-page/employees" },
-    { id: "products", label: "Products", icon: cubeOutline, path: "/admin-page/products" },
-    { id: "customers", label: "Customers", icon: statsChartOutline, path: "/admin-page/customers" },
-    { id: "equipment", label: "Equipment", icon: settingsOutline, path: "/admin-page/equipment" },
-    { id: "pricing", label: "Price Edit", icon: pricetagOutline, path: "/admin-page/priceedit" },
-    { id: "profile", label: "Profile", icon: personOutline, path: "/admin-page/profile" },
-  ];
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    membershipType: "monthly",
+    joinDate: new Date().toISOString().split("T")[0],
+  });
 
-  // Mock data - replace with API calls
-  const [customers] = useState<Customer[]>([
+  const openAddModal = () => {
+    setEditingMember(null);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      membershipType: "monthly",
+      joinDate: new Date().toISOString().split("T")[0],
+    });
+    setShowModal(true);
+  };
+
+  // Mock data - replace with actual data from your backend
+  const [members, setMembers] = useState<Member[]>([
     {
       id: 1,
-      name: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 234 567 8901",
-      membershipType: "Premium",
-      joinDate: "2023-01-15",
-      lastVisit: "2024-01-10",
-      totalSpent: 1250.00,
-      status: "active",
+      name: "John Doe",
+      email: "john.doe@example.com",
+      phone: "+1234567890",
+      membershipType: "Annual",
+      status: "Active",
+      joinDate: "2024-01-15",
+      expiryDate: "2025-01-15",
     },
     {
       id: 2,
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 234 567 8902",
-      membershipType: "Basic",
-      joinDate: "2023-06-20",
-      lastVisit: "2024-01-08",
-      totalSpent: 450.00,
-      status: "active",
+      name: "Jane Smith",
+      email: "jane.smith@example.com",
+      phone: "+1234567891",
+      membershipType: "Monthly",
+      status: "Active",
+      joinDate: "2024-03-10",
+      expiryDate: "2024-04-10",
     },
     {
       id: 3,
-      name: "Mike Wilson",
-      email: "mike.wilson@example.com",
-      phone: "+1 234 567 8903",
-      membershipType: "None",
-      joinDate: "2024-01-05",
-      lastVisit: "2024-01-05",
-      totalSpent: 75.00,
-      status: "prospect",
-    },
-    {
-      id: 4,
-      name: "Emma Davis",
-      email: "emma.davis@example.com",
-      phone: "+1 234 567 8904",
-      membershipType: "Premium",
-      joinDate: "2022-11-10",
-      lastVisit: "2023-12-15",
-      totalSpent: 890.00,
-      status: "inactive",
+      name: "Mike Johnson",
+      email: "mike.j@example.com",
+      phone: "+1234567892",
+      membershipType: "Quarterly",
+      status: "Expired",
+      joinDate: "2023-10-01",
+      expiryDate: "2024-01-01",
     },
   ]);
 
-  const handleNavigate = (path: string, itemId: string) => {
-    setActiveMenuItem(itemId);
-    setMenuOpen(false);
-    history.push(path);
+  const filteredMembers = members.filter(
+    (member) =>
+      member.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchText.toLowerCase()) ||
+      member.phone.includes(searchText)
+  );
+
+  const handleEditMember = (member: Member) => {
+    setEditingMember(member);
+    setFormData({
+      name: member.name,
+      email: member.email,
+      phone: member.phone,
+      membershipType: member.membershipType.toLowerCase(),
+      joinDate: member.joinDate,
+    });
+    setShowModal(true);
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "active":
-        return "status-active";
-      case "inactive":
-        return "status-inactive";
-      case "prospect":
-        return "status-prospect";
-      default:
-        return "";
+  const handleDeleteMember = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this member?")) {
+      setMembers(members.filter((m) => m.id !== id));
     }
   };
 
-  const filteredCustomers = customers.filter(customer =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.membershipType.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSaveMember = () => {
+    if (editingMember) {
+      // Update existing member
+      setMembers(
+        members.map((m) =>
+          m.id === editingMember.id
+            ? {
+                ...m,
+                ...formData,
+                membershipType:
+                  formData.membershipType.charAt(0).toUpperCase() +
+                  formData.membershipType.slice(1),
+              }
+            : m
+        )
+      );
+    } else {
+      // Add new member
+      const newMember: Member = {
+        id: Math.max(...members.map((m) => m.id), 0) + 1,
+        ...formData,
+        membershipType:
+          formData.membershipType.charAt(0).toUpperCase() +
+          formData.membershipType.slice(1),
+        status: "Active",
+        expiryDate: calculateExpiryDate(
+          formData.joinDate,
+          formData.membershipType
+        ),
+      };
+      setMembers([...members, newMember]);
+    }
+    setShowModal(false);
+  };
+
+  const calculateExpiryDate = (joinDate: string, type: string): string => {
+    const date = new Date(joinDate);
+    switch (type.toLowerCase()) {
+      case "monthly":
+        date.setMonth(date.getMonth() + 1);
+        break;
+      case "quarterly":
+        date.setMonth(date.getMonth() + 3);
+        break;
+      case "annual":
+        date.setFullYear(date.getFullYear() + 1);
+        break;
+    }
+    return date.toISOString().split("T")[0];
+  };
+
+  const handleGenerateQR = (member: Member) => {
+    setSelectedMember(member);
+    setShowQRModal(true);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Active":
+        return "success";
+      case "Expired":
+        return "danger";
+      case "Inactive":
+        return "warning";
+      default:
+        return "medium";
+    }
+  };
 
   return (
     <IonPage>
-      <Header menuOpen={menuOpen} toggleMenu={toggleMenu} title="Customer Management" />
-
-      <IonContent>
-        <div className="dashboard-layout">
-          <SideNavBar
-            menuOpen={menuOpen}
-            activeMenuItem={activeMenuItem}
-            handleNavigate={handleNavigate}
-            menuItems={menuItems}
-            toggleMenu={toggleMenu}
-          />
-
-          {/* Main Content */}
-          <main className="dashboard-main">
-            <div className="dashboard-container">
-              {/* Page Header */}
-              <div className="page-header">
-                <div className="page-title-section">
-                  <IonIcon icon={statsChartOutline} className="page-icon" />
-                  <div>
-                    <h1>Customer Management</h1>
-                    <p>Track and manage customer relationships</p>
-                  </div>
-                </div>
-                <button className="btn-primary">
-                  <IonIcon icon={addOutline} />
-                  Add New Customer
-                </button>
-              </div>
-
-              {/* Search and Filters */}
-              <div className="content-section">
-                <div className="search-filter-bar">
-                  <div className="search-input-wrapper">
-                    <IonIcon icon={searchOutline} className="search-icon" />
-                    <input
-                      type="text"
-                      placeholder="Search customers..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="search-input"
-                    />
-                  </div>
-                  <button className="btn-secondary">
-                    <IonIcon icon={filterOutline} />
-                    Filter
-                  </button>
-                </div>
-
-                {/* Customer Stats Cards */}
-                <div className="stats-grid">
-                  <div className="stat-card card-primary">
-                    <div className="stat-icon-wrapper">
-                      <IonIcon icon={statsChartOutline} className="stat-icon" />
-                    </div>
-                    <div className="stat-info">
-                      <p className="stat-label">Total Customers</p>
-                      <h3 className="stat-number">{customers.length}</h3>
-                    </div>
-                  </div>
-
-                  <div className="stat-card card-success">
-                    <div className="stat-icon-wrapper">
-                      <IonIcon icon={statsChartOutline} className="stat-icon" />
-                    </div>
-                    <div className="stat-info">
-                      <p className="stat-label">Active Customers</p>
-                      <h3 className="stat-number">
-                        {customers.filter(c => c.status === "active").length}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="stat-card card-warning">
-                    <div className="stat-icon-wrapper">
-                      <span className="stat-icon">💰</span>
-                    </div>
-                    <div className="stat-info">
-                      <p className="stat-label">Total Revenue</p>
-                      <h3 className="stat-number">
-                        ${customers.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="stat-card card-info">
-                    <div className="stat-icon-wrapper">
-                      <IonIcon icon={statsChartOutline} className="stat-icon" />
-                    </div>
-                    <div className="stat-info">
-                      <p className="stat-label">New This Month</p>
-                      <h3 className="stat-number">
-                        {customers.filter(c => new Date(c.joinDate).getMonth() === new Date().getMonth()).length}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Customers Table */}
-                <div className="data-table-container">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Membership</th>
-                        <th>Join Date</th>
-                        <th>Last Visit</th>
-                        <th>Total Spent</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredCustomers.map((customer) => (
-                        <tr key={customer.id}>
-                          <td>
-                            <div className="member-info">
-                              <div className="member-avatar">
-                                {customer.name.split(" ").map(n => n[0]).join("")}
-                              </div>
-                              <span>{customer.name}</span>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="contact-info">
-                              <div className="contact-item">
-                                <IonIcon icon={mailOutline} />
-                                {customer.email}
-                              </div>
-                              <div className="contact-item">
-                                <IonIcon icon={callOutline} />
-                                {customer.phone}
-                              </div>
-                            </div>
-                          </td>
-                          <td>{customer.membershipType}</td>
-                          <td>{new Date(customer.joinDate).toLocaleDateString()}</td>
-                          <td>{new Date(customer.lastVisit).toLocaleDateString()}</td>
-                          <td>${customer.totalSpent.toFixed(2)}</td>
-                          <td>
-                            <span className={`status-badge ${getStatusColor(customer.status)}`}>
-                              {customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="action-buttons">
-                              <button className="btn-icon">👁️</button>
-                              <button className="btn-icon">✏️</button>
-                              <button className="btn-icon">📧</button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Pagination */}
-                <div className="pagination">
-                  <button className="btn-pagination">Previous</button>
-                  <span className="pagination-info">Page 1 of 2</span>
-                  <button className="btn-pagination">Next</button>
-                </div>
-              </div>
+      <AdminHeader title="Members Management" />
+      <IonContent className="customers-content">
+        <IonCard className="employee-header-card">
+          <div className="employee-header-content">
+            <div>
+              <IonCardTitle>Members</IonCardTitle>
+              <IonText color="medium">
+                <p className="employee-subtitle">
+                  Manage Member accounts, Expiry, and Membership types
+                </p>
+              </IonText>
             </div>
-          </main>
+            <IonButton onClick={openAddModal} color="primary">
+              <IonIcon slot="start" icon={addOutline} />
+              Add Members
+            </IonButton>
+          </div>
+        </IonCard>
+
+        <div className="customers-container">
+          {/* Search Bar */}
+          <div className="search-section">
+            <IonSearchbar
+              value={searchText}
+              onIonInput={(e) => setSearchText(e.detail.value!)}
+              placeholder="Search members by name, email, or phone"
+              className="custom-searchbar"
+            />
+          </div>
+
+          {/* Members List */}
+          <IonList className="members-list">
+            {filteredMembers.length === 0 ? (
+              <IonCard className="empty-state-card">
+                <IonCardContent>
+                  <div className="empty-state">
+                    <IonIcon icon={searchOutline} className="empty-state-icon" />
+                    <h3>No members found</h3>
+                    <p>Try adjusting your search or add a new member</p>
+                  </div>
+                </IonCardContent>
+              </IonCard>
+            ) : (
+              filteredMembers.map((member) => (
+                <IonItem key={member.id} className="member-item">
+                  <IonAvatar slot="start" className="member-avatar">
+                    <IonIcon icon={personOutline} />
+                  </IonAvatar>
+                  <IonLabel>
+                    <h2 className="member-name">{member.name}</h2>
+                    <p className="member-info">
+                      <IonIcon icon={mailOutline} className="info-icon" />
+                      {member.email}
+                    </p>
+                    <p className="member-info">
+                      <IonIcon icon={callOutline} className="info-icon" />
+                      {member.phone}
+                    </p>
+                    <div className="member-meta">
+                      <IonBadge color={getStatusColor(member.status)}>
+                        {member.status}
+                      </IonBadge>
+                      <span className="membership-type">
+                        {member.membershipType}
+                      </span>
+                      <span className="expiry-date">
+                        Expires: {member.expiryDate}
+                      </span>
+                    </div>
+                  </IonLabel>
+                  <div className="member-actions" slot="end">
+                    <IonButton
+                      fill="clear"
+                      color="primary"
+                      onClick={() => handleGenerateQR(member)}
+                      title="Generate QR Code"
+                    >
+                      <IonIcon slot="icon-only" icon={qrCodeOutline} />
+                    </IonButton>
+                    <IonButton
+                      fill="clear"
+                      color="primary"
+                      onClick={() => handleEditMember(member)}
+                      title="Edit Member"
+                    >
+                      <IonIcon slot="icon-only" icon={createOutline} />
+                    </IonButton>
+                    <IonButton
+                      fill="clear"
+                      color="danger"
+                      onClick={() => handleDeleteMember(member.id)}
+                      title="Delete Member"
+                    >
+                      <IonIcon slot="icon-only" icon={trashOutline} />
+                    </IonButton>
+                  </div>
+                </IonItem>
+              ))
+            )}
+          </IonList>
+
+          {/* Floating Action Button */}
+          <IonFab vertical="bottom" horizontal="end" slot="fixed">
+            <IonFabButton color="primary" onClick={openAddModal}>
+              <IonIcon icon={addOutline} />
+            </IonFabButton>
+          </IonFab>
+
+          {/* Add/Edit Member Modal */}
+          <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+            <IonHeader>
+              <IonToolbar color="primary">
+                <IonTitle>
+                  {editingMember ? "Edit Member" : "Add New Member"}
+                </IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowModal(false)}>
+                    <IonIcon slot="icon-only" icon={closeOutline} />
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="modal-content">
+              <div className="form-container">
+                <div className="form-group">
+                  <IonLabel className="form-label">Full Name *</IonLabel>
+                  <IonInput
+                    value={formData.name}
+                    onIonInput={(e) =>
+                      setFormData({ ...formData, name: e.detail.value! })
+                    }
+                    placeholder="Enter full name"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <IonLabel className="form-label">Email *</IonLabel>
+                  <IonInput
+                    type="email"
+                    value={formData.email}
+                    onIonInput={(e) =>
+                      setFormData({ ...formData, email: e.detail.value! })
+                    }
+                    placeholder="Enter email address"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <IonLabel className="form-label">Phone Number *</IonLabel>
+                  <IonInput
+                    type="tel"
+                    value={formData.phone}
+                    onIonInput={(e) =>
+                      setFormData({ ...formData, phone: e.detail.value! })
+                    }
+                    placeholder="Enter phone number"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <IonLabel className="form-label">Membership Type *</IonLabel>
+                  <IonSelect
+                    value={formData.membershipType}
+                    onIonChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        membershipType: e.detail.value,
+                      })
+                    }
+                    className="form-select"
+                  >
+                    <IonSelectOption value="monthly">Monthly</IonSelectOption>
+                    <IonSelectOption value="quarterly">Quarterly</IonSelectOption>
+                    <IonSelectOption value="annual">Annual</IonSelectOption>
+                    <IonSelectOption value="weekly">Weekly</IonSelectOption>
+                  </IonSelect>
+                </div>
+
+                <div className="form-group">
+                  <IonLabel className="form-label">Join Date *</IonLabel>
+                  <IonInput
+                    type="date"
+                    value={formData.joinDate}
+                    onIonInput={(e) =>
+                      setFormData({ ...formData, joinDate: e.detail.value! })
+                    }
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <IonButton
+                    expand="block"
+                    color="medium"
+                    fill="outline"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Cancel
+                  </IonButton>
+                  <IonButton
+                    expand="block"
+                    color="primary"
+                    onClick={handleSaveMember}
+                    disabled={
+                      !formData.name || !formData.email || !formData.phone
+                    }
+                  >
+                    {editingMember ? "Update Member" : "Add Member"}
+                  </IonButton>
+                </div>
+              </div>
+            </IonContent>
+          </IonModal>
+
+          {/* QR Code Modal */}
+          <IonModal
+            isOpen={showQRModal}
+            onDidDismiss={() => setShowQRModal(false)}
+          >
+            <IonHeader>
+              <IonToolbar color="primary">
+                <IonTitle>Member QR Code</IonTitle>
+                <IonButtons slot="end">
+                  <IonButton onClick={() => setShowQRModal(false)}>
+                    <IonIcon slot="icon-only" icon={closeOutline} />
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent className="modal-content">
+              <div className="qr-container">
+                <div className="qr-member-info">
+                  <h2>{selectedMember?.name}</h2>
+                  <p>{selectedMember?.email}</p>
+                  <IonBadge color={getStatusColor(selectedMember?.status || "")}>
+                    {selectedMember?.status}
+                  </IonBadge>
+                </div>
+                <div className="qr-code-placeholder">
+                  <IonIcon icon={qrCodeOutline} className="qr-icon" />
+                  <p className="qr-placeholder-text">
+                    QR Code will be generated here
+                  </p>
+                  <p className="qr-id">Member ID: {selectedMember?.id}</p>
+                </div>
+                <IonButton expand="block" color="primary" className="download-btn">
+                  Download QR Code
+                </IonButton>
+              </div>
+            </IonContent>
+          </IonModal>
         </div>
       </IonContent>
-      <Footer />
     </IonPage>
   );
 };

@@ -1,0 +1,84 @@
+.member-status-card {
+  margin: 16px 0;
+  border-radius: var(--fdg-radius-lg, 12px);
+  box-shadow: var(--fdg-shadow, 0 2px 8px rgba(27, 46, 75, 0.1));
+  background: var(--fdg-bg-card, #FFFFFF);
+}
+
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.status-header ion-card-title {
+  font-size: var(--fdg-font-lg, 18px);
+  font-weight: var(--fdg-font-bold, 700);
+  color: var(--fdg-text-primary, #1B2E4B);
+  margin: 0;
+}
+
+.member-id {
+  font-size: var(--fdg-font-sm, 14px);
+  color: var(--fdg-text-secondary, #9BADB7);
+  margin: 4px 0 0 0;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--fdg-radius-md, 8px);
+  font-weight: var(--fdg-font-semibold, 600);
+  font-size: var(--fdg-font-sm, 14px);
+}
+
+.status-badge ion-icon {
+  font-size: 18px;
+}
+
+.status-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--fdg-border-color, #E2E8F0);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: var(--fdg-font-sm, 14px);
+  color: var(--fdg-text-secondary, #9BADB7);
+  font-weight: var(--fdg-font-medium, 500);
+}
+
+.detail-value {
+  font-size: var(--fdg-font-md, 16px);
+  color: var(--fdg-text-primary, #1B2E4B);
+  font-weight: var(--fdg-font-semibold, 600);
+}
+
+/* Status-specific card styles */
+.status-card-active {
+  border-left: 4px solid var(--fdg-status-active, #2ECC71);
+}
+
+.status-card-expired {
+  border-left: 4px solid var(--fdg-status-expired, #E74C3C);
+}
+
+.status-card-warning {
+  border-left: 4px solid var(--fdg-status-warning, #F39C12);
+}

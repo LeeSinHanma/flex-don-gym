@@ -1,0 +1,380 @@
+/* ═══════════════════════════════════════════
+   User Role — Dark Industrial Split Design
+   Mobile-first, full-bleed, bold & tactile
+   ═══════════════════════════════════════════ */
+
+/* Page */
+.ur-page {
+  --background: #0D1117;
+}
+
+/* ── Full-screen split container ── */
+.ur-split {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px);
+  min-height: 500px;
+}
+
+/* ── Each role panel ── */
+.ur-panel {
+  all: unset;
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: flex 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ur-admin {
+  background: linear-gradient(160deg, #0f1c2e 0%, #1B2E4B 60%, #162540 100%);
+}
+
+.ur-employee {
+  background: linear-gradient(160deg, #0d1a2d 0%, #1a3a5c 60%, #162540 100%);
+}
+
+.ur-panel-noise {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 150px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.ur-panel-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  right: -80px;
+  bottom: -80px;
+}
+
+.admin-glow    { background: radial-gradient(circle, rgba(46, 144, 250, 0.18) 0%, transparent 70%); }
+.employee-glow { background: radial-gradient(circle, rgba(46, 204, 113, 0.15) 0%, transparent 70%); }
+
+.ur-panel.is-hovered .ur-panel-glow { opacity: 1; }
+.ur-panel.is-hovered { flex: 1.25; }
+.ur-panel.is-dimmed  { flex: 0.8; opacity: 0.7; }
+.ur-panel:active { opacity: 0.88; }
+
+.ur-panel-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 28px;
+  width: 100%;
+}
+
+.ur-icon-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.admin-ring {
+  background: rgba(46, 144, 250, 0.18);
+  border: 1.5px solid rgba(46, 144, 250, 0.35);
+  box-shadow: 0 0 24px rgba(46, 144, 250, 0.12);
+}
+
+.employee-ring {
+  background: rgba(46, 204, 113, 0.15);
+  border: 1.5px solid rgba(46, 204, 113, 0.3);
+  box-shadow: 0 0 24px rgba(46, 204, 113, 0.1);
+}
+
+.ur-label-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ur-role-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: 'Courier New', monospace;
+}
+
+.ur-role-name {
+  font-size: 30px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.ur-role-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+  font-weight: 400;
+}
+
+.ur-arrow {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.ur-panel.is-hovered .ur-arrow {
+  transform: translateX(5px);
+}
+
+/* ── Divider ── */
+.ur-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.ur-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ur-divider-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ur-divider-badge span {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* ── Brand footer ── */
+.ur-brand {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #0D1117;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ur-brand-name {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Courier New', monospace;
+}
+
+.ur-brand-dot {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 16px;
+}
+
+.ur-brand-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+/* ══════════════════════════════════════
+   Login Modal — Mobile (bottom sheet)
+   ══════════════════════════════════════ */
+
+.ur-modal {
+  --border-radius: 24px 24px 0 0;
+  align-items: flex-end;
+}
+
+.ur-modal-toolbar {
+  --color: #ffffff;
+}
+
+.toolbar-admin    { --background: #1B2E4B; }
+.toolbar-employee { --background: #1a3a5c; }
+
+.ur-modal-title {
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ur-modal-content {
+  --background: #F0F4F8;
+}
+
+.ur-login-wrap {
+  padding: 28px 20px 48px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.ur-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 20px;
+  letter-spacing: 0.2px;
+}
+
+.pill-admin    { background: #1B2E4B; }
+.pill-employee { background: #1a3a5c; }
+
+.ur-login-heading {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1B2E4B;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+}
+
+.ur-login-sub {
+  font-size: 14px;
+  color: #9BADB7;
+  margin: 0 0 24px;
+}
+
+.ur-login-list {
+  background: transparent;
+  margin-bottom: 4px;
+}
+
+.ur-login-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ur-cancel-link {
+  all: unset;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #9BADB7;
+  cursor: pointer;
+  padding: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ur-cancel-link:active { opacity: 0.6; }
+
+/* ══════════════════════════════════════
+   Login Modal — Desktop (centered card)
+   ══════════════════════════════════════ */
+
+@media (min-width: 600px) {
+  .ur-split {
+    flex-direction: row;
+    height: calc(100vh - 52px);
+  }
+
+  .ur-divider {
+    flex-direction: column;
+    padding: 28px 0;
+    width: auto;
+  }
+
+  .ur-divider-line {
+    width: 1px;
+    height: 100%;
+    flex: 1;
+  }
+
+  .ur-panel-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 40px;
+    gap: 24px;
+  }
+
+  .ur-icon-ring {
+    width: 84px;
+    height: 84px;
+    border-radius: 24px;
+  }
+
+  .ur-role-name { font-size: 40px; }
+  .ur-role-desc { font-size: 15px; }
+  .ur-arrow { display: none; }
+
+  /*
+   * ROOT FIX:
+   * IonContent inside a modal requires the modal to have a concrete pixel
+   * height — not "auto". Without it, the shadow-DOM layout collapses the
+   * scrollable region to 0px even though the card shell is visible.
+   */
+  .ur-modal {
+    --border-radius: 20px;
+    align-items: center;
+    --width: 480px;
+    --max-width: 90vw;
+    --height: 560px;
+    --max-height: 90vh;
+  }
+
+  .ur-modal::part(content) {
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 900px) {
+  .ur-role-name { font-size: 48px; }
+  .ur-icon-ring { width: 96px; height: 96px; }
+}
+
+/* ── Entry animations ── */
+.ur-admin {
+  animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.ur-employee {
+  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}

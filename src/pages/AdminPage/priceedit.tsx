@@ -1,263 +1,526 @@
 import React, { useState } from "react";
 import {
-  IonIcon,
-  IonContent,
   IonPage,
+  IonContent,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonButton,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonText,
+  IonIcon,
+  IonBadge,
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonSelect,
+  IonSelectOption,
+  IonToggle,
+  useIonToast,
 } from "@ionic/react";
+import AdminHeader from "../../components/admincomponents/Layout/header";
 import {
-  pricetagOutline,
   saveOutline,
   refreshOutline,
-  homeOutline,
-    peopleOutline,
-    cubeOutline,
-    settingsOutline,
-    statsChartOutline,
-    personOutline,
+  addOutline,
+  createOutline,
+  trashOutline,
+  closeOutline,
+  pricetagOutline,
+  calendarOutline,
+  warningOutline,
 } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
-import Header from "../../components/admincomponents/widgets/header";
-import SideNavBar from "../../components/admincomponents/widgets/sidenavbar";
-import Footer from "../../components/admincomponents/widgets/footer";
-import "./dashboard.css";
-import "./members.css";
+import "./common.css";
+import "./priceedit.css";
 
-interface PricingItem {
+type TierType = "standard" | "promo";
+
+interface MembershipPrice {
   id: number;
-  name: string;
-  category: string;
-  currentPrice: number;
-  newPrice: number;
-  lastUpdated: string;
-  status: "unchanged" | "increased" | "decreased";
+  type: string;
+  price: number;
+  description: string;
+  duration: string;
+  tierType: TierType;
+  promoExpiry?: string; // ISO date string
+  isActive: boolean;
 }
 
+const defaultPrices: MembershipPrice[] = [
+  { id: 1, type: "Daily",     price: 15,   description: "Single day access",              duration: "1 Day",   tierType: "standard", isActive: true },
+  { id: 2, type: "Weekly",    price: 50,   description: "7 days of unlimited access",     duration: "7 Days",  tierType: "standard", isActive: true },
+  { id: 3, type: "Monthly",   price: 150,  description: "30 days of unlimited access",    duration: "30 Days", tierType: "standard", isActive: true },
+  { id: 4, type: "Quarterly", price: 400,  description: "3 months of unlimited access",   duration: "90 Days", tierType: "standard", isActive: true },
+  { id: 5, type: "Yearly",    price: 1200, description: "12 months of unlimited access",  duration: "365 Days",tierType: "standard", isActive: true },
+];
+
+const emptyForm = {
+  type: "",
+  price: "",
+  description: "",
+  duration: "",
+  tierType: "standard" as TierType,
+  promoExpiry: "",
+  isActive: true,
+};
+
 const PriceEdit: React.FC = () => {
-  const history = useHistory();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeMenuItem, setActiveMenuItem] = useState("pricing");
+  const [present] = useIonToast();
+  const [prices, setPrices] = useState<MembershipPrice[]>(defaultPrices);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Menu items configuration
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: homeOutline, path: "/dashboard" },
-    { id: "members", label: "Members", icon: peopleOutline, path: "/admin-page/members" },
-    { id: "employees", label: "Employees", icon: personOutline, path: "/admin-page/employees" },
-    { id: "products", label: "Products", icon: cubeOutline, path: "/admin-page/products" },
-    { id: "customers", label: "Customers", icon: statsChartOutline, path: "/admin-page/customers" },
-    { id: "equipment", label: "Equipment", icon: settingsOutline, path: "/admin-page/equipment" },
-    { id: "pricing", label: "Price Edit", icon: pricetagOutline, path: "/admin-page/priceedit" },
-    { id: "profile", label: "Profile", icon: personOutline, path: "/admin-page/profile" },
-  ];
+  const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentId, setCurrentId] = useState<number | null>(null);
+  const [formData, setFormData] = useState(emptyForm);
 
-  // Mock data - replace with API calls
-  const [pricingItems, setPricingItems] = useState<PricingItem[]>([
-    {
-      id: 1,
-      name: "Basic Membership",
-      category: "Memberships",
-      currentPrice: 29.99,
-      newPrice: 29.99,
-      lastUpdated: "2024-01-15",
-      status: "unchanged",
-    },
-    {
-      id: 2,
-      name: "Premium Membership",
-      category: "Memberships",
-      currentPrice: 49.99,
-      newPrice: 54.99,
-      lastUpdated: "2024-01-15",
-      status: "increased",
-    },
-    {
-      id: 3,
-      name: "Personal Training Session",
-      category: "Services",
-      currentPrice: 75.00,
-      newPrice: 80.00,
-      lastUpdated: "2024-01-15",
-      status: "increased",
-    },
-    {
-      id: 4,
-      name: "Protein Powder",
-      category: "Products",
-      currentPrice: 49.99,
-      newPrice: 45.99,
-      lastUpdated: "2024-01-15",
-      status: "decreased",
-    },
-  ]);
-
-  const handleNavigate = (path: string, itemId: string) => {
-    setActiveMenuItem(itemId);
-    setMenuOpen(false);
-    history.push(path);
+  // --- helpers ---
+  const isExpired = (expiry?: string) => {
+    if (!expiry) return false;
+    return new Date(expiry) < new Date();
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const daysUntilExpiry = (expiry?: string) => {
+    if (!expiry) return null;
+    const diff = new Date(expiry).getTime() - Date.now();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  const handlePriceChange = (id: number, newPrice: number) => {
-    setPricingItems(items =>
-      items.map(item => {
-        if (item.id === id) {
-          const status = newPrice > item.currentPrice ? "increased" :
-                        newPrice < item.currentPrice ? "decreased" : "unchanged";
-          return { ...item, newPrice, status };
-        }
-        return item;
-      })
-    );
+  const getExpiryBadge = (membership: MembershipPrice) => {
+    if (membership.tierType !== "promo" || !membership.promoExpiry) return null;
+    const days = daysUntilExpiry(membership.promoExpiry);
+    if (days === null) return null;
+    if (days < 0)  return { color: "danger",  label: "EXPIRED" };
+    if (days <= 7) return { color: "warning", label: `EXPIRES IN ${days}D` };
+    return { color: "success", label: `${days} DAYS LEFT` };
   };
 
-  const handleSaveChanges = () => {
-    // Here you would typically save to backend
-    alert("Price changes saved successfully!");
+  // --- price inline edit ---
+  const handlePriceChange = (id: number, val: string) => {
+    setPrices(prices.map(p => p.id === id ? { ...p, price: parseFloat(val) || 0 } : p));
+    setHasChanges(true);
   };
 
-  const handleResetChanges = () => {
-    setPricingItems(items =>
-      items.map(item => ({
-        ...item,
-        newPrice: item.currentPrice,
-        status: "unchanged" as const,
-      }))
-    );
+  const handleToggleActive = (id: number, active: boolean) => {
+    setPrices(prices.map(p => p.id === id ? { ...p, isActive: active } : p));
+    setHasChanges(true);
   };
 
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "increased":
-        return "status-increased";
-      case "decreased":
-        return "status-decreased";
-      case "unchanged":
-        return "status-unchanged";
-      default:
-        return "";
+  // --- modal ---
+  const openAdd = () => {
+    setIsEditing(false);
+    setCurrentId(null);
+    setFormData(emptyForm);
+    setShowModal(true);
+  };
+
+  const openEdit = (m: MembershipPrice) => {
+    setIsEditing(true);
+    setCurrentId(m.id);
+    setFormData({
+      type: m.type,
+      price: m.price.toString(),
+      description: m.description,
+      duration: m.duration,
+      tierType: m.tierType,
+      promoExpiry: m.promoExpiry || "",
+      isActive: m.isActive,
+    });
+    setShowModal(true);
+  };
+
+  const handleSaveModal = () => {
+    if (!formData.type || !formData.price || !formData.duration) {
+      present({ message: "Please fill in all required fields", duration: 2000, color: "danger", position: "top" });
+      return;
+    }
+    if (formData.tierType === "promo" && !formData.promoExpiry) {
+      present({ message: "Promo tiers require an expiry date", duration: 2000, color: "danger", position: "top" });
+      return;
+    }
+
+    if (isEditing && currentId !== null) {
+      setPrices(prices.map(p =>
+        p.id === currentId
+          ? { ...p, ...formData, price: parseFloat(formData.price) || 0, promoExpiry: formData.tierType === "promo" ? formData.promoExpiry : undefined }
+          : p
+      ));
+    } else {
+      const newItem: MembershipPrice = {
+        id: Math.max(...prices.map(p => p.id), 0) + 1,
+        type: formData.type,
+        price: parseFloat(formData.price) || 0,
+        description: formData.description,
+        duration: formData.duration,
+        tierType: formData.tierType,
+        promoExpiry: formData.tierType === "promo" ? formData.promoExpiry : undefined,
+        isActive: formData.isActive,
+      };
+      setPrices([...prices, newItem]);
+    }
+
+    setHasChanges(true);
+    setShowModal(false);
+    present({ message: isEditing ? "Tier updated!" : "New tier added!", duration: 2000, color: "success", position: "top" });
+  };
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("Delete this pricing tier?")) {
+      setPrices(prices.filter(p => p.id !== id));
+      setHasChanges(true);
     }
   };
 
+  const handleSave = () => {
+    console.log("Saving prices:", prices);
+    present({ message: "Prices updated successfully!", duration: 2000, position: "top", color: "success" });
+    setHasChanges(false);
+  };
+
+  const handleReset = () => {
+    setPrices(defaultPrices);
+    setHasChanges(false);
+    present({ message: "Prices reset to default values", duration: 2000, position: "top", color: "medium" });
+  };
+
+  const standardPrices = prices.filter(p => p.tierType === "standard");
+  const promoPrices    = prices.filter(p => p.tierType === "promo");
+
   return (
-    <IonPage>
-      <Header menuOpen={menuOpen} toggleMenu={toggleMenu} title="Price Edit" />
+    <IonPage className="admin-page">
+      <AdminHeader title="Membership Pricing" />
 
-      <IonContent>
-        <div className="dashboard-layout">
-          <SideNavBar
-            menuOpen={menuOpen}
-            activeMenuItem={activeMenuItem}
-            handleNavigate={handleNavigate}
-            menuItems={menuItems}
-            toggleMenu={toggleMenu}
-          />
+      <IonContent className="ion-padding">
 
-          {/* Main Content */}
-          <main className="dashboard-main">
-            <div className="dashboard-container">
-              {/* Page Header */}
-              <div className="page-header">
-                <div className="page-title-section">
-                  <IonIcon icon={pricetagOutline} className="page-icon" />
-                  <div>
-                    <h1>Price Management</h1>
-                    <p>Update pricing for memberships, services, and products</p>
-                  </div>
-                </div>
-                <div className="header-actions">
-                  <button className="btn-secondary" onClick={handleResetChanges}>
-                    <IonIcon icon={refreshOutline} />
-                    Reset Changes
-                  </button>
-                  <button className="btn-primary" onClick={handleSaveChanges}>
-                    <IonIcon icon={saveOutline} />
-                    Save Changes
-                  </button>
-                </div>
+        {/* Page Header */}
+        <IonCard className="pricing-header-card">
+          <IonCardHeader>
+            <div className="pricing-header-content">
+              <div>
+                <IonCardTitle>Membership Pricing Tiers</IonCardTitle>
+                <IonText color="medium">
+                  <p className="pricing-subtitle">Manage standard and promo pricing</p>
+                </IonText>
               </div>
+              <IonButton onClick={openAdd} color="primary">
+                <IonIcon slot="start" icon={addOutline} style={{ fontSize: "20px", color: "#ffffff", display: "block" }} />
+                Add Tier
+              </IonButton>
+            </div>
+          </IonCardHeader>
+        </IonCard>
 
-              {/* Pricing Table */}
-              <div className="content-section">
-                <div className="data-table-container">
-                  <table className="data-table">
-                    <thead>
-                      <tr>
-                        <th>Item Name</th>
-                        <th>Category</th>
-                        <th>Current Price</th>
-                        <th>New Price</th>
-                        <th>Change</th>
-                        <th>Last Updated</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {pricingItems.map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.name}</td>
-                          <td>{item.category}</td>
-                          <td>${item.currentPrice.toFixed(2)}</td>
-                          <td>
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={item.newPrice}
-                              onChange={(e) => handlePriceChange(item.id, parseFloat(e.target.value) || 0)}
-                              className="price-input"
-                            />
-                          </td>
-                          <td>
-                            {item.newPrice !== item.currentPrice && (
-                              <span className={`price-change ${item.newPrice > item.currentPrice ? 'positive' : 'negative'}`}>
-                                {item.newPrice > item.currentPrice ? '+' : ''}
-                                ${(item.newPrice - item.currentPrice).toFixed(2)}
+        {/* ── STANDARD TIERS ── */}
+        <div className="section-label">
+          <IonIcon icon={pricetagOutline} style={{ fontSize: "18px", color: "#1B2E4B", display: "block" }} />
+          <span>Standard Tiers</span>
+        </div>
+
+        <IonGrid>
+          <IonRow>
+            {standardPrices.map((membership) => (
+              <IonCol key={membership.id} size="12" sizeMd="6" sizeLg="4">
+                <IonCard className={`pricing-card ${!membership.isActive ? "inactive-card" : ""}`}>
+                  <IonCardHeader className="pricing-card-header">
+                    <div className="pricing-card-header-top">
+                      <div className="pricing-type-badge">{membership.duration}</div>
+                      <div className="card-header-actions">
+                        <IonButton fill="clear" onClick={() => openEdit(membership)}>
+                          <IonIcon icon={createOutline} style={{ fontSize: "18px", color: "#ffffff", display: "block" }} />
+                        </IonButton>
+                        <IonButton fill="clear" onClick={() => handleDelete(membership.id)}>
+                          <IonIcon icon={trashOutline} style={{ fontSize: "18px", color: "rgba(255,255,255,0.8)", display: "block" }} />
+                        </IonButton>
+                      </div>
+                    </div>
+                    <IonCardTitle className="pricing-card-title">{membership.type}</IonCardTitle>
+                    <p className="pricing-description">{membership.description}</p>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    <div className="active-toggle-row">
+                      <span className="active-label">Active</span>
+                      <IonToggle
+                        checked={membership.isActive}
+                        onIonChange={(e) => handleToggleActive(membership.id, e.detail.checked)}
+                      />
+                    </div>
+                    <IonItem lines="none" className="price-input-item">
+                      <IonLabel position="stacked" className="price-label">Price ($)</IonLabel>
+                      <IonInput
+                        type="number"
+                        value={membership.price}
+                        onIonInput={(e) => handlePriceChange(membership.id, e.detail.value!)}
+                        className="price-input"
+                        min="0"
+                        step="0.01"
+                      />
+                    </IonItem>
+                    <div className="price-display">${membership.price.toFixed(2)}</div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            ))}
+          </IonRow>
+        </IonGrid>
+
+        {/* ── PROMO TIERS ── */}
+        <div className="section-label promo-label">
+          <IonIcon icon={calendarOutline} style={{ fontSize: "18px", color: "#E74C3C", display: "block" }} />
+          <span>Promo Tiers</span>
+          {promoPrices.filter(p => isExpired(p.promoExpiry)).length > 0 && (
+            <IonBadge color="danger" className="expired-badge">
+              {promoPrices.filter(p => isExpired(p.promoExpiry)).length} Expired
+            </IonBadge>
+          )}
+        </div>
+
+        {promoPrices.length === 0 ? (
+          <IonCard className="empty-promo-card">
+            <IonCardContent>
+              <div className="empty-promo">
+                <IonIcon icon={pricetagOutline} style={{ fontSize: "48px", color: "#adb5bd", display: "block", margin: "0 auto 12px" }} />
+                <p className="empty-promo-text">No promo tiers yet</p>
+                <p className="empty-promo-sub">Click "Add Tier" and select Promo type to create one</p>
+              </div>
+            </IonCardContent>
+          </IonCard>
+        ) : (
+          <IonGrid>
+            <IonRow>
+              {promoPrices.map((membership) => {
+                const badge = getExpiryBadge(membership);
+                const expired = isExpired(membership.promoExpiry);
+                return (
+                  <IonCol key={membership.id} size="12" sizeMd="6" sizeLg="4">
+                    <IonCard className={`pricing-card promo-card ${expired ? "expired-card" : ""} ${!membership.isActive ? "inactive-card" : ""}`}>
+                      <IonCardHeader className="pricing-card-header promo-header">
+                        <div className="pricing-card-header-top">
+                          <div className="pricing-type-badge">{membership.duration}</div>
+                          <div className="card-header-actions">
+                            <IonButton fill="clear" onClick={() => openEdit(membership)}>
+                              <IonIcon icon={createOutline} style={{ fontSize: "18px", color: "#ffffff", display: "block" }} />
+                            </IonButton>
+                            <IonButton fill="clear" onClick={() => handleDelete(membership.id)}>
+                              <IonIcon icon={trashOutline} style={{ fontSize: "18px", color: "rgba(255,255,255,0.8)", display: "block" }} />
+                            </IonButton>
+                          </div>
+                        </div>
+                        <IonCardTitle className="pricing-card-title">{membership.type}</IonCardTitle>
+                        <p className="pricing-description">{membership.description}</p>
+                        {badge && (
+                          <div className="expiry-badge-row">
+                            <IonBadge color={badge.color} className="expiry-badge">
+                              {expired && <IonIcon icon={warningOutline} style={{ fontSize: "12px", marginRight: "4px", display: "inline", verticalAlign: "middle" }} />}
+                              {badge.label}
+                            </IonBadge>
+                            {membership.promoExpiry && (
+                              <span className="expiry-date">
+                                {new Date(membership.promoExpiry).toLocaleDateString()}
                               </span>
                             )}
-                          </td>
-                          <td>{new Date(item.lastUpdated).toLocaleDateString()}</td>
-                          <td>
-                            <span className={`status-badge ${getStatusColor(item.status)}`}>
-                              {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          </div>
+                        )}
+                      </IonCardHeader>
+                      <IonCardContent>
+                        <div className="active-toggle-row">
+                          <span className="active-label">Active</span>
+                          <IonToggle
+                            checked={membership.isActive}
+                            onIonChange={(e) => handleToggleActive(membership.id, e.detail.checked)}
+                          />
+                        </div>
+                        {expired && (
+                          <div className="expired-warning">
+                            <IonIcon icon={warningOutline} style={{ fontSize: "14px", color: "#E74C3C", display: "block" }} />
+                            <span>This promo has expired. Update the expiry date or delete it.</span>
+                          </div>
+                        )}
+                        <IonItem lines="none" className="price-input-item">
+                          <IonLabel position="stacked" className="price-label">Price ($)</IonLabel>
+                          <IonInput
+                            type="number"
+                            value={membership.price}
+                            onIonInput={(e) => handlePriceChange(membership.id, e.detail.value!)}
+                            className="price-input"
+                            min="0"
+                            step="0.01"
+                          />
+                        </IonItem>
+                        <div className="price-display">${membership.price.toFixed(2)}</div>
+                        {expired && (
+                          <IonButton expand="block" color="warning" fill="outline" className="update-expiry-btn" onClick={() => openEdit(membership)}>
+                            Update Expiry Date
+                          </IonButton>
+                        )}
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                );
+              })}
+            </IonRow>
+          </IonGrid>
+        )}
 
-                {/* Summary */}
-                <div className="pricing-summary">
-                  <h3>Price Change Summary</h3>
-                  <div className="summary-stats">
-                    <div className="summary-item">
-                      <span className="summary-label">Items Increased:</span>
-                      <span className="summary-value increased">
-                        {pricingItems.filter(item => item.status === "increased").length}
-                      </span>
+        {/* Action Buttons */}
+        <div className="pricing-actions">
+          <IonCard className="actions-card">
+            <IonCardContent>
+              <div className="action-buttons">
+                <IonButton expand="block" color="primary" onClick={handleSave} disabled={!hasChanges}>
+                  <IonIcon slot="start" icon={saveOutline} style={{ fontSize: "20px", color: "#ffffff", display: "block" }} />
+                  Save Changes
+                </IonButton>
+                <IonButton expand="block" color="medium" fill="outline" onClick={handleReset}>
+                  <IonIcon slot="start" icon={refreshOutline} style={{ fontSize: "20px", display: "block" }} />
+                  Reset to Default
+                </IonButton>
+              </div>
+              {hasChanges && <p className="unsaved-changes-text">You have unsaved changes</p>}
+            </IonCardContent>
+          </IonCard>
+        </div>
+
+        {/* Pricing Summary */}
+        <IonCard className="summary-card">
+          <IonCardHeader>
+            <IonCardTitle>Pricing Summary</IonCardTitle>
+          </IonCardHeader>
+          <IonCardContent>
+            <div className="summary-list">
+              {prices.map((membership) => {
+                const expired = isExpired(membership.promoExpiry);
+                return (
+                  <div key={membership.id} className={`summary-item ${expired ? "summary-expired" : ""}`}>
+                    <div className="summary-left">
+                      <span className="summary-type">{membership.type}</span>
+                      {membership.tierType === "promo" && (
+                        <IonBadge color={expired ? "danger" : "tertiary"} className="summary-promo-badge">
+                          {expired ? "EXPIRED" : "PROMO"}
+                        </IonBadge>
+                      )}
+                      {!membership.isActive && (
+                        <IonBadge color="medium" className="summary-promo-badge">INACTIVE</IonBadge>
+                      )}
                     </div>
-                    <div className="summary-item">
-                      <span className="summary-label">Items Decreased:</span>
-                      <span className="summary-value decreased">
-                        {pricingItems.filter(item => item.status === "decreased").length}
-                      </span>
-                    </div>
-                    <div className="summary-item">
-                      <span className="summary-label">Items Unchanged:</span>
-                      <span className="summary-value unchanged">
-                        {pricingItems.filter(item => item.status === "unchanged").length}
-                      </span>
-                    </div>
+                    <span className="summary-price">${membership.price.toFixed(2)}</span>
                   </div>
-                </div>
+                );
+              })}
+            </div>
+            <div className="summary-total">
+              <span className="total-label">Active Revenue Potential:</span>
+              <span className="total-value">
+                ${prices.filter(p => p.isActive && !isExpired(p.promoExpiry)).reduce((sum, p) => sum + p.price, 0).toFixed(2)}
+              </span>
+            </div>
+          </IonCardContent>
+        </IonCard>
+
+        {/* Add / Edit Modal */}
+        <IonModal isOpen={showModal} onDidDismiss={() => setShowModal(false)}>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>{isEditing ? "Edit Tier" : "Add Tier"}</IonTitle>
+              <IonButtons slot="end">
+                <IonButton onClick={() => setShowModal(false)}>
+                  <IonIcon icon={closeOutline} style={{ fontSize: "24px", color: "#ffffff", display: "block" }} />
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            <div className="tier-form">
+
+              <IonItem className="form-item">
+                <IonLabel position="stacked">Tier Type *</IonLabel>
+                <IonSelect
+                  value={formData.tierType}
+                  onIonChange={(e) => setFormData({ ...formData, tierType: e.detail.value, promoExpiry: "" })}
+                >
+                  <IonSelectOption value="standard">Standard</IonSelectOption>
+                  <IonSelectOption value="promo">Promo</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+
+              <IonItem className="form-item">
+                <IonLabel position="stacked">Name * (e.g. "Summer Promo")</IonLabel>
+                <IonInput
+                  value={formData.type}
+                  onIonInput={(e) => setFormData({ ...formData, type: e.detail.value! })}
+                  placeholder="Enter tier name"
+                />
+              </IonItem>
+
+              <IonItem className="form-item">
+                <IonLabel position="stacked">Duration * (e.g. "30 Days")</IonLabel>
+                <IonInput
+                  value={formData.duration}
+                  onIonInput={(e) => setFormData({ ...formData, duration: e.detail.value! })}
+                  placeholder="e.g. 30 Days"
+                />
+              </IonItem>
+
+              <IonItem className="form-item">
+                <IonLabel position="stacked">Price ($) *</IonLabel>
+                <IonInput
+                  type="number"
+                  value={formData.price}
+                  onIonInput={(e) => setFormData({ ...formData, price: e.detail.value! })}
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                />
+              </IonItem>
+
+              <IonItem className="form-item">
+                <IonLabel position="stacked">Description</IonLabel>
+                <IonInput
+                  value={formData.description}
+                  onIonInput={(e) => setFormData({ ...formData, description: e.detail.value! })}
+                  placeholder="Short description"
+                />
+              </IonItem>
+
+              {formData.tierType === "promo" && (
+                <IonItem className="form-item promo-expiry-item">
+                  <IonLabel position="stacked">Promo Expiry Date *</IonLabel>
+                  <IonInput
+                    type="date"
+                    value={formData.promoExpiry}
+                    onIonInput={(e) => setFormData({ ...formData, promoExpiry: e.detail.value! })}
+                  />
+                </IonItem>
+              )}
+
+              <IonItem className="form-item" lines="none">
+                <IonLabel>Active</IonLabel>
+                <IonToggle
+                  checked={formData.isActive}
+                  onIonChange={(e) => setFormData({ ...formData, isActive: e.detail.checked })}
+                />
+              </IonItem>
+
+              <div className="modal-actions">
+                <IonButton expand="block" color="medium" fill="outline" onClick={() => setShowModal(false)}>
+                  Cancel
+                </IonButton>
+                <IonButton expand="block" color="primary" onClick={handleSaveModal}>
+                  {isEditing ? "Update" : "Add"} Tier
+                </IonButton>
               </div>
             </div>
-          </main>
-        </div>
+          </IonContent>
+        </IonModal>
+
       </IonContent>
-      <Footer />
     </IonPage>
   );
 };

@@ -1,414 +1,282 @@
 import React, { useState } from "react";
 import {
-  IonIcon,
-  IonContent,
   IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonButton,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonText,
+  IonIcon,
+  IonAvatar,
+  useIonToast,
 } from "@ionic/react";
+import AdminHeader from "../../components/admincomponents/Layout/header";
 import {
   personOutline,
-  lockClosedOutline,
   mailOutline,
   callOutline,
-  locationOutline,
-  calendarOutline,
+  briefcaseOutline,
+  logOutOutline,
   saveOutline,
-  keyOutline,
-  homeOutline,
-  peopleOutline,
-  cubeOutline,
-    pricetagOutline,
-    settingsOutline,
-    statsChartOutline,
+  createOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-import Header from "../../components/admincomponents/widgets/header";
-import SideNavBar from "../../components/admincomponents/widgets/sidenavbar";
-import Footer from "../../components/admincomponents/widgets/footer";
-import "./dashboard.css";
-import "./members.css";
+import { useAuth } from "../../context/AuthContext";
+import "./common.css";
 import "./profile.css";
 
 interface AdminProfile {
-  id: number;
   name: string;
   email: string;
   phone: string;
-  address: string;
-  dateOfBirth: string;
-  joinDate: string;
   role: string;
-  department: string;
+  joinedDate: string;
 }
 
 const Profile: React.FC = () => {
   const history = useHistory();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeMenuItem, setActiveMenuItem] = useState("profile");
-  const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
-  const [isEditing, setIsEditing] = useState(false);
+  const { logout } = useAuth();
+  const [present] = useIonToast();
 
-  // Menu items configuration
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: homeOutline, path: "/dashboard" },
-    { id: "members", label: "Members", icon: peopleOutline, path: "/admin-page/members" },
-    { id: "employees", label: "Employees", icon: personOutline, path: "/admin-page/employees" },
-    { id: "products", label: "Products", icon: cubeOutline, path: "/admin-page/products" },
-    { id: "customers", label: "Customers", icon: statsChartOutline, path: "/admin-page/customers" },
-    { id: "equipment", label: "Equipment", icon: settingsOutline, path: "/admin-page/equipment" },
-    { id: "pricing", label: "Price Edit", icon: pricetagOutline, path: "/admin-page/priceedit" },
-    { id: "profile", label: "Profile", icon: personOutline, path: "/admin-page/profile" },
-  ];
-
-  // Mock admin profile data - replace with API calls
   const [profile, setProfile] = useState<AdminProfile>({
-    id: 1,
-    name: "John Smith",
-    email: "john.smith@gym.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Fitness Street, Health City, HC 12345",
-    dateOfBirth: "1985-06-15",
-    joinDate: "2020-01-15",
-    role: "Gym Manager",
-    department: "Administration",
+    name: "Admin User",
+    email: "admin@flexdongym.com",
+    phone: "+1 234 567 8900",
+    role: "System Administrator",
+    joinedDate: "January 2024",
   });
 
-  // Password change form state
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<AdminProfile>(profile);
 
-  const handleNavigate = (path: string, itemId: string) => {
-    setActiveMenuItem(itemId);
-    setMenuOpen(false);
-    history.push(path);
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedProfile(profile);
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const handleProfileUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically submit the updated profile to backend
-    alert("Profile updated successfully!");
+  const handleCancel = () => {
     setIsEditing(false);
+    setEditedProfile(profile);
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = () => {
+    setProfile(editedProfile);
+    setIsEditing(false);
 
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert("New passwords do not match!");
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 8) {
-      alert("Password must be at least 8 characters long!");
-      return;
-    }
-
-    // Here you would typically submit the password change to backend
-    alert("Password changed successfully!");
-    setPasswordForm({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
+    present({
+      message: "Profile updated successfully!",
+      duration: 2000,
+      position: "top",
+      color: "success",
     });
   };
 
-  const handleProfileChange = (field: keyof AdminProfile, value: string) => {
-    setProfile(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const handleLogout = () => {
+    present({
+      message: "Logging out...",
+      duration: 1500,
+      position: "top",
+      color: "medium",
+    });
+
+    setTimeout(() => {
+      logout();
+      window.location.href = "/";
+    }, 1500);
   };
 
-  const handlePasswordChangeInput = (field: string, value: string) => {
-    setPasswordForm(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
-    <IonPage>
-      <Header menuOpen={menuOpen} toggleMenu={toggleMenu} title="Profile Management" />
+    <IonPage className="admin-page">
+      <AdminHeader title="Admin Profile" />
 
-      <IonContent>
-        <div className="dashboard-layout">
-          <SideNavBar
-            menuOpen={menuOpen}
-            activeMenuItem={activeMenuItem}
-            handleNavigate={handleNavigate}
-            menuItems={menuItems}
-            toggleMenu={toggleMenu}
-          />
-
-          {/* Main Content */}
-          <main className="dashboard-main">
-            <div className="dashboard-container">
-              {/* Page Header */}
-              <div className="page-header">
-                <div className="page-title-section">
-                  <IonIcon icon={personOutline} className="page-icon" />
-                  <div>
-                    <h1>Profile Settings</h1>
-                    <p>Manage your account information and security settings</p>
+      <IonContent className="ion-padding">
+        {/* Profile Header */}
+        <IonCard className="profile-header-card">
+          <IonCardContent>
+            <div className="profile-header-content">
+              <div className="profile-avatar-section">
+                <IonAvatar className="profile-avatar-large">
+                  <div className="avatar-placeholder">
+                    {getInitials(profile.name)}
                   </div>
-                </div>
+                </IonAvatar>
               </div>
-
-              {/* Profile Tabs */}
-              <div className="content-section">
-                <div className="profile-tabs">
-                  <button
-                    className={`tab-button ${activeTab === "profile" ? "active" : ""}`}
-                    onClick={() => setActiveTab("profile")}
-                  >
-                    <IonIcon icon={personOutline} />
-                    Edit Profile
-                  </button>
-                  <button
-                    className={`tab-button ${activeTab === "password" ? "active" : ""}`}
-                    onClick={() => setActiveTab("password")}
-                  >
-                    <IonIcon icon={lockClosedOutline} />
-                    Change Password
-                  </button>
-                </div>
-
-                {/* Profile Tab */}
-                {activeTab === "profile" && (
-                  <div className="profile-content">
-                    <div className="profile-header">
-                      <div className="profile-avatar">
-                        {profile.name.split(" ").map(n => n[0]).join("")}
-                      </div>
-                      <div className="profile-info">
-                        <h2>{profile.name}</h2>
-                        <p>{profile.role} - {profile.department}</p>
-                        <p>Member since {new Date(profile.joinDate).toLocaleDateString()}</p>
-                      </div>
-                      {!isEditing && (
-                        <button
-                          className="btn-primary"
-                          onClick={() => setIsEditing(true)}
-                        >
-                          <IonIcon icon={personOutline} />
-                          Edit Profile
-                        </button>
-                      )}
-                    </div>
-
-                    <form onSubmit={handleProfileUpdate} className="profile-form">
-                      <div className="form-section">
-                        <h3>Personal Information</h3>
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>Full Name</label>
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                className="form-input"
-                                value={profile.name}
-                                onChange={(e) => handleProfileChange("name", e.target.value)}
-                                required
-                              />
-                            ) : (
-                              <div className="form-display">
-                                <IonIcon icon={personOutline} />
-                                {profile.name}
-                              </div>
-                            )}
-                          </div>
-                          <div className="form-group">
-                            <label>Email Address</label>
-                            {isEditing ? (
-                              <input
-                                type="email"
-                                className="form-input"
-                                value={profile.email}
-                                onChange={(e) => handleProfileChange("email", e.target.value)}
-                                required
-                              />
-                            ) : (
-                              <div className="form-display">
-                                <IonIcon icon={mailOutline} />
-                                {profile.email}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>Phone Number</label>
-                            {isEditing ? (
-                              <input
-                                type="tel"
-                                className="form-input"
-                                value={profile.phone}
-                                onChange={(e) => handleProfileChange("phone", e.target.value)}
-                                required
-                              />
-                            ) : (
-                              <div className="form-display">
-                                <IonIcon icon={callOutline} />
-                                {profile.phone}
-                              </div>
-                            )}
-                          </div>
-                          <div className="form-group">
-                            <label>Date of Birth</label>
-                            {isEditing ? (
-                              <input
-                                type="date"
-                                className="form-input"
-                                value={profile.dateOfBirth}
-                                onChange={(e) => handleProfileChange("dateOfBirth", e.target.value)}
-                                required
-                              />
-                            ) : (
-                              <div className="form-display">
-                                <IonIcon icon={calendarOutline} />
-                                {new Date(profile.dateOfBirth).toLocaleDateString()}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="form-group">
-                          <label>Address</label>
-                          {isEditing ? (
-                            <textarea
-                              className="form-textarea"
-                              value={profile.address}
-                              onChange={(e) => handleProfileChange("address", e.target.value)}
-                              rows={3}
-                              required
-                            />
-                          ) : (
-                            <div className="form-display">
-                              <IonIcon icon={locationOutline} />
-                              {profile.address}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="form-section">
-                        <h3>Work Information</h3>
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>Role</label>
-                            <div className="form-display">
-                              <IonIcon icon={personOutline} />
-                              {profile.role}
-                            </div>
-                          </div>
-                          <div className="form-group">
-                            <label>Department</label>
-                            <div className="form-display">
-                              <IonIcon icon={personOutline} />
-                              {profile.department}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="form-group">
-                          <label>Join Date</label>
-                          <div className="form-display">
-                            <IonIcon icon={calendarOutline} />
-                            {new Date(profile.joinDate).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {isEditing && (
-                        <div className="form-actions">
-                          <button
-                            type="button"
-                            className="btn-secondary"
-                            onClick={() => setIsEditing(false)}
-                          >
-                            Cancel
-                          </button>
-                          <button type="submit" className="btn-primary">
-                            <IonIcon icon={saveOutline} />
-                            Save Changes
-                          </button>
-                        </div>
-                      )}
-                    </form>
-                  </div>
-                )}
-
-                {/* Password Tab */}
-                {activeTab === "password" && (
-                  <div className="password-content">
-                    <div className="password-header">
-                      <IonIcon icon={keyOutline} className="password-icon" />
-                      <div>
-                        <h3>Change Password</h3>
-                        <p>Update your account password to keep your account secure</p>
-                      </div>
-                    </div>
-
-                    <form onSubmit={handlePasswordChange} className="password-form">
-                      <div className="form-section">
-                        <div className="form-group">
-                          <label>Current Password</label>
-                          <input
-                            type="password"
-                            className="form-input"
-                            value={passwordForm.currentPassword}
-                            onChange={(e) => handlePasswordChangeInput("currentPassword", e.target.value)}
-                            required
-                            placeholder="Enter your current password"
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>New Password</label>
-                          <input
-                            type="password"
-                            className="form-input"
-                            value={passwordForm.newPassword}
-                            onChange={(e) => handlePasswordChangeInput("newPassword", e.target.value)}
-                            required
-                            placeholder="Enter your new password"
-                            minLength={8}
-                          />
-                          <small className="form-hint">
-                            Password must be at least 8 characters long
-                          </small>
-                        </div>
-                        <div className="form-group">
-                          <label>Confirm New Password</label>
-                          <input
-                            type="password"
-                            className="form-input"
-                            value={passwordForm.confirmPassword}
-                            onChange={(e) => handlePasswordChangeInput("confirmPassword", e.target.value)}
-                            required
-                            placeholder="Confirm your new password"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-actions">
-                        <button type="submit" className="btn-primary">
-                          <IonIcon icon={lockClosedOutline} />
-                          Change Password
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                )}
+              <div className="profile-info-section">
+                <IonText>
+                  <h2 className="profile-name">{profile.name}</h2>
+                  <p className="profile-role">{profile.role}</p>
+                  <p className="profile-joined">
+                    Member since {profile.joinedDate}
+                  </p>
+                </IonText>
               </div>
             </div>
-          </main>
-        </div>
+          </IonCardContent>
+        </IonCard>
+
+        {/* Profile Details */}
+        <IonCard className="profile-details-card">
+          <IonCardHeader>
+            <div className="card-header-with-action">
+              <IonCardTitle>Profile Information</IonCardTitle>
+              {!isEditing && (
+                <IonButton size="small" onClick={handleEdit}>
+                  <IonIcon slot="start" icon={createOutline} />
+                  Edit
+                </IonButton>
+              )}
+            </div>
+          </IonCardHeader>
+          <IonCardContent>
+            <IonList>
+              <IonItem>
+                <IonIcon icon={personOutline} slot="start" color="primary" />
+                <IonLabel position="stacked">Full Name</IonLabel>
+                {isEditing ? (
+                  <IonInput
+                    value={editedProfile.name}
+                    onIonInput={(e) =>
+                      setEditedProfile({
+                        ...editedProfile,
+                        name: e.detail.value!,
+                      })
+                    }
+                  />
+                ) : (
+                  <IonInput value={profile.name} readonly />
+                )}
+              </IonItem>
+
+              <IonItem>
+                <IonIcon icon={mailOutline} slot="start" color="primary" />
+                <IonLabel position="stacked">Email</IonLabel>
+                {isEditing ? (
+                  <IonInput
+                    type="email"
+                    value={editedProfile.email}
+                    onIonInput={(e) =>
+                      setEditedProfile({
+                        ...editedProfile,
+                        email: e.detail.value!,
+                      })
+                    }
+                  />
+                ) : (
+                  <IonInput value={profile.email} readonly />
+                )}
+              </IonItem>
+
+              <IonItem>
+                <IonIcon icon={callOutline} slot="start" color="primary" />
+                <IonLabel position="stacked">Phone</IonLabel>
+                {isEditing ? (
+                  <IonInput
+                    type="tel"
+                    value={editedProfile.phone}
+                    onIonInput={(e) =>
+                      setEditedProfile({
+                        ...editedProfile,
+                        phone: e.detail.value!,
+                      })
+                    }
+                  />
+                ) : (
+                  <IonInput value={profile.phone} readonly />
+                )}
+              </IonItem>
+
+              <IonItem>
+                <IonIcon icon={briefcaseOutline} slot="start" color="primary" />
+                <IonLabel position="stacked">Role</IonLabel>
+                <IonInput value={profile.role} readonly />
+              </IonItem>
+            </IonList>
+
+            {isEditing && (
+              <div className="profile-actions">
+                <IonButton expand="block" color="primary" onClick={handleSave}>
+                  <IonIcon slot="start" icon={saveOutline} />
+                  Save Changes
+                </IonButton>
+                <IonButton
+                  expand="block"
+                  color="medium"
+                  fill="outline"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </IonButton>
+              </div>
+            )}
+          </IonCardContent>
+        </IonCard>
+
+        {/* Settings & Actions */}
+        <IonCard className="settings-card">
+          <IonCardHeader>
+            <IonCardTitle>Account Settings</IonCardTitle>
+          </IonCardHeader>
+          <IonCardContent>
+            <IonList>
+              <IonItem button detail>
+                <IonLabel>
+                  <h3>Change Password</h3>
+                  <p>Update your account password</p>
+                </IonLabel>
+              </IonItem>
+
+              <IonItem button detail>
+                <IonLabel>
+                  <h3>Notification Preferences</h3>
+                  <p>Manage email and push notifications</p>
+                </IonLabel>
+              </IonItem>
+
+              <IonItem button detail>
+                <IonLabel>
+                  <h3>Security Settings</h3>
+                  <p>Two-factor authentication and security</p>
+                </IonLabel>
+              </IonItem>
+            </IonList>
+          </IonCardContent>
+        </IonCard>
+
+        {/* Logout Section */}
+        <IonCard className="logout-card">
+          <IonCardContent>
+            <IonButton
+              expand="block"
+              color="danger"
+              onClick={handleLogout}
+              className="logout-button"
+            >
+              <IonIcon slot="start" icon={logOutOutline} />
+              Logout
+            </IonButton>
+            <p className="logout-note">
+              You will be redirected to the login page
+            </p>
+          </IonCardContent>
+        </IonCard>
       </IonContent>
-      <Footer />
     </IonPage>
   );
 };

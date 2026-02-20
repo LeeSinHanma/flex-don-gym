@@ -1,0 +1,178 @@
+/* Equipment Page Styles */
+
+.equipment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--gym-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.page-title {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--gym-primary);
+}
+
+.page-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  color: var(--gym-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* Equipment Card */
+.equipment-card {
+  margin-bottom: var(--spacing-lg);
+}
+
+.equipment-list {
+  background: transparent;
+  padding: 0;
+}
+
+.equipment-item {
+  --background: var(--gym-bg-primary);
+  --border-color: var(--gym-border-light);
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gym-border-light);
+  transition: all var(--transition-base);
+}
+
+.equipment-item:hover {
+  --background: var(--gym-bg-secondary);
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.equipment-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gym-primary);
+  margin: 0 0 var(--spacing-xs);
+}
+
+.equipment-detail {
+  font-size: var(--font-size-sm);
+  color: var(--gym-text-secondary);
+  margin: var(--spacing-xs) 0;
+}
+
+.equipment-notes {
+  font-size: var(--font-size-sm);
+  color: var(--gym-text-muted);
+  font-style: italic;
+  margin: var(--spacing-xs) 0 0;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Maintenance Log Card */
+.maintenance-log-card {
+  margin-bottom: var(--spacing-lg);
+}
+
+.log-list {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.log-entry {
+  padding: var(--spacing-md);
+  background: var(--gym-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gym-border-light);
+  transition: all var(--transition-base);
+}
+
+.log-entry:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--gym-border-light);
+}
+
+.log-equipment {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gym-primary);
+}
+
+.log-date {
+  font-size: var(--font-size-sm);
+  color: var(--gym-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.log-details {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.log-details p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--gym-text-primary);
+  line-height: var(--line-height-normal);
+}
+
+.log-details strong {
+  color: var(--gym-text-secondary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.log-notes {
+  margin-top: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--gym-border-light);
+}
+
+/* Modal Actions */
+.modal-actions {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .equipment-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .equipment-header ion-button {
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .log-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+}
