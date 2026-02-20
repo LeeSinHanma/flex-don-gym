@@ -4,8 +4,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
-import { IonImg } from "@ionic/react";
-import dondonLogo from "../../resources/dondon-logo.png";
+import { loginUser } from "../../logicHandlers/userServices";
 
 const LoginRegister: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,16 +15,22 @@ const LoginRegister: React.FC = () => {
 
   const history = useHistory();
 
-  const handleSubmit = () => {
-    if (!isLogin && password !== confirmPassword) {
-      alert("Passwords do not match!");
+  const handleSubmit = async () => {
+    if (!username || !password) {
+      alert("Please fill in all fields");
       return;
     }
-    console.log("Form submitted:", {
-      username,
-      password,
-      mode: isLogin ? "login" : "register",
-    });
+
+    // Login flow with API call
+    try {
+      const data = await loginUser(username, password);
+      console.log("✅ Login success:", data);
+
+      history.push("/menu");
+    } catch (error: any) {
+      console.error("❌ Login failed:", error.message);
+      alert(error.message);
+    }
   };
 
   return (
@@ -36,12 +41,27 @@ const LoginRegister: React.FC = () => {
           <h1 className="gym-name">DONDON'S FITNESS GYM</h1>
         </div>
         <div className="button-group">
-          <UsernameInput className="input-username" placeholder="Username" />
-          <PasswordInput className="input-password" placeholder="Password" />
+          <UsernameInput
+            className="input-username"
+            placeholder="Username"
+            value={username}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setUsername(e.target.value)
+            }
+          />
+
+          <PasswordInput
+            className="input-password"
+            placeholder="Password"
+            value={password}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
+          />
           <Button
             className="btn btn-signup"
-            type="submit"
-            onClick={() => history.push("/menu")}
+            type="button"
+            onClick={handleSubmit}
           >
             Sign in
           </Button>

@@ -41,3 +41,87 @@
 .add-member-container {
   margin-bottom: 10 0px;
 }
+
+.pos-nav {
+  display: flex; /* ⬅️ horizontal */
+  flex-direction: row; /* ⬅️ explicit row */
+  align-items: center;
+  list-style: none; /* remove bullets */
+  gap: 20px;
+  padding: 4px;
+  margin: 0;
+  background-color: none;
+}
+
+.pos-nav button {
+  width: 100%;
+  background: transparent;
+  color: #04354f;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.pos-nav button[data-active="true"] {
+  background: #e9f3ff;
+  color: #0085c9;
+  height: 50px;
+  border-radius: 25px;
+}
+
+.pos-nav li {
+  display: flex;
+}
+
+.pos-nav button {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.qr .pos-container h3,
+.qr .status-container h3 {
+  font-size: 16px;
+}
+
+.qr .qr-container h3 {
+  font-size: 20px;
+  color: #0084c9;
+}
+
+h3 {
+  cursor: pointer;
+}
+
+/* ===== QR CAMERA CONTAINER ===== */
+.camera-container {
+  width: 100%;
+  height: 260px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+#qr-reader {
+  width: 100%;
+  height: 100%;
+}
+
+#qr-reader video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
