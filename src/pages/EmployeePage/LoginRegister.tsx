@@ -5,7 +5,7 @@ import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
 import { IonImg } from "@ionic/react";
-import dondonLogo from "../../resources/dondon-logo.png";
+import dondonLogo from "../../resource/dondon-logo.png";
 
 const LoginRegister: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
