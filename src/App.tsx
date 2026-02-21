@@ -90,11 +90,6 @@ const App: React.FC = () => {
 
               <Route exact path="/pos" component={PosPage} />
               <Route exact path="/pos-item" component={PosItemPage} />
-              <Route
-                exact
-                path="/dashboard-opt"
-                component={DashboardOptionPage}
-              />
 
               {/* QR Generator Route */}
               <Route exact path="/generator" component={QRGenerator} />
