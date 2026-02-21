@@ -4,7 +4,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
-import { loginUser } from "../../logicHandlers/userServices";
+import { getUserType, loginUser } from "../../logicHandlers/userServices";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 
@@ -14,24 +14,33 @@ const LoginRegister: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const history = useHistory();
 
   const handleSubmit = async () => {
     if (!username || !password) {
-      alert("Please fill in all fields");
+      setErrorMessage("Please fill in all fields");
       return;
     }
 
-    // Login flow with API call
     try {
       const data = await loginUser(username, password);
-      console.log("✅ Login success:", data);
 
-      history.push("/menu");
+      const userType = await getUserType(username);
+
+      if (userType === 0) {
+        // Employee
+        history.push("/qr");
+      } else if (userType === 1) {
+        // Admin
+        history.push("/admin-page");
+      }
     } catch (error: any) {
-      console.error("❌ Login failed:", error.message);
-      alert(error.message);
+      setErrorMessage("Invalid username or password");
+
+      setUsername("");
+      setPassword("");
     }
   };
 
@@ -60,6 +69,8 @@ const LoginRegister: React.FC = () => {
               setPassword(e.target.value)
             }
           />
+
+          {errorMessage && <span className="login-error">{errorMessage}</span>}
           <Button
             className="btn btn-signup"
             type="button"
