@@ -5,6 +5,7 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
+import { Modal } from "../../components/Reusable/Modals";
 import "./Member.css";
 
 const MemberMenu: React.FC = () => {
@@ -47,16 +48,15 @@ const MemberMenu: React.FC = () => {
       </div>
 
       {/* MODAL */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h2>Member Added</h2>
-            <p>This is the QR</p>
-
-            <Button onClick={() => setShowModal(false)}>Close</Button>
-          </div>
-        </div>
-      )}
+      <Modal
+        className="modal-box"
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="QR Code"
+      >
+        <h2>Member Added</h2>
+        <p>This is the QR</p>
+      </Modal>
     </div>
   );
 };
