@@ -7,33 +7,40 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
 
+import "./App.css";
+
 import Menu from "./components/Menu";
 import Page from "./pages/Page";
-import QRGenerator from "./App"; // QR Generator
+
 import LoginRegister from "./pages/EmployeePage/LoginRegister";
 import MenuButtons from "./pages/EmployeePage/Menu";
 import MemberMenu from "./pages/EmployeePage/Member";
 import WalkInMenu from "./pages/EmployeePage/WalkIn";
 import PrepaidMenu from "./pages/EmployeePage/Prepaid";
 import QRScannerHome from "./pages/EmployeePage/QRScanner";
+
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
+
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
-import PosPage from "./pages/EmployeePage/Pos";
-import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
-import PosItemPage from "./pages/EmployeePage/PosItem";
 
-/* Core CSS required for Ionic components to work properly */
+import PosPage from "./pages/EmployeePage/Pos";
+import PosItemPage from "./pages/EmployeePage/PosItem";
+import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
+
+// import GeneratorHome from "./pages/QrGenPage/GeneratorHome"; // ✅ QR Generator Page
+
+/* Ionic Core CSS */
 import "@ionic/react/css/core.css";
 
-/* Basic CSS for apps built with Ionic */
+/* Basic CSS */
 import "@ionic/react/css/normalize.css";
 import "@ionic/react/css/structure.css";
 import "@ionic/react/css/typography.css";
 
-/* Optional CSS utils that can be commented out */
+/* Optional CSS utils */
 import "@ionic/react/css/padding.css";
 import "@ionic/react/css/float-elements.css";
 import "@ionic/react/css/text-alignment.css";
@@ -41,17 +48,10 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
+/* Dark Mode */
 import "@ionic/react/css/palettes/dark.system.css";
 
-/* Theme variables */
+/* Theme */
 import "./theme/variables.css";
 
 setupIonicReact();
@@ -77,29 +77,29 @@ const App: React.FC = () => {
               <Route exact path="/walkin" component={WalkInMenu} />
               <Route exact path="/prepaid" component={PrepaidMenu} />
               <Route exact path="/qr" component={QRScannerHome} />
+              <Route exact path="/status-member" component={StatusMemberPage} />
+              <Route exact path="/pos" component={PosPage} />
+              <Route exact path="/pos-item" component={PosItemPage} />
+
+              {/* Admin Routes */}
               <Route exact path="/admin-page" component={StartingPageAdmin} />
               <Route exact path="/employee-login" component={EmployeeMenu} />
-              <Route exact path="/employee-login" component={EmployeeMenu} />
               <Route exact path="/admin-menu" component={AdminMenu} />
-              <Route exact path="/status-member" component={StatusMemberPage} />
               <Route
                 exact
                 path="/manage-status"
                 component={ManageStatusMemPage}
               />
-
-              <Route exact path="/pos" component={PosPage} />
-              <Route exact path="/pos-item" component={PosItemPage} />
               <Route
                 exact
                 path="/dashboard-opt"
                 component={DashboardOptionPage}
               />
 
-              {/* QR Generator Route */}
-              <Route exact path="/generator" component={QRGenerator} />
+              {/* QR Generator */}
+              {/* <Route exact path="/generator" component={GeneratorHome} /> */}
 
-              {/* Folder Route - keep at the end */}
+              {/* Folder Route (keep last) */}
               <Route exact path="/folder/:name" component={Page} />
             </Switch>
           </IonRouterOutlet>
