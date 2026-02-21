@@ -16,6 +16,9 @@ import PosPage from "./pages/EmployeePage/Pos";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
 import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
 import PosItemPage from "./pages/EmployeePage/PosItem";
+import LoginRegisterErrorPage from "./components/Reusable/LoginRegisterError";
+import LoadingScreen from "./pages/LoadingScreen";
+
 const QRGenerator = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -53,6 +56,18 @@ const QRGenerator = () => {
       >
         POS
       </button>
+      <button
+        style={{ marginTop: "20px" }}
+        onClick={() => history.push("/error-page")}
+      >
+        Login Error
+      </button>
+      <button
+        style={{ marginTop: "20px" }}
+        onClick={() => history.push("/loading")}
+      >
+        Loading Screen
+      </button>
     </div>
   );
 };
@@ -76,6 +91,8 @@ const App = () => {
       <Route exact path="/pos" component={PosPage} />
       <Route exact path="/pos-item" component={PosItemPage} />
       <Route exact path="/dashboard-opt" component={DashboardOptionPage} />
+      <Route exact path="/error-page" component={LoginRegisterErrorPage} />
+      <Route exact path="/loading" component={LoadingScreen} />
     </>
   );
 };
