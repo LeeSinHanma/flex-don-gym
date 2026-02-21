@@ -3,6 +3,9 @@ import { useHistory } from "react-router-dom";
 import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./StatusMember.css";
 import { Button } from "../../components/Reusable/Button";
+import { searchOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
+import PosNav from "../../components/Reusable/NavItems";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
@@ -13,6 +16,7 @@ const StatusMemberPage: React.FC = () => {
         <div className="top-header">
           <h2>Manage Member</h2>
           <div className="search-bar">
+            <IonIcon icon={searchOutline} className="search-icon" />
             <input className="search-input" type="text" placeholder="Search" />
           </div>
           <div className="nav-carousel">
@@ -25,7 +29,7 @@ const StatusMemberPage: React.FC = () => {
         <div className="cards-container">
           <div
             className="status-card"
-            onClick={() => history.push("/profile-member")}
+            onClick={() => history.push("/manage-status")}
           >
             <div className="status-info">
               <div className="left-info">
@@ -39,19 +43,13 @@ const StatusMemberPage: React.FC = () => {
             <div className="client-status">active</div>
           </div>
         </div>
-        <div className="pos-container">
-          <div className="stat pos-nav-container">
-            <div className="pos-container">
-              <h3>POS</h3>
-            </div>
-            <div className="stat qr-container">
-              <h3 onClick={() => history.push("/qr")}>QR Scanner</h3>
-            </div>
-            <div className="stat status-container">
-              <h3 onClick={() => history.push("/status-member")}>Status</h3>
-            </div>
-          </div>
-        </div>
+        <PosNav
+          items={[
+            { label: "POS", path: "/pos" },
+            { label: "QR Scanner", path: "/qr" },
+            { label: "Status", path: "/status-member" },
+          ]}
+        />
       </div>
     </div>
   );

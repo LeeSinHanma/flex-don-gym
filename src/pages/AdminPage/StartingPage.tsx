@@ -4,6 +4,8 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resource/dondon-logo.png";
 
 const StartingPageAdmin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,14 +32,15 @@ const StartingPageAdmin: React.FC = () => {
     <div className="admin-login-container">
       <div className="admin-main-container">
         <div className="admin-image-group">
-          <img src="/dondon-logo.png" className="dondon-logo" alt="Logo" />
+          <IonImg src={dondonLogo} className="dondon-logo" alt="Logo" />
+
           <h1 className="admin-gym-name">DONDON'S FITNESS GYM</h1>
         </div>
         <div className="admin-button-group">
           <Button
             className="btn btn-signup"
             type="submit"
-            onClick={() => history.push("/menu-admin")}
+            onClick={() => history.push("/qr")}
           >
             Get started
           </Button>
