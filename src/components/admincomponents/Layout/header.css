@@ -1,0 +1,24 @@
+.admin-header {
+  box-shadow: var(--fdg-shadow, 0 2px 8px rgba(27, 46, 75, 0.1));
+}
+
+.admin-header ion-toolbar {
+  --background: var(--gym-primary, #1B2E4B);
+  --color: white;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+}
+
+.admin-header-title {
+  font-size: var(--fdg-font-lg, 18px);
+  font-weight: var(--fdg-font-bold, 700);
+  color: white;
+}
+
+.admin-header ion-button {
+  --color: white;
+}
+
+.admin-header ion-icon {
+  font-size: 24px;
+}

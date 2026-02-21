@@ -1,0 +1,170 @@
+/* Admin Dashboard Styles */
+.dashboard-content {
+  --background: #f5f7fa;
+}
+
+.dashboard-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Stats Cards */
+.stat-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card ion-card-content {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Icon Wrapper — background only, color is set inline on IonIcon */
+.stat-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon-wrapper.primary {
+  background: rgba(27, 46, 75, 0.1);
+}
+
+.stat-icon-wrapper.success {
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.stat-icon-wrapper.warning {
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.stat-icon-wrapper.revenue {
+  background: rgba(46, 204, 113, 0.1);
+}
+
+/* Stat Content */
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: #1b2e4b;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Charts Section */
+.charts-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-top: 24px;
+}
+
+.charts-card ion-card-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.charts-card ion-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1b2e4b;
+}
+
+.charts-card ion-card-content {
+  padding: 40px 20px;
+}
+
+.charts-placeholder {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(27, 46, 75, 0.02) 0%,
+    rgba(46, 204, 113, 0.02) 100%
+  );
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
+.chart-placeholder-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+  margin: 0 0 8px 0;
+}
+
+.chart-placeholder-subtext {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+
+  .stat-card ion-card-content {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .stat-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+  }
+
+  .charts-placeholder {
+    padding: 40px 16px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .dashboard-container {
+    padding: 24px;
+  }
+
+  .stat-card ion-card-content {
+    padding: 24px;
+  }
+}

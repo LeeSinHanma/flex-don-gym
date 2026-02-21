@@ -1,0 +1,18 @@
+#admin-content {
+  --background: var(--gym-bg-secondary, #F0F4F8);
+}
+
+.admin-page-content {
+  --background: var(--gym-bg-secondary, #F0F4F8);
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+}
+
+@media (max-width: 768px) {
+  .admin-page-content {
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+}

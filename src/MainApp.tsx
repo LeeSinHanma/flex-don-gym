@@ -1,61 +1,24 @@
-import React from "react";
-import { IonApp, IonRouterOutlet, IonSplitPane } from "@ionic/react";
-import { IonReactRouter } from "@ionic/react-router";
-import { Route, Redirect, Switch } from "react-router-dom";
+import App from './App';
 
-import Menu from "./components/Menu";
-import Page from "./pages/Page";
-import App from "./App"; // QR Generator
-import LoginRegister from "./pages/EmployeePage/LoginRegister";
-import MenuButtons from "./pages/EmployeePage/Menu";
-import MemberMenu from "./pages/EmployeePage/Member";
-import WalkInMenu from "./pages/EmployeePage/WalkIn";
-import PrepaidMenu from "./pages/EmployeePage/Prepaid";
-import QRScannerHome from "./pages/EmployeePage/QRScanner";
-import StartingPageAdmin from "./pages/AdminPage/StartingPage";
-import EmployeeMenu from "./pages/AdminPage/Employee";
-import AdminMenu from "./pages/AdminPage/Admin";
-import MenuAdminButtons from "./pages/AdminPage/MenuAdmin";
-import StatusMemberPage from "./pages/EmployeePage/StatusMember";
-import ProfileMemberPage from "./pages/EmployeePage/ProfileMember";
+/* Core CSS required for Ionic components to work properly */
+import '@ionic/react/css/core.css';
 
-const MainApp: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonSplitPane contentId="main">
-        <Menu />
+/* Basic CSS for apps built with Ionic */
+import '@ionic/react/css/normalize.css';
+import '@ionic/react/css/structure.css';
+import '@ionic/react/css/typography.css';
 
-        <IonRouterOutlet id="main">
-          <Switch>
-            {/* Default redirect */}
-            <Route exact path="/">
-              <Redirect to="/folder/Inbox" />
-            </Route>
+/* Optional CSS utils that can be commented out */
+import '@ionic/react/css/padding.css';
+import '@ionic/react/css/float-elements.css';
+import '@ionic/react/css/text-alignment.css';
+import '@ionic/react/css/text-transformation.css';
+import '@ionic/react/css/flex-utils.css';
+import '@ionic/react/css/display.css';
 
-            {/* Employee Routes */}
-            <Route exact path="/login" component={LoginRegister} />
-            <Route exact path="/menu" component={MenuButtons} />
-            <Route exact path="/member" component={MemberMenu} />
-            <Route exact path="/walkin" component={WalkInMenu} />
-            <Route exact path="/prepaid" component={PrepaidMenu} />
-            <Route exact path="/qr" component={QRScannerHome} />
-            <Route exact path="/admin-page" component={StartingPageAdmin} />
-            <Route exact path="/employee" component={EmployeeMenu} />
-            <Route exact path="/admin" component={AdminMenu} />
-            <Route exact path="/menu-admin" component={MenuAdminButtons} />
-            <Route exact path="/status-member" component={StatusMemberPage} />
-            <Route exact path="/status-member" component={ProfileMemberPage} />
+/* Theme variables */
+import './theme/variables.css';
 
-            {/* QR Generator */}
-            <Route exact path="/generator" component={App} />
-
-            {/* Folder/Page route - should be last */}
-            <Route exact path="/folder/:name" component={Page} />
-          </Switch>
-        </IonRouterOutlet>
-      </IonSplitPane>
-    </IonReactRouter>
-  </IonApp>
-);
+const MainApp: React.FC = () => <App />;
 
 export default MainApp;

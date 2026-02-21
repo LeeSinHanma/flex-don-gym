@@ -1,0 +1,26 @@
+.fdg-button {
+  --border-radius: var(--fdg-radius-md, 8px);
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  font-weight: var(--fdg-font-semibold, 600);
+  text-transform: none;
+  letter-spacing: 0.3px;
+}
+
+.fdg-button[size='small'] {
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  font-size: var(--fdg-font-sm, 14px);
+}
+
+.fdg-button[size='large'] {
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --padding-start: 24px;
+  --padding-end: 24px;
+  font-size: var(--fdg-font-lg, 18px);
+}

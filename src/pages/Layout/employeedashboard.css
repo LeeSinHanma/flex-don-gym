@@ -1,0 +1,18 @@
+#employee-content {
+  --background: var(--gym-bg-secondary, #F0F4F8);
+}
+
+.employee-page-content {
+  --background: var(--gym-bg-secondary, #F0F4F8);
+  --padding-top: 16px;
+  --padding-bottom: 80px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+@media (max-width: 768px) {
+  .employee-page-content {
+    --padding-start: 12px;
+    --padding-end: 12px;
+  }
+}

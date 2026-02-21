@@ -1,29 +1,44 @@
-interface QRScannerProps {
-  items: string[];
-  active: string;
-  onClick: (value: string) => void;
-  className?: string;
+import React from 'react';
+import { IonFab, IonFabButton, IonIcon } from '@ionic/react';
+import { qrCodeOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+
+interface QRScannerNavProps {
+  position?: 'top-right' | 'bottom-right' | 'top-left' | 'bottom-left';
+  color?: string;
+  scannerPath?: string;
 }
 
-export default function QRScanner({
-  items,
-  active,
-  onClick,
-  className,
-}: QRScannerProps) {
+const QRScannerNav: React.FC<QRScannerNavProps> = ({
+  position = 'bottom-right',
+  color = 'secondary',
+  scannerPath = '/employee/qr-scanner',
+}) => {
+  const history = useHistory();
+
+  const getVerticalPosition = () => {
+    return position.startsWith('top') ? 'top' : 'bottom';
+  };
+
+  const getHorizontalPosition = () => {
+    return position.endsWith('right') ? 'end' : 'start';
+  };
+
+  const handleScanClick = () => {
+    history.push(scannerPath);
+  };
+
   return (
-    <ul className={className}>
-      {items.map((item) => (
-        <li key={item}>
-          <button
-            type="button"
-            data-active={active === item}
-            onClick={() => onClick(item)}
-          >
-            {item}
-          </button>
-        </li>
-      ))}
-    </ul>
+    <IonFab 
+      vertical={getVerticalPosition()} 
+      horizontal={getHorizontalPosition()} 
+      slot="fixed"
+    >
+      <IonFabButton color={color} onClick={handleScanClick}>
+        <IonIcon icon={qrCodeOutline} />
+      </IonFabButton>
+    </IonFab>
   );
-}
+};
+
+export default QRScannerNav;
