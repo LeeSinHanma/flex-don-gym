@@ -18,7 +18,10 @@ import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
 import MenuAdminButtons from "./pages/AdminPage/MenuAdmin";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
-import ProfileMemberPage from "./pages/EmployeePage/ProfileMember";
+import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
+import PosPage from "./pages/EmployeePage/Pos";
+import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
+import PosItemPage from "./pages/EmployeePage/PosItem";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -46,7 +49,18 @@ const MainApp: React.FC = () => (
             <Route exact path="/admin" component={AdminMenu} />
             <Route exact path="/menu-admin" component={MenuAdminButtons} />
             <Route exact path="/status-member" component={StatusMemberPage} />
-            <Route exact path="/status-member" component={ProfileMemberPage} />
+            <Route
+              exact
+              path="/manage-status"
+              component={ManageStatusMemPage}
+            />
+            <Route exact path="/pos" component={PosPage} />
+            <Route exact path="/pos-item" component={PosItemPage} />
+            <Route
+              exact
+              path="/dashboard-opt"
+              component={DashboardOptionPage}
+            />
 
             {/* QR Generator */}
             <Route exact path="/generator" component={App} />

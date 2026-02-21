@@ -1,0 +1,161 @@
+.manage-member-container {
+  min-height: 100vh;
+  background-color: #d1d5db; /* Gray-300 equivalent */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.main-container {
+  background-color: #d9d9d9; /* Slate-800 equivalent */
+  color: white;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 0.375rem;
+  height: 95vh;
+  overflow: hidden;
+}
+
+.status-top-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+  margin-bottom: 1rem; /* Add spacing below header */
+}
+
+.status-top-header h2 {
+  font-size: 30px;
+  font-family: "Inter", sans-serif;
+  color: #04354f;
+  margin: 0;
+}
+
+.status-top-header .status-btn-back {
+  position: absolute;
+  left: 0;
+}
+
+.status-btn-back {
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+}
+
+.member-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.member-name {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 32px;
+  font-weight: bold;
+  color: #04354f;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 14px;
+}
+
+.member-type {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 26px;
+  font-weight: bold;
+  color: #0084c9;
+}
+
+.member-duration {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 22px;
+  font-weight: normal;
+  color: #0084c9;
+}
+
+.middle-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 16px;
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* spacing between history box & button */
+}
+
+.history-box {
+  width: 100%;
+  height: 90px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 12px;
+
+  display: flex;
+  align-items: flex-start;
+}
+
+.history-info {
+  margin: 0;
+  font-size: 14px;
+  color: #04354f;
+}
+
+/* Button */
+.btn-qr {
+  width: 100%;
+  height: 56px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-button-container {
+  margin-top: 50px;
+}
+
+.status-button {
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+}
+
+.renew-btn,
+.cancel-btn {
+  border-radius: 15px;
+  width: 125px;
+  height: 60px;
+}
+
+.cancel-btn {
+  background-color: #af2828;
+}

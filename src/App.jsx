@@ -12,8 +12,10 @@ import QRScannerHome from "./pages/EmployeePage/QRScanner";
 import QRGen from "./pages/QrGenPage/QrGen";
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
-import AdminMenu from "./pages/AdminPage/Admin";
-
+import PosPage from "./pages/EmployeePage/Pos";
+import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
+import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
+import PosItemPage from "./pages/EmployeePage/PosItem";
 const QRGenerator = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -39,14 +41,17 @@ const QRGenerator = () => {
         Login
       </button>
 
-      <button style={{ marginTop: "20px" }} onClick={() => history.push("/qr")}>
-        POS
+      <button
+        style={{ marginTop: "20px" }}
+        onClick={() => history.push("/admin-page")}
+      >
+        Get Started
       </button>
       <button
         style={{ marginTop: "20px" }}
-        onClick={() => history.push("/status-member")}
+        onClick={() => history.push("/pos")}
       >
-        Status
+        POS
       </button>
     </div>
   );
@@ -67,6 +72,10 @@ const App = () => {
       <Route exact path="/qrGen" component={QRGen} />
       <Route exact path="/admin-page" component={StartingPageAdmin} />
       <Route exact path="/status-member" component={StatusMemberPage} />
+      <Route exact path="/manage-status" component={ManageStatusMemPage} />
+      <Route exact path="/pos" component={PosPage} />
+      <Route exact path="/pos-item" component={PosItemPage} />
+      <Route exact path="/dashboard-opt" component={DashboardOptionPage} />
     </>
   );
 };

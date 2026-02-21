@@ -195,6 +195,11 @@
   flex: 0 0 auto;
   gap: 1rem;
 }
+
+.dondon-logo {
+  height: 379px;
+}
+
 .gym-name {
   font-size: 25px;
   font-weight: bold;
