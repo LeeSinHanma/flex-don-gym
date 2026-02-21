@@ -28,7 +28,6 @@ import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
 
 import PosPage from "./pages/EmployeePage/Pos";
 import PosItemPage from "./pages/EmployeePage/PosItem";
-import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
 
 // import GeneratorHome from "./pages/QrGenPage/GeneratorHome"; // ✅ QR Generator Page
 
@@ -89,11 +88,6 @@ const App: React.FC = () => {
                 exact
                 path="/manage-status"
                 component={ManageStatusMemPage}
-              />
-              <Route
-                exact
-                path="/dashboard-opt"
-                component={DashboardOptionPage}
               />
 
               {/* QR Generator */}

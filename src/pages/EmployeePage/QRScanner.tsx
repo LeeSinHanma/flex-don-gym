@@ -4,7 +4,10 @@ import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import QRResultModal from "../../components/Modals/QRResultModal";
 import { useEffect } from "react";
-import { startQrScanner, stopQrScanner } from "../../logicHandlers/qrScannerModule";
+import {
+  startQrScanner,
+  stopQrScanner,
+} from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
 
 const QRScannerHome: React.FC = () => {
@@ -19,9 +22,9 @@ const QRScannerHome: React.FC = () => {
 
         console.log("Member Details:", member);
 
-        setMemberName(member.first_name);   // store data
-        setIsModalOpen(true);               // open modal
-        stopQrScanner();                    // stop camera while modal is open
+        setMemberName(member.first_name); // store data
+        setIsModalOpen(true); // open modal
+        stopQrScanner(); // stop camera while modal is open
       } catch (err: any) {
         console.error("Failed to fetch member:", err.message);
       }
@@ -33,12 +36,12 @@ const QRScannerHome: React.FC = () => {
   }, []);
 
   return (
-    <div className="main-pos-container">
+    <div className="main-qr-container">
       <div className="main-container">
         <div className="camera-container">
           <div id="qr-reader" />
         </div>
-        <div className="menu-pos-container">
+        <div className="menu-qr-container">
           <div className="add-member-container">
             <Button
               className="btn add-member"
@@ -49,8 +52,8 @@ const QRScannerHome: React.FC = () => {
             </Button>
           </div>
           <div className="qr pos-nav-container">
-            <div className="pos-container">
-              <h3>POS</h3>
+            <div className="qr-container">
+              <h3 onClick={() => history.push("/pos")}>POS</h3>
             </div>
             <div className="qr qr-container">
               <h3 onClick={() => history.push("/")}>QR Scanner</h3>

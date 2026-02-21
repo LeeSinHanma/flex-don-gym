@@ -7,6 +7,7 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import PosNav from "../../components/Reusable/NavItems";
 import "./ManageStatusMem.css";
+import { Modal } from "../../components/Reusable/Modals";
 
 const ManageStatusMemPage: React.FC = () => {
   const history = useHistory();
@@ -68,16 +69,14 @@ const ManageStatusMemPage: React.FC = () => {
           />
         </div>
       </div>
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h2>Show QR</h2>
-            <p>This is the QR</p>
-
-            <Button onClick={() => setShowModal(false)}>Close</Button>
-          </div>
-        </div>
-      )}
+      <Modal
+        className="modal-box"
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="QR Code"
+      >
+        <p>This is the QR</p>
+      </Modal>
     </div>
   );
 };

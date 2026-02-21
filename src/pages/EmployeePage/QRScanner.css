@@ -1,4 +1,4 @@
-.main-pos-container {
+.main-qr-container {
   min-height: 100vh;
   background-color: #d1d5db; /* Gray-300 equivalent */
   display: flex;
@@ -20,7 +20,7 @@
   height: 95vh;
 }
 
-.menu-pos-container {
+.menu-qr-container {
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -63,9 +63,7 @@
   font-size: 16px;
   padding: 8px 12px;
   border-radius: 8px;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .pos-nav button[data-active="true"] {
@@ -80,19 +78,12 @@
 }
 
 .pos-nav button {
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .qr .pos-container h3,
 .qr .status-container h3 {
   font-size: 16px;
-}
-
-.qr .qr-container h3 {
-  font-size: 20px;
-  color: #0084c9;
 }
 
 h3 {
