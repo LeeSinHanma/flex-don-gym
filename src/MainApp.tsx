@@ -20,8 +20,9 @@ import MenuAdminButtons from "./pages/AdminPage/MenuAdmin";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
 import PosPage from "./pages/EmployeePage/Pos";
-import DashboardOptionPage from "./pages/AdminPage/DashboardOption";
 import PosItemPage from "./pages/EmployeePage/PosItem";
+import LoginRegisterErrorPage from "./components/Reusable/LoginRegisterError";
+import LoadingScreen from "./pages/LoadingScreen";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -56,14 +57,16 @@ const MainApp: React.FC = () => (
             />
             <Route exact path="/pos" component={PosPage} />
             <Route exact path="/pos-item" component={PosItemPage} />
+
             <Route
               exact
-              path="/dashboard-opt"
-              component={DashboardOptionPage}
+              path="/error-page"
+              component={LoginRegisterErrorPage}
             />
 
             {/* QR Generator */}
             <Route exact path="/generator" component={App} />
+            <Route exact path="/loading" component={LoadingScreen} />
 
             {/* Folder/Page route - should be last */}
             <Route exact path="/folder/:name" component={Page} />
