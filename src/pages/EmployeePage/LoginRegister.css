@@ -227,7 +227,8 @@
   width: 100%;
   text-align: left;
   color: #e53e3e;
-  font-size: 0.813rem;
+  font-size: 16px;
+  font-weight: 600;
   margin-top: -0.25rem;
   margin-bottom: 0.25rem;
   padding-left: 0.25rem;
@@ -243,17 +244,18 @@
   border: none;
   border-radius: 16px;
   height: 60px;
+  font-weight: 600;
 }
 
 .input-username::placeholder,
 .input-password::placeholder {
   color: #04354f;
-  font-weight: 600;
+  font-weight: normal;
 }
 
 .login-error {
   color: #d93025; /* professional red */
-  font-size: 13px; /* small text */
+  font-size: 16px; /* small text */
   margin-top: 6px;
   display: block;
   text-align: left;
@@ -283,7 +285,8 @@
   padding: 10px 12px;
   border-radius: 10px;
   margin-bottom: 10px;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
   background: rgba(255, 0, 0, 0.12);
   color: #b00020;
   text-align: center;

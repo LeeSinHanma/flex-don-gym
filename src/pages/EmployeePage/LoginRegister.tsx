@@ -116,7 +116,7 @@ const LoginRegister: React.FC = () => {
             />
 
             {errorMessage && (
-              <span className="login-error">{errorMessage}</span>
+              <strong className="login-error">{errorMessage}</strong>
             )}
 
             <Button
