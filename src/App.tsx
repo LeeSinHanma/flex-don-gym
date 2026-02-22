@@ -1,15 +1,9 @@
-import {
-  IonApp,
-  IonRouterOutlet,
-  IonSplitPane,
-  setupIonicReact,
-} from "@ionic/react";
+import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
 
 import "./App.css";
 
-import Menu from "./components/Menu";
 import Page from "./pages/Page";
 
 import LoginRegister from "./pages/EmployeePage/LoginRegister";
@@ -28,8 +22,6 @@ import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
 
 import PosPage from "./pages/EmployeePage/Pos";
 import PosItemPage from "./pages/EmployeePage/PosItem";
-
-// import GeneratorHome from "./pages/QrGenPage/GeneratorHome"; // ✅ QR Generator Page
 
 /* Ionic Core CSS */
 import "@ionic/react/css/core.css";
@@ -59,45 +51,38 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu />
+        <IonRouterOutlet>
+          <Switch>
+            {/* Default Redirect */}
+            <Route exact path="/">
+              <Redirect to="/login" />
+            </Route>
 
-          <IonRouterOutlet id="main">
-            <Switch>
-              {/* Default Redirect */}
-              <Route exact path="/">
-                <Redirect to="/login" />
-              </Route>
+            {/* Employee Routes */}
+            <Route exact path="/login" component={LoginRegister} />
+            <Route exact path="/menu" component={MenuButtons} />
+            <Route exact path="/member" component={MemberMenu} />
+            <Route exact path="/walkin" component={WalkInMenu} />
+            <Route exact path="/prepaid" component={PrepaidMenu} />
+            <Route exact path="/qr" component={QRScannerHome} />
+            <Route exact path="/status-member" component={StatusMemberPage} />
+            <Route exact path="/pos" component={PosPage} />
+            <Route exact path="/pos-item" component={PosItemPage} />
 
-              {/* Employee Routes */}
-              <Route exact path="/login" component={LoginRegister} />
-              <Route exact path="/menu" component={MenuButtons} />
-              <Route exact path="/member" component={MemberMenu} />
-              <Route exact path="/walkin" component={WalkInMenu} />
-              <Route exact path="/prepaid" component={PrepaidMenu} />
-              <Route exact path="/qr" component={QRScannerHome} />
-              <Route exact path="/status-member" component={StatusMemberPage} />
-              <Route exact path="/pos" component={PosPage} />
-              <Route exact path="/pos-item" component={PosItemPage} />
+            {/* Admin Routes */}
+            <Route exact path="/admin-page" component={StartingPageAdmin} />
+            <Route exact path="/employee-login" component={EmployeeMenu} />
+            <Route exact path="/admin-menu" component={AdminMenu} />
+            <Route
+              exact
+              path="/manage-status"
+              component={ManageStatusMemPage}
+            />
 
-              {/* Admin Routes */}
-              <Route exact path="/admin-page" component={StartingPageAdmin} />
-              <Route exact path="/employee-login" component={EmployeeMenu} />
-              <Route exact path="/admin-menu" component={AdminMenu} />
-              <Route
-                exact
-                path="/manage-status"
-                component={ManageStatusMemPage}
-              />
-
-              {/* QR Generator */}
-              {/* <Route exact path="/generator" component={GeneratorHome} /> */}
-
-              {/* Folder Route (keep last) */}
-              <Route exact path="/folder/:name" component={Page} />
-            </Switch>
-          </IonRouterOutlet>
-        </IonSplitPane>
+            {/* Folder Route (keep last) */}
+            <Route exact path="/folder/:name" component={Page} />
+          </Switch>
+        </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
   );
