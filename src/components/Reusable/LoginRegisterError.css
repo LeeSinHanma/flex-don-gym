@@ -232,6 +232,10 @@
   padding-left: 0.25rem;
 }
 
+.info-error p {
+  font-size: 16px;
+}
+
 .input-username,
 .input-password {
   width: 100%;
@@ -242,12 +246,13 @@
   border: none;
   border-radius: 16px;
   height: 60px;
+  font-weight: 600;
 }
 
 .input-username::placeholder,
 .input-password::placeholder {
   color: #04354f;
-  font-weight: 600;
+  font-weight: normal;
 }
 
 .btn-signup {
