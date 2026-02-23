@@ -1,2 +1,20 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
+
+
+.qr-modal::part(content) {
+  width: 380px;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.qr-modal::part(backdrop) {
+  opacity: 0.4;
+}
+
+@media (max-width: 500px) {
+  .qr-modal::part(content) {
+    width: 95%;
+  }
+}
