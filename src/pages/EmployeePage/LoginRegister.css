@@ -229,7 +229,8 @@
   width: 100%;
   text-align: left;
   color: #e53e3e;
-  font-size: 0.813rem;
+  font-size: 16px;
+  font-weight: 600;
   margin-top: -0.25rem;
   margin-bottom: 0.25rem;
   padding-left: 0.25rem;
@@ -271,6 +272,18 @@
 
 .btn-signup:hover {
   background-color: #2d5580;
+}
+
+.offline-banner {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  background: rgba(255, 0, 0, 0.12);
+  color: #b00020;
+  text-align: center;
 }
 
 /* Responsive adjustments */

@@ -2,9 +2,9 @@
 import { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "your.app.id",
-  appName: "YourAppName",
-  webDir: "build",
+  appId: "com.flexdongym.app",
+  appName: "FlexDonGym",
+  webDir: "dist",
   bundledWebRuntime: false,
 };
 
