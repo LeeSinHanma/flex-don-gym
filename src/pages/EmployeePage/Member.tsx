@@ -16,13 +16,15 @@ const MemberMenu: React.FC = () => {
     <div className="member-menu-container">
       <div className="main-container">
         <div className="top-container">
-          <BackButton
-            className="btn btn-back"
-            onClick={() => history.push("/menu")}
-          >
-            <IonIcon icon={arrowBackOutline} />
-          </BackButton>
-          <h1>Member</h1>
+          <div className="top-item-container">
+            <BackButton
+              className="btn btn-back"
+              onClick={() => history.push("/menu")}
+            >
+              <IonIcon icon={arrowBackOutline} />
+            </BackButton>
+            <h1>Member</h1>
+          </div>
         </div>
 
         <div className="form-container">

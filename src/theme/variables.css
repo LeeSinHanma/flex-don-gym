@@ -1,6 +1,17 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
 
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  font-size: 30px;
+  color: #04354f;
+}
+
+button {
+  border-radius: 15px;
+}
 
 .qr-modal::part(content) {
   width: 380px;

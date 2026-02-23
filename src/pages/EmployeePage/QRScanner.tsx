@@ -52,21 +52,15 @@ const QRScannerHome: React.FC = () => {
               ADD NEW MEMBER
             </Button>
           </div>
-          <PosNav
-            items={[
-              { label: "POS", path: "/pos", className: "pos-nav-container" },
-              {
-                label: "QR Scanner",
-                path: "/qr",
-                className: "qr-nav-container",
-              },
-              {
-                label: "Status",
-                path: "/status-member",
-                className: "status-nav-container",
-              },
-            ]}
-          />
+          <div className="pos-footer">
+            <PosNav
+              items={[
+                { label: "POS", path: "/pos" },
+                { label: "QR Scanner", path: "/qr" },
+                { label: "Status", path: "/status-member" },
+              ]}
+            />
+          </div>
         </div>
       </div>
       {/* ✅ PUT THE MODAL RIGHT HERE */}
