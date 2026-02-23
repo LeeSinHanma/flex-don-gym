@@ -149,3 +149,22 @@ h3 {
   font-size: 20px;
   color: #0084c9;
 }
+
+@media (max-width: 480px) {
+  .top-header {
+    width: 100%;
+    box-sizing: border-box;
+    align-items: stretch; /* only applies on mobile */
+  }
+
+  .top-header h2 {
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .search-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}

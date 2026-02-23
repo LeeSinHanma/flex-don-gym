@@ -70,6 +70,7 @@
 }
 
 .cart-icon {
+  cursor: pointer;
   color: #04354f;
   width: 35px;
   height: 35px;
@@ -147,15 +148,22 @@
   margin: 0;
 }
 
-.pos-product-price {
-  margin: 0;
-  font-size: 0.875rem;
-  opacity: 0.8;
-}
-
 .pos-item {
   font-size: 1.5rem;
   font-weight: bold;
   min-width: 40px;
   text-align: center;
+}
+
+@media (max-width: 480px) {
+  .pos-footer {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .pos-footer .pos-nav-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 }
