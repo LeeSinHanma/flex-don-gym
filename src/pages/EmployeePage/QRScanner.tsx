@@ -9,6 +9,7 @@ import {
   stopQrScanner,
 } from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
+import PosNav from "../../components/Reusable/NavItems";
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
@@ -44,25 +45,28 @@ const QRScannerHome: React.FC = () => {
         <div className="menu-qr-container">
           <div className="add-member-container">
             <Button
-              className="btn add-member"
+              className="btn-add-member"
               type="button"
               onClick={() => history.push("/menu")}
             >
               ADD NEW MEMBER
             </Button>
           </div>
-          <div className="qr pos-nav-container">
-            <div className="qr-container">
-              <h3 onClick={() => history.push("/pos")}>POS</h3>
-            </div>
-            <div className="qr qr-container">
-              <h3 onClick={() => history.push("/")}>QR Scanner</h3>
-            </div>
-
-            <div className="qr status-container">
-              <h3 onClick={() => history.push("/status-member")}>Status</h3>
-            </div>
-          </div>
+          <PosNav
+            items={[
+              { label: "POS", path: "/pos", className: "pos-nav-container" },
+              {
+                label: "QR Scanner",
+                path: "/qr",
+                className: "qr-nav-container",
+              },
+              {
+                label: "Status",
+                path: "/status-member",
+                className: "status-nav-container",
+              },
+            ]}
+          />
         </div>
       </div>
       {/* ✅ PUT THE MODAL RIGHT HERE */}

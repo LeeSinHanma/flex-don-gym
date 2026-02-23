@@ -43,6 +43,7 @@ const StatusMemberPage: React.FC = () => {
             <div className="client-status">active</div>
           </div>
         </div>
+
         <PosNav
           items={[
             { label: "POS", path: "/pos" },
