@@ -1,5 +1,6 @@
 import React, { use, useState } from "react";
 
+import "./LoginRegisterError.css";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";

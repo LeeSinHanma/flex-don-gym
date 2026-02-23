@@ -51,15 +51,15 @@ const ManageStatusMemPage: React.FC = () => {
         <div className="status-button-container">
           <div className="status-button">
             <Button type="button" className="renew-btn">
-              Renew
+              Edit
             </Button>
             <Button type="button" className="cancel-btn">
-              Cancel
+              Delete
             </Button>
           </div>
         </div>
 
-        <div className="pos-container">
+        {/*<div className="pos-container">
           <PosNav
             items={[
               { label: "POS", path: "/pos" },
@@ -67,7 +67,7 @@ const ManageStatusMemPage: React.FC = () => {
               { label: "Status", path: "/status-member" },
             ]}
           />
-        </div>
+        </div>*/}
       </div>
       <Modal
         className="modal-box"
