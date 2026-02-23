@@ -196,8 +196,10 @@
   gap: 1rem;
 }
 
-.dondon-logo {
-  height: 379px;
+.dondon-logo::part(image) {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .gym-name {
