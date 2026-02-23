@@ -81,11 +81,6 @@
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-.qr .pos-container h3,
-.qr .status-container h3 {
-  font-size: 16px;
-}
-
 h3 {
   cursor: pointer;
 }
@@ -115,4 +110,33 @@ h3 {
   height: 100%;
   object-fit: cover;
   transform: scaleX(-1);
+}
+
+@media (max-width: 480px) {
+  .menu-qr-container {
+    width: 100%;
+    box-sizing: border-box;
+    gap: 20px;
+  }
+
+  .pos-nav-container {
+    width: 100%; /* removes the hardcoded 400px */
+    max-width: 100%;
+    box-sizing: border-box;
+    gap: 10px;
+  }
+
+  .pos-nav {
+    width: 100%;
+    gap: 10px;
+    justify-content: space-between;
+  }
+
+  .pos-nav li {
+    flex: 1; /* each item shares space equally */
+  }
+
+  .pos-nav button {
+    width: 100%;
+  }
 }

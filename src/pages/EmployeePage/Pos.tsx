@@ -5,6 +5,7 @@ import "./Pos.css";
 import { IonIcon } from "@ionic/react";
 import { cartOutline, menuOutline } from "ionicons/icons";
 import PosNav from "../../components/Reusable/NavItems";
+import POSCard from "../../components/Reusable/PosCard";
 
 const PosPage: React.FC = () => {
   const history = useHistory();
@@ -33,23 +34,16 @@ const PosPage: React.FC = () => {
             <h2 className="amount">P4000</h2>
           </div>
         </div>
+
         <div className="pos-card-item">
-          <div className="pos-cards-container">
-            <div
-              className="pos-status-card"
-              onClick={() => history.push("/manage-status")}
-            >
-              <div className="pos-status-info">
-                <div className="pos-left-info">
-                  <h2 className="pos-product-name">Protein Powder</h2>
-                  <div className="pos-product-details">
-                    <p className="pos-product-price">Member</p>
-                  </div>
-                </div>
-              </div>
-              <div className="pos-item">2</div>
-            </div>
-          </div>
+          <POSCard
+            productName="Protein Powder"
+            price={1000.0}
+            initialCount={0}
+            minCount={0}
+            maxCount={10}
+            onCountChange={(count) => console.log("count changed:", count)}
+          />
         </div>
         <div className="pos-footer">
           <PosNav

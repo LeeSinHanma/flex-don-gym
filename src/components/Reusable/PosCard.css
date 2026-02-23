@@ -1,0 +1,164 @@
+/* Card Wrapper */
+.pos-card-item {
+  width: 100%;
+}
+
+.pos-cards-container {
+  padding: 4px 0;
+}
+
+/* Main Card */
+.pos-status-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pos-status-card:hover {
+  background-color: #f9fafb;
+}
+
+/* Variants */
+.pos-status-card--highlighted {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.pos-status-card--highlighted:hover {
+  background-color: #dbeafe;
+}
+
+.pos-status-card--inactive {
+  border-color: #e5e7eb;
+  background-color: #f9fafb;
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Status Info Row */
+.pos-status-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Left Info */
+.pos-left-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pos-product-name {
+  font-size: 16px;
+  font-weight: normal;
+  color: #04354f;
+  margin: 0;
+}
+
+.pos-product-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #04354f;
+  margin: 0;
+}
+
+/* Right Side */
+.pos-card-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Counter */
+.pos-counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.pos-counter-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: #04354f;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.pos-counter-btn:hover:not(:disabled) {
+  color: #2563eb;
+}
+
+.pos-counter-btn:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.pos-counter-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e3a5f;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Button */
+.pos-card-btn {
+  width: 130px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background-color: #04354f;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.pos-card-btn-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+/* Count Badge */
+.pos-card-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #04354f;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 50%;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+}
+
+/* Footer */
+.pos-card-footer {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
