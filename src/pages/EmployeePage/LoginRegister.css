@@ -286,6 +286,18 @@
   text-align: center;
 }
 
+.login-error {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 10px;
+  justify-content: flex-start;
+  font-size: 16px;
+  color: #af2828;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
   img {
