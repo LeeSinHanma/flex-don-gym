@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import {
   IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -11,20 +8,19 @@ import {
   IonCardContent,
   IonButton,
   IonList,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonSelect,
-  IonSelectOption,
   IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonButtons,
-  IonGrid,
-  IonRow,
-  IonCol,
+  IonIcon,
   IonText,
-  IonBadge,
 } from "@ionic/react";
-import AdminHeader from "../../components/admincomponents/Layout/header";
+import { closeOutline } from "ionicons/icons";
+import AdminHeader from "../../../components/admincomponents/Layout/header";
+import { EquipmentCard } from "../../../components/admincomponents/cards";
+import { EquipmentForm } from "../../../components/admincomponents/forms";
+import { EmptyStateCard } from "../../../components/Reusable/cards";
 import "./common.css";
 import "./equipment.css";
 
@@ -167,31 +163,6 @@ const Equipment: React.FC = () => {
     setShowModal(false);
   };
 
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "working":
-        return "success";
-      case "maintenance":
-        return "warning";
-      case "broken":
-        return "danger";
-      default:
-        return "medium";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "working":
-        return "Working";
-      case "maintenance":
-        return "Maintenance";
-      case "broken":
-        return "Broken";
-      default:
-        return status;
-    }
-  };
 
   return (
     <IonPage className="admin-page">
@@ -220,31 +191,17 @@ const Equipment: React.FC = () => {
           </IonCardHeader>
           <IonCardContent>
             <IonList className="equipment-list">
-              {equipmentList.map((equipment) => (
-                <IonItem
-                  key={equipment.id}
-                  className="equipment-item"
-                  button
-                  onClick={() => handleEditEquipment(equipment)}
-                >
-                  <IonLabel>
-                    <h2 className="equipment-name">{equipment.name}</h2>
-                    <p className="equipment-detail">
-                      Last Maintenance: {equipment.lastMaintenance}
-                    </p>
-                    {equipment.notes && (
-                      <p className="equipment-notes">{equipment.notes}</p>
-                    )}
-                  </IonLabel>
-                  <IonBadge
-                    slot="end"
-                    color={getStatusBadgeColor(equipment.status)}
-                    className="status-badge"
-                  >
-                    {getStatusText(equipment.status)}
-                  </IonBadge>
-                </IonItem>
-              ))}
+              {equipmentList.length === 0 ? (
+                <EmptyStateCard message="No equipment found. Add your first equipment to get started." />
+              ) : (
+                equipmentList.map((equipment) => (
+                  <EquipmentCard
+                    key={equipment.id}
+                    equipment={equipment}
+                    onEdit={() => handleEditEquipment(equipment)}
+                  />
+                ))
+              )}
             </IonList>
           </IonCardContent>
         </IonCard>
@@ -294,61 +251,9 @@ const Equipment: React.FC = () => {
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
-            <IonList>
-              <IonItem>
-                <IonLabel position="stacked">Equipment Name</IonLabel>
-                <IonInput
-                  value={formData.name}
-                  placeholder="e.g., Treadmill #1"
-                  onIonInput={(e) =>
-                    setFormData({ ...formData, name: e.detail.value! })
-                  }
-                />
-              </IonItem>
+            <EquipmentForm formData={formData} onChange={setFormData} />
 
-              <IonItem>
-                <IonLabel position="stacked">Status</IonLabel>
-                <IonSelect
-                  value={formData.status}
-                  onIonChange={(e) =>
-                    setFormData({ ...formData, status: e.detail.value })
-                  }
-                >
-                  <IonSelectOption value="working">Working</IonSelectOption>
-                  <IonSelectOption value="maintenance">
-                    Maintenance
-                  </IonSelectOption>
-                  <IonSelectOption value="broken">Broken</IonSelectOption>
-                </IonSelect>
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="stacked">Last Maintenance Date</IonLabel>
-                <IonInput
-                  type="date"
-                  value={formData.lastMaintenance}
-                  onIonInput={(e) =>
-                    setFormData({
-                      ...formData,
-                      lastMaintenance: e.detail.value!,
-                    })
-                  }
-                />
-              </IonItem>
-
-              <IonItem>
-                <IonLabel position="stacked">Notes</IonLabel>
-                <IonInput
-                  value={formData.notes}
-                  placeholder="Additional notes..."
-                  onIonInput={(e) =>
-                    setFormData({ ...formData, notes: e.detail.value! })
-                  }
-                />
-              </IonItem>
-            </IonList>
-
-            <div className="modal-actions">
+            <div className="modal-actions" style={{ padding: '16px 0' }}>
               <IonButton
                 expand="block"
                 color="primary"

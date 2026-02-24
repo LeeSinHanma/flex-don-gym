@@ -1,0 +1,20 @@
+/* MemberRegistrationForm Component Styles */
+.member-registration-form ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 12px;
+}
+
+.member-registration-form ion-label {
+  font-weight: 600;
+  color: #1B2E4B;
+  margin-bottom: 8px;
+}
+
+.member-registration-form ion-input,
+.member-registration-form ion-select {
+  --background: #F8F9FA;
+  --border-radius: 8px;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+}

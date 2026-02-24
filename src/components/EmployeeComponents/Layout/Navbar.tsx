@@ -16,6 +16,8 @@ import {
   peopleOutline,
   qrCodeOutline,
   cartOutline,
+  addCircleOutline,
+  statsChartOutline,
   logOutOutline,
 } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
@@ -45,30 +47,54 @@ const EmployeeNavbar: React.FC = () => {
       <IonContent>
         <IonList>
           <IonMenuToggle autoHide={false}>
+            {/* Main Navigation */}
             <IonItem button onClick={() => navigateTo('/employee/dashboard')}>
               <IonIcon icon={speedometerOutline} slot="start" />
               <IonLabel>Dashboard</IonLabel>
             </IonItem>
 
-            <IonItem button onClick={() => navigateTo('/employee/members')}>
-              <IonIcon icon={peopleOutline} slot="start" />
-              <IonLabel>Members</IonLabel>
-            </IonItem>
+            {/* Member Management */}
+            <div className="menu-section">
+              <div className="menu-section-title">Member Management</div>
+              
+              <IonItem button onClick={() => navigateTo('/employee/members')}>
+                <IonIcon icon={peopleOutline} slot="start" />
+                <IonLabel>All Members</IonLabel>
+              </IonItem>
 
-            <IonItem button onClick={() => navigateTo('/employee/qr-scanner')}>
-              <IonIcon icon={qrCodeOutline} slot="start" />
-              <IonLabel>Scan QR</IonLabel>
-            </IonItem>
+              <IonItem button onClick={() => navigateTo('/employee/prepaid')}>
+                <IonIcon icon={addCircleOutline} slot="start" />
+                <IonLabel>Register Prepaid</IonLabel>
+              </IonItem>
 
-            <IonItem button onClick={() => navigateTo('/employee/pos')}>
-              <IonIcon icon={cartOutline} slot="start" />
-              <IonLabel>POS</IonLabel>
-            </IonItem>
+              <IonItem button onClick={() => navigateTo('/employee/walk-in')}>
+                <IonIcon icon={addCircleOutline} slot="start" />
+                <IonLabel>Walk-In Entry</IonLabel>
+              </IonItem>
 
-            <IonItem button onClick={handleLogout}>
-              <IonIcon icon={logOutOutline} slot="start" />
-              <IonLabel>Logout</IonLabel>
-            </IonItem>
+              <IonItem button onClick={() => navigateTo('/employee/status-member')}>
+                <IonIcon icon={statsChartOutline} slot="start" />
+                <IonLabel>Member Status</IonLabel>
+              </IonItem>
+            </div>
+
+            {/* Transactions */}
+            <div className="menu-section">
+              <div className="menu-section-title">Transactions</div>
+              
+              <IonItem button onClick={() => navigateTo('/employee/pos')}>
+                <IonIcon icon={cartOutline} slot="start" />
+                <IonLabel>Point of Sale</IonLabel>
+              </IonItem>
+            </div>
+
+            {/* System */}
+            <div className="menu-section">
+              <IonItem button onClick={handleLogout} lines="none">
+                <IonIcon icon={logOutOutline} slot="start" color="danger" />
+                <IonLabel color="danger">Logout</IonLabel>
+              </IonItem>
+            </div>
           </IonMenuToggle>
         </IonList>
       </IonContent>

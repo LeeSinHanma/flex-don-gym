@@ -19,7 +19,7 @@ import {
   IonAvatar,
   useIonToast,
 } from "@ionic/react";
-import AdminHeader from "../../components/admincomponents/Layout/header";
+import AdminHeader from "../../../components/admincomponents/Layout/header";
 import {
   personOutline,
   mailOutline,
@@ -30,7 +30,7 @@ import {
   createOutline,
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import "./common.css";
 import "./profile.css";
 

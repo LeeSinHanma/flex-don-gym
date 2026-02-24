@@ -31,6 +31,7 @@ import {
 } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import EmployeeHeader from "../../components/EmployeeComponents/Layout/Header";
+import QRCodeGenerator from "../../components/Reusable/QRCodeGenerator";
 import "./Member.css";
 
 interface Member {
@@ -62,6 +63,8 @@ const MemberList: React.FC = () => {
 
   // Modal state
   const [showModal, setShowModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [formData, setFormData] = useState(emptyForm);
   const [formErrors, setFormErrors] = useState<Partial<typeof emptyForm>>({});
 
@@ -138,6 +141,10 @@ const MemberList: React.FC = () => {
     setFormData(emptyForm);
     setFormErrors({});
     present({ message: `Member ${newMember.name} added successfully!`, duration: 2500, color: "success", position: "top" });
+    
+    // Auto-generate QR code for new member
+    setSelectedMember(newMember);
+    setShowQRModal(true);
   };
 
   const handleCloseModal = () => {
@@ -394,6 +401,20 @@ const MemberList: React.FC = () => {
             </div>
           </IonContent>
         </IonModal>
+
+        {/* QR Code Generator Modal */}
+        <QRCodeGenerator
+          isOpen={showQRModal}
+          onClose={() => setShowQRModal(false)}
+          memberData={selectedMember ? {
+            id: selectedMember.id,
+            name: selectedMember.name,
+            email: selectedMember.email,
+            membershipType: selectedMember.membershipType,
+            expiryDate: selectedMember.expiryDate,
+            status: selectedMember.status,
+          } : null}
+        />
 
       </IonContent>
     </IonPage>

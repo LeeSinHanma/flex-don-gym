@@ -1,1 +1,113 @@
-Tool call argument 'initial_content' pruned from message history.
+/* QR Scanner Page Styles */
+.qr-scanner-content {
+  --background: #f5f5f5;
+}
+
+.qr-scanner-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.scanner-card {
+  margin-bottom: 20px;
+}
+
+.scanner-box {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 12px;
+  position: relative;
+}
+
+.scanner-placeholder {
+  text-align: center;
+  color: #666;
+}
+
+.scanner-icon {
+  font-size: 80px;
+  color: #3880ff;
+  margin-bottom: 16px;
+}
+
+.scanner-active {
+  text-align: center;
+}
+
+.scanning-animation {
+  width: 200px;
+  height: 200px;
+  border: 3px solid #3880ff;
+  border-radius: 12px;
+  margin: 0 auto 20px;
+  position: relative;
+  animation: scan-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scan-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+.scan-result {
+  text-align: center;
+  padding: 20px;
+}
+
+.result-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.result-icon.success {
+  color: #2dd36f;
+}
+
+.result-icon.error {
+  color: #eb445a;
+}
+
+.member-id {
+  color: #666;
+  margin: 8px 0;
+}
+
+.member-details {
+  margin-top: 20px;
+  text-align: left;
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.member-details p {
+  margin: 8px 0;
+}
+
+.info-card {
+  background: #e7f3ff;
+}
+
+.info-card h3 {
+  color: #3880ff;
+  margin-bottom: 12px;
+}
+
+.info-card ol {
+  margin-left: 20px;
+  color: #666;
+}
+
+.info-card li {
+  margin: 8px 0;
+}

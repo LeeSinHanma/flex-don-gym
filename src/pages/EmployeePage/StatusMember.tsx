@@ -6,18 +6,16 @@ import {
   IonCardContent,
   IonSearchbar,
   IonButton,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonBadge,
-  IonIcon,
   IonToast,
   IonSelect,
   IonSelectOption,
   IonModal,
+  IonItem,
+  IonLabel,
 } from '@ionic/react';
-import { checkmarkCircleOutline, timeOutline, closeCircleOutline } from 'ionicons/icons';
 import EmployeeHeader from '../../components/EmployeeComponents/Layout/Header';
+import { MemberListCard } from '../../components/EmployeeComponents/cards';
+import { EmptyStateCard } from '../../components/Reusable/cards';
 import './StatusMember.css';
 
 interface Member {
@@ -53,23 +51,6 @@ const StatusMember: React.FC = () => {
     member.id.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active': return checkmarkCircleOutline;
-      case 'expiring-soon': return timeOutline;
-      case 'expired': return closeCircleOutline;
-      default: return checkmarkCircleOutline;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'success';
-      case 'expiring-soon': return 'warning';
-      case 'expired': return 'danger';
-      default: return 'medium';
-    }
-  };
 
   const handleRenew = () => {
     if (!renewalPlan) {
@@ -101,26 +82,13 @@ const StatusMember: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
-          <IonList>
-            {filteredMembers.map((member) => (
-              <IonCard key={member.id} className="member-card">
-                <IonItem lines="none">
-                  <IonIcon 
-                    icon={getStatusIcon(member.status)} 
-                    slot="start" 
-                    color={getStatusColor(member.status)}
-                    style={{ fontSize: '32px' }}
-                  />
-                  <IonLabel>
-                    <h2 style={{ fontWeight: 'bold', color: '#1B2E4B' }}>{member.name}</h2>
-                    <p>ID: {member.id} | {member.membershipType}</p>
-                    <p>Expires: {member.expiryDate}</p>
-                  </IonLabel>
-                  <IonBadge color={getStatusColor(member.status)} slot="end">
-                    {member.status.replace('-', ' ').toUpperCase()}
-                  </IonBadge>
-                </IonItem>
-                <div style={{ padding: '0 16px 16px' }}>
+          {filteredMembers.length === 0 ? (
+            <EmptyStateCard message="No members found" />
+          ) : (
+            filteredMembers.map((member) => (
+              <div key={member.id}>
+                <MemberListCard member={member} />
+                <div style={{ padding: '0 16px 16px', marginTop: '-12px' }}>
                   <IonButton
                     expand="block"
                     size="small"
@@ -133,14 +101,8 @@ const StatusMember: React.FC = () => {
                     Renew Membership
                   </IonButton>
                 </div>
-              </IonCard>
-            ))}
-          </IonList>
-
-          {filteredMembers.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#9BADB7' }}>
-              <p>No members found</p>
-            </div>
+              </div>
+            ))
           )}
         </div>
 

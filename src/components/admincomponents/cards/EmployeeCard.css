@@ -1,0 +1,56 @@
+/* EmployeeCard Component Styles */
+.employee-card {
+  margin: 12px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employee-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.employee-name {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1B2E4B;
+}
+
+.employee-role {
+  margin: 0;
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.employee-details {
+  margin: 12px 0;
+  padding: 12px 0;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.employee-details p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.employee-email,
+.employee-phone,
+.employee-hire-date {
+  line-height: 1.6;
+}
+
+.employee-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.employee-actions ion-button {
+  flex: 1;
+}

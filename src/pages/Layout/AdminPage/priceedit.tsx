@@ -7,26 +7,29 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonText,
   IonIcon,
-  IonBadge,
   IonModal,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonButtons,
+  IonItem,
+  IonLabel,
+  IonInput,
   IonSelect,
   IonSelectOption,
   IonToggle,
+  IonBadge,
+  IonText,
+  IonGrid,
+  IonRow,
+  IonCol,
   useIonToast,
 } from "@ionic/react";
-import AdminHeader from "../../components/admincomponents/Layout/header";
+import AdminHeader from "../../../components/admincomponents/Layout/header";
+import { PriceCard } from "../../../components/admincomponents/cards";
+import { PriceForm } from "../../../components/admincomponents/forms";
+import { EmptyStateCard } from "../../../components/Reusable/cards";
 import {
   saveOutline,
   refreshOutline,
@@ -103,7 +106,6 @@ const PriceEdit: React.FC = () => {
     return { color: "success", label: `${days} DAYS LEFT` };
   };
 
-  // --- price inline edit ---
   const handlePriceChange = (id: number, val: string) => {
     setPrices(prices.map(p => p.id === id ? { ...p, price: parseFloat(val) || 0 } : p));
     setHasChanges(true);
@@ -283,15 +285,10 @@ const PriceEdit: React.FC = () => {
         </div>
 
         {promoPrices.length === 0 ? (
-          <IonCard className="empty-promo-card">
-            <IonCardContent>
-              <div className="empty-promo">
-                <IonIcon icon={pricetagOutline} style={{ fontSize: "48px", color: "#adb5bd", display: "block", margin: "0 auto 12px" }} />
-                <p className="empty-promo-text">No promo tiers yet</p>
-                <p className="empty-promo-sub">Click "Add Tier" and select Promo type to create one</p>
-              </div>
-            </IonCardContent>
-          </IonCard>
+          <EmptyStateCard
+            icon={pricetagOutline}
+            message="No promo tiers yet. Click 'Add Tier' and select Promo type to create one."
+          />
         ) : (
           <IonGrid>
             <IonRow>

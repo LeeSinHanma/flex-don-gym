@@ -15,8 +15,10 @@ import {
   IonIcon,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
-import { qrCodeOutline, cartOutline, personAddOutline, timeOutline } from "ionicons/icons";
+import { qrCodeOutline, cartOutline, personAddOutline, timeOutline, peopleOutline } from "ionicons/icons";
 import EmployeeHeader from "../../components/EmployeeComponents/Layout/Header";
+import { CheckInCountCard } from "../../components/EmployeeComponents/cards";
+import { EmptyStateCard } from "../../components/Reusable/cards";
 import qrService from "../../Services/qrService";
 import "./EmployeeDashboard.css";
 
@@ -50,52 +52,63 @@ const EmployeeDashboard: React.FC = () => {
 
   return (
     <IonPage>
-      <EmployeeHeader title="Employee Dashboard" showQRButton={false} />
+      <EmployeeHeader title="Employee Dashboard" showQRButton={true} />
       <IonContent fullscreen className="employee-dashboard-content">
         <div className="dashboard-container">
           {/* Today's Check-ins Count Card */}
-          <IonCard className="checkin-count-card">
-            <IonCardContent>
-              <div className="count-display">
-                <IonIcon icon={timeOutline} className="count-icon" />
-                <div className="count-info">
-                  <IonText className="count-label">Today's Check-ins</IonText>
-                  <IonText className="count-number">{checkInCount}</IonText>
-                </div>
-              </div>
-            </IonCardContent>
-          </IonCard>
+          <CheckInCountCard count={checkInCount} />
 
           {/* Quick Action Buttons */}
           <div className="quick-actions-section">
             <h2 className="section-title">Quick Actions</h2>
             <div className="quick-actions-grid">
-              <IonButton
-                expand="block"
-                className="action-button action-primary"
-                onClick={() => history.push("/employee/qr-scanner")}
-              >
-                <IonIcon slot="start" icon={qrCodeOutline} />
-                Scan QR
-              </IonButton>
-              <IonButton
-                expand="block"
-                className="action-button action-secondary"
-                fill="outline"
-                onClick={() => history.push("/employee/pos")}
-              >
-                <IonIcon slot="start" icon={cartOutline} />
-                POS
-              </IonButton>
-              <IonButton
-                expand="block"
-                className="action-button action-secondary"
-                fill="outline"
-                onClick={() => history.push("/employee/members")}
-              >
-                <IonIcon slot="start" icon={personAddOutline} />
-                Register Member
-              </IonButton>
+              <IonCard className="action-card" button onClick={() => history.push("/employee/members")}>
+                <IonCardContent>
+                  <div className="action-card-content">
+                    <IonIcon icon={peopleOutline} className="action-icon primary" />
+                    <div className="action-text">
+                      <h3>All Members</h3>
+                      <p>View & manage members</p>
+                    </div>
+                  </div>
+                </IonCardContent>
+              </IonCard>
+
+              <IonCard className="action-card" button onClick={() => history.push("/employee/prepaid")}>
+                <IonCardContent>
+                  <div className="action-card-content">
+                    <IonIcon icon={personAddOutline} className="action-icon success" />
+                    <div className="action-text">
+                      <h3>Register Prepaid</h3>
+                      <p>Add new member</p>
+                    </div>
+                  </div>
+                </IonCardContent>
+              </IonCard>
+
+              <IonCard className="action-card" button onClick={() => history.push("/employee/walk-in")}>
+                <IonCardContent>
+                  <div className="action-card-content">
+                    <IonIcon icon={timeOutline} className="action-icon warning" />
+                    <div className="action-text">
+                      <h3>Walk-In</h3>
+                      <p>Daily entry</p>
+                    </div>
+                  </div>
+                </IonCardContent>
+              </IonCard>
+
+              <IonCard className="action-card" button onClick={() => history.push("/employee/pos")}>
+                <IonCardContent>
+                  <div className="action-card-content">
+                    <IonIcon icon={cartOutline} className="action-icon secondary" />
+                    <div className="action-text">
+                      <h3>Point of Sale</h3>
+                      <p>Sell products</p>
+                    </div>
+                  </div>
+                </IonCardContent>
+              </IonCard>
             </div>
           </div>
 
@@ -119,13 +132,7 @@ const EmployeeDashboard: React.FC = () => {
                 </IonList>
               </IonCard>
             ) : (
-              <IonCard className="empty-state-card">
-                <IonCardContent>
-                  <IonText className="empty-state-text">
-                    No check-ins yet today. Scan a member's QR code to get started.
-                  </IonText>
-                </IonCardContent>
-              </IonCard>
+              <EmptyStateCard message="No check-ins yet today. Scan a member's QR code to get started." />
             )}
           </div>
         </div>

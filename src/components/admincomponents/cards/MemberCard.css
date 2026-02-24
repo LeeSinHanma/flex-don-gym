@@ -1,0 +1,66 @@
+/* MemberCard Component Styles */
+.member-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+}
+
+.member-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2E86DE 0%, #1B2E4B 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-avatar ion-icon {
+  font-size: 24px;
+  color: white;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #1B2E4B;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6c757d;
+  margin: 2px 0;
+}
+
+.info-icon {
+  font-size: 14px;
+  color: #9BADB7;
+}
+
+.member-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.membership-type,
+.expiry-date {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.member-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.member-actions ion-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+}

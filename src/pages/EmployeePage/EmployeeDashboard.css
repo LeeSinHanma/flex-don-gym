@@ -98,6 +98,64 @@
   --background-activated: #F0F4F8;
 }
 
+/* Action Cards */
+.action-card {
+  margin: 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-card ion-card-content {
+  padding: 20px;
+}
+
+.action-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.action-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.action-icon.primary {
+  color: #2E86DE;
+}
+
+.action-icon.success {
+  color: #2ECC71;
+}
+
+.action-icon.warning {
+  color: #F39C12;
+}
+
+.action-icon.secondary {
+  color: #1B2E4B;
+}
+
+.action-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #1B2E4B;
+}
+
+.action-text p {
+  margin: 0;
+  font-size: 13px;
+  color: #6c757d;
+}
+
 /* Recent Check-ins Section */
 .recent-checkins-section {
   margin-bottom: var(--spacing-xl);

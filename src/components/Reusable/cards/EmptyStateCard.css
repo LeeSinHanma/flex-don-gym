@@ -1,0 +1,25 @@
+/* EmptyStateCard Component Styles */
+.empty-state-card {
+  text-align: center;
+  padding: 40px 20px;
+  margin: 16px 0;
+}
+
+.empty-state-card ion-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  color: #9BADB7;
+  margin-bottom: 8px;
+}
+
+.empty-state-text {
+  color: #9BADB7;
+  font-size: 14px;
+  display: block;
+}

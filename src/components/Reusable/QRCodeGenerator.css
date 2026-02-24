@@ -1,0 +1,157 @@
+/* QRCodeGenerator Component Styles */
+.qr-generator-content {
+  --background: #f8f9fa;
+}
+
+.qr-generator-container {
+  padding: 24px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Member Info Section */
+.qr-member-info {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.member-name {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #1B2E4B;
+}
+
+.member-email {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.member-details {
+  margin: 16px 0;
+  padding: 16px 0;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.member-details p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #495057;
+}
+
+.membership-type,
+.expiry-date {
+  line-height: 1.6;
+}
+
+.status-badge {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 16px;
+}
+
+/* QR Code Display Section */
+.qr-code-display {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-code-image {
+  max-width: 300px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  background: white;
+}
+
+.qr-id {
+  margin: 12px 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1B2E4B;
+}
+
+.qr-instruction {
+  margin: 0;
+  font-size: 13px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Loading State */
+.qr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.qr-loading p {
+  margin: 0;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* Error State */
+.qr-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.qr-error p {
+  margin: 0;
+  font-size: 14px;
+  color: #e74c3c;
+}
+
+/* Action Buttons */
+.qr-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-button {
+  --border-radius: 8px;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .qr-generator-container {
+    padding: 16px;
+  }
+
+  .qr-code-display {
+    padding: 24px 16px;
+  }
+
+  .qr-code-image {
+    max-width: 250px;
+  }
+
+  .member-name {
+    font-size: 20px;
+  }
+}

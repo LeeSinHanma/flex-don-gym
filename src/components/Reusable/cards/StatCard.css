@@ -1,0 +1,56 @@
+/* StatCard Component Styles */
+.stat-card {
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.stat-card ion-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.stat-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon-wrapper.primary {
+  background: rgba(27, 46, 75, 0.1);
+}
+
+.stat-icon-wrapper.success {
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.stat-icon-wrapper.warning {
+  background: rgba(243, 156, 18, 0.1);
+}
+
+.stat-icon-wrapper.revenue {
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  margin: 0 0 4px 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: #1B2E4B;
+}
+
+.stat-label {
+  margin: 0;
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 500;
+}

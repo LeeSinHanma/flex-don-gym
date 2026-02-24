@@ -5,34 +5,30 @@ import {
   IonCard,
   IonCardContent,
   IonButton,
-  IonInput,
-  IonItem,
-  IonLabel,
   IonToast,
   IonText,
 } from '@ionic/react';
 import EmployeeHeader from '../../components/EmployeeComponents/Layout/Header';
+import { WalkInForm } from '../../components/EmployeeComponents/forms';
 
 const WalkIn: React.FC = () => {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [formData, setFormData] = useState({ name: '', phone: '' });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   const dailyRate = 100;
 
   const handleCheckIn = () => {
-    if (!name || !phone) {
+    if (!formData.name || !formData.phone) {
       setToastMessage('Please fill in all fields');
       setShowToast(true);
       return;
     }
 
     // Mock check-in - replace with actual API call
-    setToastMessage(`Walk-in registered! ${name} checked in successfully.`);
+    setToastMessage(`Walk-in registered! ${formData.name} checked in successfully.`);
     setShowToast(true);
-    setName('');
-    setPhone('');
+    setFormData({ name: '', phone: '' });
   };
 
   return (
@@ -45,38 +41,11 @@ const WalkIn: React.FC = () => {
               Daily Walk-In Entry
             </h2>
 
-            <div style={{ 
-              background: 'linear-gradient(135deg, #2E86DE 0%, #1B2E4B 100%)',
-              padding: '20px',
-              borderRadius: '12px',
-              marginBottom: '24px',
-              textAlign: 'center',
-              color: 'white'
-            }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Daily Rate</p>
-              <h1 style={{ margin: 0, fontSize: '36px', fontWeight: 'bold' }}>₱{dailyRate}</h1>
-            </div>
-
-            <IonItem>
-              <IonLabel position="stacked">Full Name *</IonLabel>
-              <IonInput
-                value={name}
-                onIonChange={(e) => setName(e.detail.value!)}
-                placeholder="Enter guest name"
-                required
-              />
-            </IonItem>
-
-            <IonItem>
-              <IonLabel position="stacked">Phone Number *</IonLabel>
-              <IonInput
-                type="tel"
-                value={phone}
-                onIonChange={(e) => setPhone(e.detail.value!)}
-                placeholder="+63 917 123 4567"
-                required
-              />
-            </IonItem>
+            <WalkInForm
+              formData={formData}
+              onChange={setFormData}
+              dailyRate={dailyRate}
+            />
 
             <IonButton expand="block" onClick={handleCheckIn} style={{ marginTop: '24px' }}>
               Check In & Collect Payment

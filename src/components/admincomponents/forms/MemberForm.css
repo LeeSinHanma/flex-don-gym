@@ -1,0 +1,32 @@
+/* MemberForm Component Styles */
+.form-container {
+  padding: 16px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #1B2E4B;
+  font-size: 14px;
+}
+
+.form-input,
+.form-select {
+  --background: #F8F9FA;
+  --border-radius: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+}
+
+.form-input:focus,
+.form-select:focus {
+  --background: #FFFFFF;
+  border-color: #2E86DE;
+}

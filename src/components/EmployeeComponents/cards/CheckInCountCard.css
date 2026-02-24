@@ -1,0 +1,35 @@
+/* CheckInCountCard Component Styles */
+.checkin-count-card {
+  margin: 16px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.count-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.count-icon {
+  font-size: 48px;
+  color: #2E86DE;
+}
+
+.count-info {
+  flex: 1;
+}
+
+.count-label {
+  display: block;
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+.count-number {
+  display: block;
+  font-size: 32px;
+  font-weight: bold;
+  color: #1B2E4B;
+}

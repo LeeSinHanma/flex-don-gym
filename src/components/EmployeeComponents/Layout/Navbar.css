@@ -1,3 +1,48 @@
+/* Employee Menu Styles */
+.employee-menu {
+  --background: #f8f9fa;
+}
+
+.employee-menu ion-toolbar {
+  --background: #1B2E4B;
+  --color: white;
+}
+
+.employee-menu ion-item {
+  --background: transparent;
+  --color: #1B2E4B;
+  margin: 4px 8px;
+  border-radius: 8px;
+}
+
+.employee-menu ion-item:hover {
+  --background: rgba(27, 46, 75, 0.1);
+}
+
+.employee-menu ion-icon {
+  color: #2E86DE;
+  margin-right: 12px;
+}
+
+/* Menu Sections */
+.menu-section {
+  margin: 16px 0;
+}
+
+.menu-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  padding: 8px 16px 4px 16px;
+  letter-spacing: 0.5px;
+}
+
+.menu-section ion-item {
+  margin: 2px 8px;
+}
+
+/* Tab Bar (keeping existing styles) */
 .employee-tabbar {
   --background: var(--gym-bg-primary, #FFFFFF);
   border-top: 1px solid var(--fdg-border-color, #E2E8F0);

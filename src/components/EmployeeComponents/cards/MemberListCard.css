@@ -1,0 +1,21 @@
+/* MemberListCard Component Styles */
+.member-list-card {
+  margin: 12px 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-list-card ion-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.member-list-card h2 {
+  margin-bottom: 4px;
+}
+
+.member-list-card p {
+  font-size: 13px;
+  color: #6c757d;
+  margin: 2px 0;
+}

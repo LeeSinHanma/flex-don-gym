@@ -5,17 +5,10 @@ import {
   IonCard,
   IonCardContent,
   IonButton,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
   IonToast,
-  IonGrid,
-  IonRow,
-  IonCol,
 } from '@ionic/react';
 import EmployeeHeader from '../../components/EmployeeComponents/Layout/Header';
+import { MemberRegistrationForm } from '../../components/EmployeeComponents/forms';
 
 const Prepaid: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -23,18 +16,14 @@ const Prepaid: React.FC = () => {
     email: '',
     phone: '',
     membershipType: '',
-    paymentMethod: '',
+    paymentMethod: '' as string | undefined,
   });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
-  const membershipPlans = [
-    { value: 'daily', label: 'Daily - ₱100', price: 100 },
-    { value: 'weekly', label: 'Weekly - ₱500', price: 500 },
-    { value: 'monthly', label: 'Monthly - ₱1,500', price: 1500 },
-    { value: 'quarterly', label: 'Quarterly - ₱4,000', price: 4000 },
-    { value: 'yearly', label: 'Yearly - ₱15,000', price: 15000 },
-  ];
+  const handleFormChange = (data: any) => {
+    setFormData(data);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +37,7 @@ const Prepaid: React.FC = () => {
     // Mock registration - replace with actual API call
     setToastMessage(`Member registered successfully! Welcome ${formData.name}`);
     setShowToast(true);
-    setFormData({ name: '', email: '', phone: '', membershipType: '', paymentMethod: '' });
+    setFormData({ name: '', email: '', phone: '', membershipType: '', paymentMethod: '' as string | undefined });
   };
 
   return (
@@ -62,86 +51,14 @@ const Prepaid: React.FC = () => {
             </h2>
 
             <form onSubmit={handleSubmit}>
-              <IonGrid>
-                <IonRow>
-                  <IonCol size="12" sizeMd="6">
-                    <IonItem>
-                      <IonLabel position="stacked">Full Name *</IonLabel>
-                      <IonInput
-                        value={formData.name}
-                        onIonChange={(e) => setFormData({ ...formData, name: e.detail.value! })}
-                        placeholder="Enter full name"
-                        required
-                      />
-                    </IonItem>
-                  </IonCol>
-
-                  <IonCol size="12" sizeMd="6">
-                    <IonItem>
-                      <IonLabel position="stacked">Email *</IonLabel>
-                      <IonInput
-                        type="email"
-                        value={formData.email}
-                        onIonChange={(e) => setFormData({ ...formData, email: e.detail.value! })}
-                        placeholder="Enter email"
-                        required
-                      />
-                    </IonItem>
-                  </IonCol>
-
-                  <IonCol size="12" sizeMd="6">
-                    <IonItem>
-                      <IonLabel position="stacked">Phone Number *</IonLabel>
-                      <IonInput
-                        type="tel"
-                        value={formData.phone}
-                        onIonChange={(e) => setFormData({ ...formData, phone: e.detail.value! })}
-                        placeholder="+63 917 123 4567"
-                        required
-                      />
-                    </IonItem>
-                  </IonCol>
-
-                  <IonCol size="12" sizeMd="6">
-                    <IonItem>
-                      <IonLabel position="stacked">Membership Plan *</IonLabel>
-                      <IonSelect
-                        value={formData.membershipType}
-                        onIonChange={(e) => setFormData({ ...formData, membershipType: e.detail.value })}
-                        placeholder="Select plan"
-                      >
-                        {membershipPlans.map((plan) => (
-                          <IonSelectOption key={plan.value} value={plan.value}>
-                            {plan.label}
-                          </IonSelectOption>
-                        ))}
-                      </IonSelect>
-                    </IonItem>
-                  </IonCol>
-
-                  <IonCol size="12">
-                    <IonItem>
-                      <IonLabel position="stacked">Payment Method *</IonLabel>
-                      <IonSelect
-                        value={formData.paymentMethod}
-                        onIonChange={(e) => setFormData({ ...formData, paymentMethod: e.detail.value })}
-                        placeholder="Select payment method"
-                      >
-                        <IonSelectOption value="cash">Cash</IonSelectOption>
-                        <IonSelectOption value="card">Credit/Debit Card</IonSelectOption>
-                        <IonSelectOption value="gcash">GCash</IonSelectOption>
-                        <IonSelectOption value="paymaya">PayMaya</IonSelectOption>
-                      </IonSelect>
-                    </IonItem>
-                  </IonCol>
-
-                  <IonCol size="12">
-                    <IonButton expand="block" type="submit" style={{ marginTop: '20px' }}>
-                      Register Member
-                    </IonButton>
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
+              <MemberRegistrationForm
+                formData={formData}
+                onChange={handleFormChange}
+                showPaymentMethod={true}
+              />
+              <IonButton expand="block" type="submit" style={{ marginTop: '20px' }}>
+                Register Member
+              </IonButton>
             </form>
           </IonCardContent>
         </IonCard>
