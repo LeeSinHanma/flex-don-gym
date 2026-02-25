@@ -9,6 +9,9 @@ import {
   stopQrScanner,
 } from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
+import PosNav from "../../components/Reusable/NavItems";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resource/dondon-logo.png";
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
@@ -38,30 +41,44 @@ const QRScannerHome: React.FC = () => {
   return (
     <div className="main-qr-container">
       <div className="main-container">
+        <div className="text-container">
+          <IonImg src={dondonLogo} className="login-logo" />
+          <p>Scan QR code</p>
+        </div>
+
         <div className="camera-container">
           <div id="qr-reader" />
         </div>
         <div className="menu-qr-container">
           <div className="add-member-container">
             <Button
-              className="btn add-member"
+              className="btn-add-member"
               type="button"
               onClick={() => history.push("/menu")}
             >
               ADD NEW MEMBER
             </Button>
           </div>
-          <div className="qr pos-nav-container">
-            <div className="qr-container">
-              <h3 onClick={() => history.push("/pos")}>POS</h3>
-            </div>
-            <div className="qr qr-container">
-              <h3 onClick={() => history.push("/")}>QR Scanner</h3>
-            </div>
-
-            <div className="qr status-container">
-              <h3 onClick={() => history.push("/status-member")}>Status</h3>
-            </div>
+          <div className="pos-footer">
+            <PosNav
+              items={[
+                {
+                  label: "POS",
+                  path: "/pos",
+                  className: "pos-nav-item-container",
+                },
+                {
+                  label: "QR Scanner",
+                  path: "/qr",
+                  className: "qr-nav-item-container",
+                },
+                {
+                  label: "Status",
+                  path: "/status-member",
+                  className: "status-item-nav-container",
+                },
+              ]}
+            />
           </div>
         </div>
       </div>

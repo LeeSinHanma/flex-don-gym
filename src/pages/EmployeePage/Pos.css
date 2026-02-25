@@ -1,17 +1,16 @@
 .pos-main-container {
   min-height: 100vh;
-  background-color: #d1d5db; /* Gray-300 equivalent */
+  background-color: #d1d5db;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 1rem;
 }
 
 .pos-container {
   background-color: #d9d9d9; /* Slate-800 equivalent */
   color: white;
-  padding: 2rem 1.5rem;
+  padding: 1rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -153,6 +152,13 @@
   font-weight: bold;
   min-width: 40px;
   text-align: center;
+}
+
+.pos-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (max-width: 480px) {

@@ -25,15 +25,14 @@ const MemberProfilePage: React.FC = () => {
           </div>
         </div>
         <div className="history-details"></div>
-        <div className="pos-container">
-          <PosNav
-            items={[
-              { label: "POS", path: "/pos" },
-              { label: "QR Scanner", path: "/qr" },
-              { label: "Status", path: "/status-member" },
-            ]}
-          />
-        </div>
+
+        <PosNav
+          items={[
+            { label: "POS", path: "/pos" },
+            { label: "QR Scanner", path: "/qr" },
+            { label: "Status", path: "/status-member" },
+          ]}
+        />
       </div>
     </div>
   );

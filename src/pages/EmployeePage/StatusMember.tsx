@@ -16,7 +16,6 @@ const StatusMemberPage: React.FC = () => {
         <div className="top-header">
           <h2>Manage Member</h2>
           <div className="search-bar">
-            <IonIcon icon={searchOutline} className="search-icon" />
             <input className="search-input" type="text" placeholder="Search" />
           </div>
           <div className="nav-carousel">
@@ -43,13 +42,16 @@ const StatusMemberPage: React.FC = () => {
             <div className="client-status">active</div>
           </div>
         </div>
-        <PosNav
-          items={[
-            { label: "POS", path: "/pos" },
-            { label: "QR Scanner", path: "/qr" },
-            { label: "Status", path: "/status-member" },
-          ]}
-        />
+
+        <div className="pos-footer">
+          <PosNav
+            items={[
+              { label: "POS", path: "/pos" },
+              { label: "QR Scanner", path: "/qr" },
+              { label: "Status", path: "/status-member" },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );

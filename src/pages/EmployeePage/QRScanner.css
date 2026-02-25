@@ -8,9 +8,9 @@
 }
 
 .main-container {
-  background-color: #d9d9d9;
+  background-color: #d9d9d9; /* Slate-800 equivalent */
   color: white;
-  padding: 2rem 1.5rem;
+  padding: 1rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 3rem;
@@ -23,7 +23,8 @@
 .menu-qr-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  width: 100%;
+  gap: 25px;
 }
 .pos-nav-container {
   display: flex;
@@ -31,15 +32,41 @@
   align-items: center;
   justify-content: center;
   gap: 36px;
-  width: 400px;
+  width: 100%;
   height: 70px;
-  border-radius: 60px;
-  color: #03454f;
+  border-radius: 35px;
+  color: #04354f;
+
   background-color: #ffffff;
 }
 
+.pos-nav-container h3 {
+  margin: 0;
+  align-items: center;
+  font-size: 18px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+}
+
 .add-member-container {
-  margin-bottom: 10 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.btn-add-member {
+  width: 100%;
+  padding: 0.75rem;
+  height: 60px;
+  background-color: #04354f;
+  color: #d9d9d9;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .pos-nav {
@@ -81,23 +108,38 @@
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-h3 {
-  cursor: pointer;
+.login-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
 }
 
 /* ===== QR CAMERA CONTAINER ===== */
 .camera-container {
   width: 100%;
-  height: 260px;
+  height: 100%;
   margin: 0 auto;
-
   display: flex;
+  flex-direction: column; /* stack text then camera */
   align-items: center;
-  justify-content: center;
-
+  justify-content: flex-start; /* start from top */
   background-color: #000;
   border-radius: 16px;
   overflow: hidden;
+  padding: 16px;
+  gap: 10px;
+}
+
+.text-container {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: #04354f;
+  z-index: 2;
+}
+
+.text-container p {
+  margin: 0;
 }
 
 #qr-reader {
@@ -112,6 +154,12 @@ h3 {
   transform: scaleX(-1);
 }
 
+.qr-nav-item-container {
+  background-color: #e9f3ff;
+  color: #0084c9;
+  border-radius: 25px;
+}
+
 @media (max-width: 480px) {
   .menu-qr-container {
     width: 100%;
@@ -123,7 +171,6 @@ h3 {
     width: 100%; /* removes the hardcoded 400px */
     max-width: 100%;
     box-sizing: border-box;
-    gap: 10px;
   }
 
   .pos-nav {
