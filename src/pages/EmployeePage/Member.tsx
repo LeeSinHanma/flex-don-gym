@@ -7,6 +7,8 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import { createMember } from "../../logicHandlers/memberCrud"; // adjust path if different
+import { generateGymQr } from "../../logicHandlers/qrGenModule";
+import QRCode from "react-qr-code";
 import "./Member.css";
 
 const MemberMenu: React.FC = () => {
@@ -17,32 +19,33 @@ const MemberMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
+  const [acceptedData, setAcceptedData] = useState<{
+    email: string;
+    contactNumber: string;
+    firstName: string;
+    lastName: string;
+    qrValue: string;
+  } | null>(null);
+
   const handleAddMember = async () => {
     console.log("Add button clicked");
 
-    // Trim values
     const trimmedEmail = email.trim();
     const trimmedContact = contactNumber.trim();
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
 
-    // 🔎 Empty field checker
-    if (
-      !trimmedEmail ||
-      !trimmedContact ||
-      !trimmedFirstName ||
-      !trimmedLastName
-    ) {
+    if (!trimmedEmail || !trimmedContact || !trimmedFirstName || !trimmedLastName) {
       alert("All fields are required.");
-      return; // ❌ stop here
+      return;
     }
 
-    console.log("Form Data:", {
-      trimmedEmail,
-      trimmedContact,
-      trimmedFirstName,
-      trimmedLastName,
-    });
+    const accepted = {
+      email: trimmedEmail,
+      contactNumber: trimmedContact,
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+    };
 
     try {
       const response = await createMember(
@@ -50,13 +53,26 @@ const MemberMenu: React.FC = () => {
         trimmedContact,
         trimmedFirstName,
         trimmedLastName,
-        0,
-        1,
-        0,
-        1,
+        0, 1, 0, 1
       );
 
       console.log("API SUCCESS RESPONSE:", response);
+
+      const qrValue = response?.member_id; // ✅ use member_id
+
+      if (!qrValue) {
+        alert("Member created but member_id is missing.");
+        return;
+      }
+
+      setAcceptedData({
+        email: response.email,
+        contactNumber: response.contact_number,
+        firstName: response.first_name,
+        lastName: response.last_name,
+        qrValue,
+      });
+
       setShowModal(true);
     } catch (err: any) {
       console.log("API ERROR:", err.message);
@@ -113,7 +129,6 @@ const MemberMenu: React.FC = () => {
             className="btn-submit"
             type="button"
             onClick={handleAddMember}
-            // onClick={() => setShowModal(true)}
           >
             Add
           </Button>
@@ -124,11 +139,33 @@ const MemberMenu: React.FC = () => {
       <Modal
         className="modal-box"
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title="QR Code"
+        onClose={() => {
+          setShowModal(false);
+          setAcceptedData(null);
+        }}
+        title="Member Details"
       >
-        <h2>Member Added</h2>
-        <p>This is the QR</p>
+        {acceptedData ? (
+          <div className="accepted-details">
+            <p><b>Email:</b> {acceptedData.email}</p>
+            <p><b>Contact:</b> {acceptedData.contactNumber}</p>
+            <p><b>First Name:</b> {acceptedData.firstName}</p>
+            <p><b>Last Name:</b> {acceptedData.lastName}</p>
+
+            {/* ✅ Add this at the bottom */}
+            <div className="qr-section">
+              <p className="qr-label">QR Code:</p>
+
+              <div className="qr-wrapper">
+                <QRCode value={acceptedData.qrValue} size={180} />
+              </div>
+
+              <p className="qr-value-text">{acceptedData.qrValue}</p>
+            </div>
+          </div>
+        ) : (
+          <p>No accepted data.</p>
+        )}
       </Modal>
     </div>
   );
