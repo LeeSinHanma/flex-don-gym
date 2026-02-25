@@ -61,3 +61,13 @@ export async function getUserType(username: string): Promise<number> {
     throw new Error("Failed to get user role");
   }
 }
+
+
+export const getCurrentUser = () => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+};
+
+export const logout = () => {
+  localStorage.removeItem("user");
+};

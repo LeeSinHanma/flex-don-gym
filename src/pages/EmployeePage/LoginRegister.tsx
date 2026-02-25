@@ -22,6 +22,18 @@ const LoginRegister: React.FC = () => {
 
   // ✅ Detect internet changes
   useEffect(() => {
+
+    const user = localStorage.getItem("user");
+
+      if (user) {
+        const parsed = JSON.parse(user);
+
+        console.log("User already logged in:", parsed); // ✅
+
+        if (parsed.userType === 0) history.push("/qr");
+        else if (parsed.userType === 1) history.push("/admin-page");
+      }
+
     const onOnline = () => setIsOnline(true);
     const onOffline = () => setIsOnline(false);
 
@@ -50,12 +62,24 @@ const LoginRegister: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await loginUser(username, password);
+      const user = await loginUser(username, password);
       const userType = await getUserType(username);
+
+      const loggedUser = {
+        username,
+        userType
+      };
+
+      // ✅ Save logged in user
+      localStorage.setItem("user", JSON.stringify(loggedUser));
+
+      // ✅ Console log here
+      console.log("Logged in user:", loggedUser);
 
       if (userType === 0) history.push("/qr");
       else if (userType === 1) history.push("/admin-page");
       else setErrorMessage("Unknown user type");
+
     } catch (error: any) {
       // ✅ show better message if it's likely internet issue
       const msg = String(error?.message || "");

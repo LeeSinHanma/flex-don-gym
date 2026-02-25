@@ -142,6 +142,10 @@ const MemberMenu: React.FC = () => {
         onClose={() => {
           setShowModal(false);
           setAcceptedData(null);
+          setEmail("");
+          setContactNumber("");
+          setFirstName("");
+          setLastName("");
         }}
         title="Member Details"
       >
