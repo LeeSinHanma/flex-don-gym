@@ -7,13 +7,7 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({
-  isOpen,
-  onClose,
-  title,
-  children,
-  className,
-}: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -22,9 +16,9 @@ export function Modal({
         className={`modal-content ${className ?? ""}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {title && <h2>{title}</h2>}
+        {title && <h2 className="modal-title">{title}</h2>}
         <div className="modal-body">{children}</div>
-        <button onClick={onClose}>Close</button>
+        <button className="modal-close-btn" onClick={onClose}>Close</button>
       </div>
     </div>
   );

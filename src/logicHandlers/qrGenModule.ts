@@ -1,7 +1,7 @@
 export type QrInput = {
   firstName: string;
   lastName: string;
-  age: string | number;
+  contactNumber?: string; // optional (since you have it)
 };
 
 export type QrResult =
@@ -11,10 +11,10 @@ export type QrResult =
 export function generateGymQr(input: QrInput): QrResult {
   const firstName = (input.firstName ?? "").trim();
   const lastName = (input.lastName ?? "").trim();
-  const ageNum = Number(input.age);
+  const contact = (input.contactNumber ?? "").trim();
 
-  // required fields
-  if (!firstName || !lastName || !input.age || ageNum <= 0) {
+  // required fields (match your MemberMenu)
+  if (!firstName || !lastName) {
     return { ok: false, error: "Complete All Fields" };
   }
 
@@ -23,6 +23,11 @@ export function generateGymQr(input: QrInput): QrResult {
     return { ok: false, error: "Invalid input, try again" };
   }
 
-  const formatted = `000001DonGym${firstName}${lastName}${ageNum}`;
-  return { ok: true, value: formatted };
+  // ✅ QR value format (simple + parseable)
+  // if contact exists, include it so it's more unique
+  const value = contact
+    ? `${firstName}-${lastName}-${contact}`
+    : `${firstName}-${lastName}`;
+
+  return { ok: true, value };
 }

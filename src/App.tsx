@@ -44,6 +44,8 @@ import "@ionic/react/css/palettes/dark.system.css";
 
 /* Theme */
 import "./theme/variables.css";
+import PrivateRoute from "./PrivateRoute";
+import AdminRoute from "./AdminRoute";
 
 setupIonicReact();
 
@@ -64,7 +66,7 @@ const App: React.FC = () => {
             <Route exact path="/member" component={MemberMenu} />
             <Route exact path="/walkin" component={WalkInMenu} />
             <Route exact path="/prepaid" component={PrepaidMenu} />
-            <Route exact path="/qr" component={QRScannerHome} />
+            <PrivateRoute path="/qr" component={QRScannerHome} />
             <Route exact path="/status-member" component={StatusMemberPage} />
             <Route exact path="/pos" component={PosPage} />
             <Route exact path="/pos-item" component={PosItemPage} />
@@ -72,7 +74,7 @@ const App: React.FC = () => {
             {/* Admin Routes */}
             <Route exact path="/admin-page" component={StartingPageAdmin} />
             <Route exact path="/employee-login" component={EmployeeMenu} />
-            <Route exact path="/admin-menu" component={AdminMenu} />
+            <AdminRoute exact path="/admin-page" component={AdminMenu} />
             <Route
               exact
               path="/manage-status"
