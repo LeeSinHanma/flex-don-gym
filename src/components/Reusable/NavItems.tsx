@@ -14,12 +14,12 @@ interface PosNavProps {
 }
 
 const defaultNavItems: NavItem[] = [
-  { label: "POS", path: "/pos", className: "pos-nav-container" },
-  { label: "QR Scanner", path: "/", className: "qr-nav-container" },
+  { label: "POS", path: "/pos", className: "nav-item-container" },
+  { label: "QR Scanner", path: "/", className: "nav-item-container" },
   {
     label: "Status",
     path: "/status-member",
-    className: "status-nav-container",
+    className: "nav-item-container",
   },
 ];
 

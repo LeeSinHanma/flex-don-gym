@@ -10,6 +10,8 @@ import {
 } from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
 import PosNav from "../../components/Reusable/NavItems";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resource/dondon-logo.png";
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
@@ -39,6 +41,11 @@ const QRScannerHome: React.FC = () => {
   return (
     <div className="main-qr-container">
       <div className="main-container">
+        <div className="text-container">
+          <IonImg src={dondonLogo} className="login-logo" />
+          <p>Scan QR code</p>
+        </div>
+
         <div className="camera-container">
           <div id="qr-reader" />
         </div>
@@ -55,9 +62,21 @@ const QRScannerHome: React.FC = () => {
           <div className="pos-footer">
             <PosNav
               items={[
-                { label: "POS", path: "/pos" },
-                { label: "QR Scanner", path: "/qr" },
-                { label: "Status", path: "/status-member" },
+                {
+                  label: "POS",
+                  path: "/pos",
+                  className: "pos-nav-item-container",
+                },
+                {
+                  label: "QR Scanner",
+                  path: "/qr",
+                  className: "qr-nav-item-container",
+                },
+                {
+                  label: "Status",
+                  path: "/status-member",
+                  className: "status-item-nav-container",
+                },
               ]}
             />
           </div>

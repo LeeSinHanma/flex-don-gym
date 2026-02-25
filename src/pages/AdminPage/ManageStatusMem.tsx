@@ -53,6 +53,9 @@ const ManageStatusMemPage: React.FC = () => {
             <Button type="button" className="renew-btn">
               Edit
             </Button>
+            <Button type="button" className="renew-btn">
+              Renew
+            </Button>
             <Button type="button" className="cancel-btn">
               Delete
             </Button>

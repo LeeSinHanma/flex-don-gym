@@ -5,6 +5,8 @@ import "./PosItem.css";
 import { useHistory } from "react-router-dom";
 import POSCard from "../../components/Reusable/PosCard";
 import { cartOutline } from "ionicons/icons";
+import { BackButton } from "../../components/Reusable/BackButton";
+import { arrowBackOutline } from "ionicons/icons";
 
 const PosItemPage: React.FC = () => {
   const history = useHistory();
@@ -12,18 +14,22 @@ const PosItemPage: React.FC = () => {
     <div className="pos-item-container">
       <div className="item-main-container">
         <div className="top-header">
-          <h2>All items</h2>
+          <div className="top-top-header">
+            <BackButton
+              className="pos-btn-back"
+              type="submit"
+              onClick={() => history.push("/pos")}
+            >
+              <IonIcon icon={arrowBackOutline} />
+            </BackButton>
+            <h2>All items</h2>
+          </div>
           <div className="pos-search-bar">
             <div className="item-search-bar">
               <input
                 className="pos-search-input"
                 type="text"
                 placeholder="Search"
-              />
-              <IonIcon
-                icon={cartOutline}
-                className="cart-icon"
-                onClick={() => history.push("/pos")}
               />
             </div>
           </div>

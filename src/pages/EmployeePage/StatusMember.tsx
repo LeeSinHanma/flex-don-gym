@@ -16,7 +16,6 @@ const StatusMemberPage: React.FC = () => {
         <div className="top-header">
           <h2>Manage Member</h2>
           <div className="search-bar">
-            <IonIcon icon={searchOutline} className="search-icon" />
             <input className="search-input" type="text" placeholder="Search" />
           </div>
           <div className="nav-carousel">
