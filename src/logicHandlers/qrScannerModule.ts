@@ -6,32 +6,28 @@ let isStarting = false;
 
 export async function startQrScanner(
   onScan: (decodedText: string) => void,
-  onError?: (err: string) => void
+  onError?: (err: string) => void,
 ) {
-  // Prevent double-start in React strict mode / rerenders
   if (qr || isStarting) return;
   isStarting = true;
 
   try {
     const elementId = "qr-reader";
-
     qr = new Html5Qrcode(elementId);
 
     await qr.start(
-      { facingMode: "environment" }, // back camera if available
-      { fps: 10, qrbox: 250 },
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
       (decodedText) => {
-        onScan(decodedText);
-        stopQrScanner();
+        onScan(decodedText); // ✅ ONLY call callback, don't stop here
       },
       (errorMessage) => {
-        // This fires a lot while scanning; usually ignore
+        // normal spam while scanning; optional
         onError?.(errorMessage);
-      }
+      },
     );
   } catch (e: any) {
     onError?.(e?.message ?? String(e));
-    // if start fails, clear instance so you can retry
     qr = null;
   } finally {
     isStarting = false;
@@ -43,15 +39,11 @@ export async function stopQrScanner() {
 
   try {
     await qr.stop();
-  } catch {
-    // ignore stop errors (not started, already stopped)
-  }
+  } catch {}
 
   try {
     await qr.clear();
-  } catch {
-    // ignore clear errors
-  }
+  } catch {}
 
   qr = null;
 }

@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import QRResultModal from "../../components/Modals/QRResultModal";
-import { useEffect } from "react";
 import {
   startQrScanner,
   stopQrScanner,
@@ -18,25 +17,29 @@ const QRScannerHome: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [memberName, setMemberName] = useState("");
 
+  const handleDecoded = useCallback(async (decodedText: string) => {
+    try {
+      const id = decodedText.trim(); // important
+      const member = await getMemberByID(id);
+
+      console.log("Member Details:", member);
+
+      setMemberName(member.first_name);
+      setIsModalOpen(true);
+
+      stopQrScanner(); // stop camera while modal open
+    } catch (err: any) {
+      console.error("Failed to fetch member:", err?.message || err);
+    }
+  }, []);
+
   useEffect(() => {
-    startQrScanner(async (decodedText) => {
-      try {
-        const member = await getMemberByID(decodedText);
-
-        console.log("Member Details:", member);
-
-        setMemberName(member.first_name); // store data
-        setIsModalOpen(true); // open modal
-        stopQrScanner(); // stop camera while modal is open
-      } catch (err: any) {
-        console.error("Failed to fetch member:", err.message);
-      }
-    });
+    startQrScanner(handleDecoded);
 
     return () => {
       stopQrScanner();
     };
-  }, []);
+  }, [handleDecoded]);
 
   return (
     <div className="main-qr-container">
@@ -89,10 +92,11 @@ const QRScannerHome: React.FC = () => {
         onConfirm={() => {
           console.log("Confirmed:", memberName);
           setIsModalOpen(false);
+          startQrScanner(handleDecoded); // ✅ restart
         }}
         onClose={() => {
           setIsModalOpen(false);
-          startQrScanner(() => {}); // restart scanner
+          startQrScanner(handleDecoded); // ✅ correct
         }}
       />
     </div>
