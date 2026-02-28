@@ -1,8 +1,8 @@
-// src/logicHandlers/qrScannerModule.ts
 import { Html5Qrcode } from "html5-qrcode";
 
 let qr: Html5Qrcode | null = null;
 let isStarting = false;
+let isHandlingScan = false;
 
 export async function startQrScanner(
   onScan: (decodedText: string) => void,
@@ -14,15 +14,24 @@ export async function startQrScanner(
   try {
     const elementId = "qr-reader";
     qr = new Html5Qrcode(elementId);
+    isHandlingScan = false;
 
     await qr.start(
       { facingMode: "environment" },
       { fps: 10, qrbox: { width: 250, height: 250 } },
-      (decodedText) => {
-        onScan(decodedText); // ✅ ONLY call callback, don't stop here
+      async (decodedText) => {
+        if (isHandlingScan) return;
+        isHandlingScan = true;
+
+        try {
+          onScan(decodedText);
+        } catch (e: any) {
+          onError?.(e?.message ?? String(e));
+        } finally {
+          await stopQrScanner(); // stop after first scan
+        }
       },
       (errorMessage) => {
-        // normal spam while scanning; optional
         onError?.(errorMessage);
       },
     );
@@ -46,4 +55,5 @@ export async function stopQrScanner() {
   } catch {}
 
   qr = null;
+  isHandlingScan = false;
 }

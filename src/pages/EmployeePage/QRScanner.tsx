@@ -19,7 +19,7 @@ const QRScannerHome: React.FC = () => {
 
   const handleDecoded = useCallback(async (decodedText: string) => {
     try {
-      const id = decodedText.trim(); // important
+      const id = decodedText.trim();
       const member = await getMemberByID(id);
 
       console.log("Member Details:", member);
@@ -27,13 +27,25 @@ const QRScannerHome: React.FC = () => {
       setMemberName(member.first_name);
       setIsModalOpen(true);
 
-      stopQrScanner(); // stop camera while modal open
+      // ❌ REMOVE stopQrScanner() here — module already stops after scan
     } catch (err: any) {
       console.error("Failed to fetch member:", err?.message || err);
     }
   }, []);
 
+  const restartScanner = useCallback(async () => {
+    await stopQrScanner(); // ensure fully stopped
+    await startQrScanner(handleDecoded); // start clean
+  }, [handleDecoded]);
+
   useEffect(() => {
+    setTimeout(() => {
+      const el = document.getElementById("qr-reader");
+
+      console.log("QR Reader Element:", el);
+      console.log("Width:", el?.clientWidth);
+      console.log("Height:", el?.clientHeight);
+    }, 1000);
     startQrScanner(handleDecoded);
 
     return () => {
@@ -52,6 +64,7 @@ const QRScannerHome: React.FC = () => {
         <div className="camera-container">
           <div id="qr-reader" />
         </div>
+
         <div className="menu-qr-container">
           <div className="add-member-container">
             <Button
@@ -62,6 +75,7 @@ const QRScannerHome: React.FC = () => {
               ADD NEW MEMBER
             </Button>
           </div>
+
           <div className="pos-footer">
             <PosNav
               items={[
@@ -85,18 +99,18 @@ const QRScannerHome: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* ✅ PUT THE MODAL RIGHT HERE */}
+
       <QRResultModal
         isOpen={isModalOpen}
         qrText={memberName}
-        onConfirm={() => {
+        onConfirm={async () => {
           console.log("Confirmed:", memberName);
           setIsModalOpen(false);
-          startQrScanner(handleDecoded); // ✅ restart
+          await restartScanner();
         }}
-        onClose={() => {
+        onClose={async () => {
           setIsModalOpen(false);
-          startQrScanner(handleDecoded); // ✅ correct
+          await restartScanner();
         }}
       />
     </div>
