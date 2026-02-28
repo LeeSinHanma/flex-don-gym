@@ -1,37 +1,42 @@
-// src/logicHandlers/qrScannerModule.ts
 import { Html5Qrcode } from "html5-qrcode";
 
 let qr: Html5Qrcode | null = null;
 let isStarting = false;
+let isHandlingScan = false;
 
 export async function startQrScanner(
   onScan: (decodedText: string) => void,
-  onError?: (err: string) => void
+  onError?: (err: string) => void,
 ) {
-  // Prevent double-start in React strict mode / rerenders
   if (qr || isStarting) return;
   isStarting = true;
 
   try {
     const elementId = "qr-reader";
-
     qr = new Html5Qrcode(elementId);
+    isHandlingScan = false;
 
     await qr.start(
-      { facingMode: "environment" }, // back camera if available
-      { fps: 10, qrbox: 250 },
-      (decodedText) => {
-        onScan(decodedText);
-        stopQrScanner();
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      async (decodedText) => {
+        if (isHandlingScan) return;
+        isHandlingScan = true;
+
+        try {
+          onScan(decodedText);
+        } catch (e: any) {
+          onError?.(e?.message ?? String(e));
+        } finally {
+          await stopQrScanner(); // stop after first scan
+        }
       },
       (errorMessage) => {
-        // This fires a lot while scanning; usually ignore
         onError?.(errorMessage);
-      }
+      },
     );
   } catch (e: any) {
     onError?.(e?.message ?? String(e));
-    // if start fails, clear instance so you can retry
     qr = null;
   } finally {
     isStarting = false;
@@ -43,15 +48,12 @@ export async function stopQrScanner() {
 
   try {
     await qr.stop();
-  } catch {
-    // ignore stop errors (not started, already stopped)
-  }
+  } catch {}
 
   try {
     await qr.clear();
-  } catch {
-    // ignore clear errors
-  }
+  } catch {}
 
   qr = null;
+  isHandlingScan = false;
 }

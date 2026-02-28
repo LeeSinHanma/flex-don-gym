@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import QRResultModal from "../../components/Modals/QRResultModal";
-import { useEffect } from "react";
 import {
   startQrScanner,
   stopQrScanner,
@@ -18,25 +17,41 @@ const QRScannerHome: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [memberName, setMemberName] = useState("");
 
+  const handleDecoded = useCallback(async (decodedText: string) => {
+    try {
+      const id = decodedText.trim();
+      const member = await getMemberByID(id);
+
+      console.log("Member Details:", member);
+
+      setMemberName(member.first_name);
+      setIsModalOpen(true);
+
+      // ❌ REMOVE stopQrScanner() here — module already stops after scan
+    } catch (err: any) {
+      console.error("Failed to fetch member:", err?.message || err);
+    }
+  }, []);
+
+  const restartScanner = useCallback(async () => {
+    await stopQrScanner(); // ensure fully stopped
+    await startQrScanner(handleDecoded); // start clean
+  }, [handleDecoded]);
+
   useEffect(() => {
-    startQrScanner(async (decodedText) => {
-      try {
-        const member = await getMemberByID(decodedText);
+    setTimeout(() => {
+      const el = document.getElementById("qr-reader");
 
-        console.log("Member Details:", member);
-
-        setMemberName(member.first_name); // store data
-        setIsModalOpen(true); // open modal
-        stopQrScanner(); // stop camera while modal is open
-      } catch (err: any) {
-        console.error("Failed to fetch member:", err.message);
-      }
-    });
+      console.log("QR Reader Element:", el);
+      console.log("Width:", el?.clientWidth);
+      console.log("Height:", el?.clientHeight);
+    }, 1000);
+    startQrScanner(handleDecoded);
 
     return () => {
       stopQrScanner();
     };
-  }, []);
+  }, [handleDecoded]);
 
   return (
     <div className="main-qr-container">
@@ -49,6 +64,7 @@ const QRScannerHome: React.FC = () => {
         <div className="camera-container">
           <div id="qr-reader" />
         </div>
+
         <div className="menu-qr-container">
           <div className="add-member-container">
             <Button
@@ -59,6 +75,7 @@ const QRScannerHome: React.FC = () => {
               ADD NEW MEMBER
             </Button>
           </div>
+
           <div className="pos-footer">
             <PosNav
               items={[
@@ -82,17 +99,18 @@ const QRScannerHome: React.FC = () => {
           </div>
         </div>
       </div>
-      {/* ✅ PUT THE MODAL RIGHT HERE */}
+
       <QRResultModal
         isOpen={isModalOpen}
         qrText={memberName}
-        onConfirm={() => {
+        onConfirm={async () => {
           console.log("Confirmed:", memberName);
           setIsModalOpen(false);
+          await restartScanner();
         }}
-        onClose={() => {
+        onClose={async () => {
           setIsModalOpen(false);
-          startQrScanner(() => {}); // restart scanner
+          await restartScanner();
         }}
       />
     </div>
