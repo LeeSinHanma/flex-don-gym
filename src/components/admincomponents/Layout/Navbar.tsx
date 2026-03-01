@@ -17,7 +17,7 @@ import {
   speedometerOutline,
   peopleOutline,
   personOutline,
-  cashOutline,
+  cashOutline, 
   barbellOutline,
   cartOutline,
   settingsOutline,

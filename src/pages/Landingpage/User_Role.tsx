@@ -85,7 +85,7 @@ const UserRole: React.FC = () => {
                 />
               </div>
               <div className="ur-label-group">
-                <span className="ur-role-tag">ACCESS LEVEL 01</span>
+                <span className="ur-role-tag">Owner</span>
                 <h2 className="ur-role-name">Admin</h2>
                 <p className="ur-role-desc">Full system control</p>
               </div>
@@ -124,7 +124,7 @@ const UserRole: React.FC = () => {
                 />
               </div>
               <div className="ur-label-group">
-                <span className="ur-role-tag">ACCESS LEVEL 02</span>
+                <span className="ur-role-tag">Staff</span>
                 <h2 className="ur-role-name">Employee</h2>
                 <p className="ur-role-desc">Daily operations</p>
               </div>
