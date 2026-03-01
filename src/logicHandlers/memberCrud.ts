@@ -77,3 +77,15 @@ export async function getMemberById(memberId: string): Promise<Member> {
     throw new Error(getErrorMessage(err));
   }
 }
+
+// ✅ DELETE /members/delete/{member_id}
+export async function deleteMember(memberId: string): Promise<APIResponse> {
+  try {
+    const res = await api.delete<APIResponse>(
+      `/members/delete/${memberId}`
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
