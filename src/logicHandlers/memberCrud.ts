@@ -3,6 +3,22 @@ import axios from "axios";
 
 export type APIResponse = any;
 
+export type Member = {
+  member_id: string;
+  email: string;
+  contact_number: string;
+  first_name: string;
+  last_name: string;
+  membership_type: number; // 0 = Member, 1 = Casual (based on your data)
+  membership_plan_id: number;
+  membership_expiry: string | null;
+  credits: number;
+  registered_by: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 // ---------- Helpers ----------
 function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
@@ -12,9 +28,7 @@ function getErrorMessage(err: unknown): string {
   return "Unknown error";
 }
 
-// ---------- Services ----------
-
-// ✅ POST /members/create  (JSON body)
+// ✅ POST /members/create
 export async function createMember(
   email: string,
   contact_number: string,
@@ -23,7 +37,7 @@ export async function createMember(
   membership_type: number,
   membership_plan_id: number,
   credits: number,
-  registered_by: number,
+  registered_by: number
 ): Promise<APIResponse> {
   try {
     const body = {
@@ -44,4 +58,22 @@ export async function createMember(
   }
 }
 
-export {};
+// ✅ GET /members/all  (returns Member[])
+export async function getMembers(): Promise<Member[]> {
+  try {
+    const res = await api.get<Member[]>("/members/all");
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+// ✅ GET /members/by-id/{member_id}  (returns Member[])
+export async function getMemberById(memberId: string): Promise<Member> {
+  try {
+    const res = await api.get<Member>(`/members/by-id/${memberId}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}

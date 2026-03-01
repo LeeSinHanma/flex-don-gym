@@ -1,6 +1,7 @@
-import React, { useState } from "react";
 
-import { useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+
+import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
@@ -8,11 +9,31 @@ import { arrowBackOutline } from "ionicons/icons";
 import PosNav from "../../components/Reusable/NavItems";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
+import { getMemberById, Member } from "../../logicHandlers/memberCrud";
+
+interface RouteParams {
+  memberId: string;
+}
 
 const ManageStatusMemPage: React.FC = () => {
   const history = useHistory();
+  const { memberId } = useParams<RouteParams>();
+
+  const [member, setMember] = useState<Member | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  useEffect(() => {
+    const loadMember = async () => {
+      try {
+        const data = await getMemberById(memberId);
+        setMember(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadMember();
+  }, [memberId]);
   return (
     <div className="manage-member-container">
       <div className="main-container">
@@ -27,10 +48,20 @@ const ManageStatusMemPage: React.FC = () => {
         </div>
         <div className="member-container">
           <div className="member-info">
-            <h2 className="member-name">Juan</h2>
+            <h2 className="member-name">
+              {member ? `${member.first_name} ${member.last_name}` : "Loading..."}
+            </h2>
             <div className="member-details">
-              <h4 className="member-type">Member</h4>
-              <h4 className="member-duration">10 months left</h4>
+              <h4 className="member-type">
+                {member
+                  ? member.membership_type === 0
+                    ? "Member"
+                    : "Casual"
+                  : ""}
+              </h4>
+              <h4 className="member-duration">
+                {member?.membership_expiry ?? "No Expiry"}
+              </h4>
             </div>
           </div>
         </div>
