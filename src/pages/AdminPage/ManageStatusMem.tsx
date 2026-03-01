@@ -8,6 +8,8 @@ import { arrowBackOutline } from "ionicons/icons";
 import PosNav from "../../components/Reusable/NavItems";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resource/dondon-logo.png";
 
 const ManageStatusMemPage: React.FC = () => {
   const history = useHistory();
@@ -72,13 +74,18 @@ const ManageStatusMemPage: React.FC = () => {
           />
         </div>*/}
       </div>
+
       <Modal
         className="modal-box"
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="QR Code"
+        title="DONDON'S FITNESS GYM"
+        headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
       >
-        <p>This is the QR</p>
+        <div className="qr-wrapper">
+          <p className="qr-image"></p>
+        </div>
+        <p className="qr-member-name">Juan Dela Cruz</p>
       </Modal>
     </div>
   );
