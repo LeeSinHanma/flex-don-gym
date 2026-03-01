@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./StatusMember.css";
@@ -6,11 +6,25 @@ import { Button } from "../../components/Reusable/Button";
 import { searchOutline } from "ionicons/icons";
 import { IonIcon } from "@ionic/react";
 import PosNav from "../../components/Reusable/NavItems";
+import { getMembers, Member } from "../../logicHandlers/memberCrud";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
+  const [members, setMembers] = useState<Member[]>([]);
 
-  return (
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getMembers();
+        setMembers(data);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    load();
+  }, []);
+
+return (
     <div className="manage-member-container">
       <div className="main-container">
         <div className="top-header">
@@ -25,22 +39,33 @@ const StatusMemberPage: React.FC = () => {
             <div className="nav-item">All</div>
           </div>
         </div>
+
         <div className="cards-container">
-          <div
-            className="status-card"
-            onClick={() => history.push("/manage-status")}
-          >
-            <div className="status-info">
-              <div className="left-info">
-                <h2 className="client-name">Juan</h2>
-                <div className="client-details">
-                  <p className="client-type">Member</p>
-                  <p className="client-duration">1 month</p>
+          {members.map((m) => (
+            <div
+              key={m.member_id}
+              className="status-card"
+              onClick={() => history.push(`/manage-status/${m.member_id}`)}
+            >
+              <div className="status-info">
+                <div className="left-info">
+                  <h2 className="client-name">
+                    {m.first_name} {m.last_name}
+                  </h2>
+                  <div className="client-details">
+                    <p className="client-type">
+                      {m.membership_type === 0 ? "Member" : "Casual"}
+                    </p>
+                    <p className="client-duration">
+                      {m.membership_expiry ? m.membership_expiry : "No Expiry"}
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              <div className="client-status">{m.is_active ? "active" : "inactive"}</div>
             </div>
-            <div className="client-status">active</div>
-          </div>
+          ))}
         </div>
 
         <div className="pos-footer">
