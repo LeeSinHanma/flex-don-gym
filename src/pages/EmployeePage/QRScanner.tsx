@@ -2,50 +2,57 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
-import QRResultModal from "../../components/Modals/QRResultModal";
-import {
-  startQrScanner,
-  stopQrScanner,
-} from "../../logicHandlers/qrScannerModule";
+import { Modal } from "../../components/Reusable/Modals"; // ✅ use this modal
+import { startQrScanner, stopQrScanner } from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
 import PosNav from "../../components/Reusable/NavItems";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 
+type MemberInfo = {
+  member_id: string;
+  email: string;
+  contact_number: string;
+  first_name: string;
+  last_name: string;
+  membership_type: number;
+  membership_plan_id: number;
+  membership_expiry: string;
+  credits: number;
+  registered_by: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [memberName, setMemberName] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+  const [member, setMember] = useState<MemberInfo | null>(null);
 
   const handleDecoded = useCallback(async (decodedText: string) => {
     try {
       const id = decodedText.trim();
-      const member = await getMemberByID(id);
+      if (!id) return;
 
-      console.log("Member Details:", member);
+      const fetched = await getMemberByID(id);
+      console.log("Member Details:", fetched);
 
-      setMemberName(member.first_name);
-      setIsModalOpen(true);
-
-      // ❌ REMOVE stopQrScanner() here — module already stops after scan
+      setMember(fetched);
+      setShowModal(true);
+      // ✅ no need to stop here if your module already stops after scan
     } catch (err: any) {
       console.error("Failed to fetch member:", err?.message || err);
     }
   }, []);
 
   const restartScanner = useCallback(async () => {
-    await stopQrScanner(); // ensure fully stopped
-    await startQrScanner(handleDecoded); // start clean
+    await stopQrScanner();                 // ensure fully stopped
+    await startQrScanner(handleDecoded);   // start clean
   }, [handleDecoded]);
 
   useEffect(() => {
-    setTimeout(() => {
-      const el = document.getElementById("qr-reader");
-
-      console.log("QR Reader Element:", el);
-      console.log("Width:", el?.clientWidth);
-      console.log("Height:", el?.clientHeight);
-    }, 1000);
     startQrScanner(handleDecoded);
 
     return () => {
@@ -79,40 +86,77 @@ const QRScannerHome: React.FC = () => {
           <div className="pos-footer">
             <PosNav
               items={[
-                {
-                  label: "POS",
-                  path: "/pos",
-                  className: "pos-nav-item-container",
-                },
-                {
-                  label: "QR Scanner",
-                  path: "/qr",
-                  className: "qr-nav-item-container",
-                },
-                {
-                  label: "Status",
-                  path: "/status-member",
-                  className: "status-item-nav-container",
-                },
+                { label: "POS", path: "/pos", className: "pos-nav-item-container" },
+                { label: "QR Scanner", path: "/qr", className: "qr-nav-item-container" },
+                { label: "Status", path: "/status-member", className: "status-item-nav-container" },
               ]}
             />
           </div>
         </div>
       </div>
 
-      <QRResultModal
-        isOpen={isModalOpen}
-        qrText={memberName}
-        onConfirm={async () => {
-          console.log("Confirmed:", memberName);
-          setIsModalOpen(false);
-          await restartScanner();
-        }}
+      {/* ✅ Reused MODAL */}
+      <Modal
+        className="modal-box"
+        isOpen={showModal}
+        title="Member Details"
         onClose={async () => {
-          setIsModalOpen(false);
-          await restartScanner();
+          setShowModal(false);
+          setMember(null);
+          await restartScanner(); // ✅ restart scanning after closing modal
         }}
-      />
+      >
+        {member ? (
+          <div className="accepted-details">
+            <p>
+              <b>Member ID:</b> {String(member.member_id ?? "")}
+            </p>
+            <p>
+              <b>First Name:</b> {member.first_name ?? ""}
+            </p>
+            <p>
+              <b>Last Name:</b> {member.last_name ?? ""}
+            </p>
+            <p>
+              <b>Credits:</b> {member.credits ?? ""}
+            </p>
+            <p>
+              <b>Amount to Pay:</b> {"50.00"} {/* Placeholder for amount, replace with actual logic */}
+            </p>
+
+            {/* Optional: Add a confirm button */}
+            <div className="modal-buttons">
+              <Button
+                className="btn-submit"
+                type="button"
+                onClick={async () => {
+                  console.log("Confirmed member:", member);
+                  setShowModal(false);
+                  setMember(null);
+                  await restartScanner();
+                }}
+              >
+                Confirm
+              </Button>
+
+              <Button
+                className="btn-submit btn-cancel"
+                type="button"
+                onClick={async () => {
+                  console.log("Cancelled member:", member);
+                  setShowModal(false);
+                  setMember(null);
+                  await restartScanner();
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p>No member data.</p>
+        )}
+      </Modal>
     </div>
   );
 };
