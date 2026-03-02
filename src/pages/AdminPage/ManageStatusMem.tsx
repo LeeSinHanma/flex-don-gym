@@ -90,7 +90,11 @@ const ManageStatusMemPage: React.FC = () => {
 
         <div className="status-button-container">
           <div className="status-button">
-            <Button type="button" className="renew-btn">
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={() => history.push(`/members/edit/${memberId}`)}
+            >
               Edit
             </Button>
             <Button type="button" className="renew-btn">
