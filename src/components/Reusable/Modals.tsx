@@ -1,3 +1,7 @@
+// Modal.tsx
+import "./Modals.css";
+import React from "react";
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -5,6 +9,10 @@ interface ModalProps {
   children: React.ReactNode;
   className?: string;
   headerImage?: React.ReactNode; // 👈 add this
+
+  // ✅ NEW (optional)
+  showCloseButton?: boolean;   // default true
+  closeText?: string;          // default "Close"
 }
 
 export function Modal({
@@ -14,6 +22,8 @@ export function Modal({
   children,
   className,
   headerImage, // 👈 add this
+  showCloseButton = true,
+  closeText = "Close",
 }: ModalProps) {
   if (!isOpen) return null;
 
@@ -26,10 +36,18 @@ export function Modal({
         {headerImage && <div className="modal-header-image">{headerImage}</div>}{" "}
         {/* 👈 add this */}
         {title && <h2 className="modal-title">{title}</h2>}
+
         <div className="modal-body">{children}</div>
         <button className="modal-close-btn" onClick={onClose}>
           Close
         </button>
+
+        {/* ✅ only show this when you want */}
+        {showCloseButton && (
+          <button className="modal-close-btn" onClick={onClose}>
+            {closeText}
+          </button>
+        )}
       </div>
     </div>
   );

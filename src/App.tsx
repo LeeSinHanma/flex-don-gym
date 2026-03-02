@@ -75,11 +75,7 @@ const App: React.FC = () => {
             <Route exact path="/admin-page" component={StartingPageAdmin} />
             <Route exact path="/employee-login" component={EmployeeMenu} />
             <AdminRoute exact path="/admin-page" component={AdminMenu} />
-            <Route
-              exact
-              path="/manage-status"
-              component={ManageStatusMemPage}
-            />
+            <Route path="/manage-status/:memberId" component={ManageStatusMemPage} />
 
             {/* Folder Route (keep last) */}
             <Route exact path="/folder/:name" component={Page} />
