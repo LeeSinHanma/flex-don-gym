@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import { useHistory, useParams } from "react-router-dom";
@@ -11,7 +10,11 @@ import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
-import { getMemberById, Member, deleteMember} from "../../logicHandlers/memberCrud";
+import {
+  getMemberById,
+  Member,
+  deleteMember,
+} from "../../logicHandlers/memberCrud";
 
 interface RouteParams {
   memberId: string;
@@ -53,7 +56,9 @@ const ManageStatusMemPage: React.FC = () => {
         <div className="member-container">
           <div className="member-info">
             <h2 className="member-name">
-              {member ? `${member.first_name} ${member.last_name}` : "Loading..."}
+              {member
+                ? `${member.first_name} ${member.last_name}`
+                : "Loading..."}
             </h2>
             <div className="member-details">
               <h4 className="member-type">
@@ -113,10 +118,12 @@ const ManageStatusMemPage: React.FC = () => {
           <IonImg src={dondonLogo} className="qr-image" alt="QR code" />
         </div>
         <p className="qr-member-name">Juan Dela Cruz</p>
+      </Modal>
+
+      <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         title="Confirm Delete"
-        showCloseButton={false}
         className="confirm-modal"
       >
         <p>Are you sure you want to delete this member?</p>
@@ -139,9 +146,8 @@ const ManageStatusMemPage: React.FC = () => {
               try {
                 await deleteMember(member.member_id);
 
-                setShowDeleteModal(false);   // close confirm
-                setShowSuccessModal(true);   // open success modal
-
+                setShowDeleteModal(false); // close confirm
+                setShowSuccessModal(true); // open success modal
               } catch (error) {
                 console.error(error);
                 alert("Delete failed");
@@ -160,7 +166,6 @@ const ManageStatusMemPage: React.FC = () => {
           history.push("/status-member");
         }}
         title="Member Deleted"
-        showCloseButton={false}
       >
         <p style={{ textAlign: "center" }}>
           The member has been successfully deleted.
