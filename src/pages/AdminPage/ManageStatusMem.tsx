@@ -83,7 +83,7 @@ const ManageStatusMemPage: React.FC = () => {
         headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
       >
         <div className="qr-wrapper">
-          <p className="qr-image"></p>
+          <IonImg src={dondonLogo} className="qr-image" alt="QR code" />
         </div>
         <p className="qr-member-name">Juan Dela Cruz</p>
       </Modal>
