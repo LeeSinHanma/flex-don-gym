@@ -89,3 +89,13 @@ export async function deleteMember(memberId: string): Promise<APIResponse> {
     throw new Error(getErrorMessage(err));
   }
 }
+
+// ✅ UPDATE /members/update/{member_id}
+export async function updateMember(member_id: string, payload: any) {
+  const res = await api.put(
+    `/members/update/${encodeURIComponent(member_id)}`,
+    payload
+  );
+
+  return res.data;
+}

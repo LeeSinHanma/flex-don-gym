@@ -19,6 +19,7 @@ import AdminMenu from "./pages/AdminPage/Admin";
 
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
+import EditMemberPage from "./pages/AdminPage/EditMemberPage";
 
 import PosPage from "./pages/EmployeePage/Pos";
 import PosItemPage from "./pages/EmployeePage/PosItem";
@@ -76,6 +77,7 @@ const App: React.FC = () => {
             <Route exact path="/employee-login" component={EmployeeMenu} />
             <AdminRoute exact path="/admin-page" component={AdminMenu} />
             <Route path="/manage-status/:memberId" component={ManageStatusMemPage} />
+            <Route path="/members/edit/:memberId" component={EditMemberPage} />
 
             {/* Folder Route (keep last) */}
             <Route exact path="/folder/:name" component={Page} />
