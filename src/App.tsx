@@ -16,6 +16,7 @@ import QRScannerHome from "./pages/EmployeePage/QRScanner";
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
+import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
@@ -47,6 +48,8 @@ import "@ionic/react/css/palettes/dark.system.css";
 import "./theme/variables.css";
 import PrivateRoute from "./PrivateRoute";
 import AdminRoute from "./AdminRoute";
+import ProductPage from "./pages/AdminPage/Product";
+import MembershipPage from "./pages/AdminPage/Membership";
 
 setupIonicReact();
 
@@ -74,11 +77,16 @@ const App: React.FC = () => {
 
             {/* Admin Routes */}
             <Route exact path="/admin-page" component={StartingPageAdmin} />
-            <Route exact path="/employee-login" component={EmployeeMenu} />
+            <Route exact path="/employee-page" component={EmployeeMenu} />
             <AdminRoute exact path="/admin-page" component={AdminMenu} />
-            <Route path="/manage-status/:memberId" component={ManageStatusMemPage} />
+            <Route exact path="/admin-product" component={ProductPage} />
+            <Route exact path="/admin-membership" component={MembershipPage} />
+            <Route
+              path="/manage-status/:memberId"
+              component={ManageStatusMemPage}
+            />
             <Route path="/members/edit/:memberId" component={EditMemberPage} />
-
+            <Route exact path="/admin-dashboard" component={AdminDashboard} />
             {/* Folder Route (keep last) */}
             <Route exact path="/folder/:name" component={Page} />
           </Switch>

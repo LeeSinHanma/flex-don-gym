@@ -44,6 +44,13 @@ const StartingPageAdmin: React.FC = () => {
           >
             Get started
           </Button>
+          <Button
+            className="btn btn-signup"
+            type="submit"
+            onClick={() => history.push("/admin-dashboard")}
+          >
+            Admin Page
+          </Button>
         </div>
       </div>
     </div>

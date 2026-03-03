@@ -57,14 +57,16 @@
   gap: 4px;
 }
 
-.pos-product-name {
+.pos-left-info h2,
+.pos-card-product-name {
   font-size: 16px;
   font-weight: normal;
   color: #04354f;
   margin: 0;
 }
 
-.pos-product-price {
+.pos-left-info p,
+.pos-card-product-price {
   font-size: 18px;
   font-weight: bold;
   color: #04354f;
@@ -79,7 +81,7 @@
 }
 
 /* Counter */
-.pos-counter {
+.pos-card-counter {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -122,10 +124,11 @@
   height: 50px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 6px 14px;
-  background-color: #04354f;
-  color: #ffffff;
+  background-color: rgba(113, 112, 112, 0.25);
+  color: #04354f;
   border: none;
   border-radius: 10px;
   font-size: 13px;

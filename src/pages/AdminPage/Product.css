@@ -1,0 +1,165 @@
+.product-search-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-search-input {
+  flex: 1;
+  border-radius: 15px;
+  background-color: #c5c5c5;
+  border: none;
+  height: 50px;
+  padding: 0 1rem;
+  color: #04354f;
+  font-family: "Inter", sans-serif;
+}
+
+.product-search-input:focus {
+  outline: none;
+}
+
+.product-search-input::placeholder {
+  color: #04354f;
+  font-family: "Inter", sans-serif;
+}
+
+.product-search-btn {
+  width: 85px;
+  height: 50px;
+  border: none;
+  border-radius: 10px;
+  background-color: #04354f;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+}
+
+.product-card-wrapper {
+  width: 100%;
+}
+
+.product-stock-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #04354f;
+  font-family: "Inter", sans-serif;
+}
+
+.product-main-container .bottom-container {
+  margin-top: auto;
+  padding: 1.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.product-main-container .bottom-container .btn-submit {
+  width: 400px;
+  height: 62px;
+  border-radius: 15px;
+  background-color: #04354f;
+  color: white;
+  border: none;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.product-main-container .bottom-container .btn-submit:hover {
+  background-color: #053a56;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.product-main-container .bottom-container .btn-submit:active {
+  transform: translateY(0);
+}
+
+.employee-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  font-family: "Inter", sans-serif;
+}
+
+.employee-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-family: "Inter", sans-serif;
+}
+
+.employee-input:focus {
+  border-color: #04354f;
+}
+
+.employee-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btn-modal {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+}
+
+.btn-submit-modal {
+  background-color: #04354f;
+  color: white;
+}
+
+.btn-submit-modal:hover {
+  background-color: #053a56;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cancel-modal {
+  background-color: #6b7280;
+  color: white;
+}
+
+.btn-cancel-modal:hover {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-modal:active {
+  transform: translateY(0);
+}

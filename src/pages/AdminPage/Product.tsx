@@ -7,14 +7,16 @@ import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { menuOutline } from "ionicons/icons";
+import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
-import "./Employee.css";
+import "./Product.css";
 
-const EmployeeMenu: React.FC = () => {
+const ProductPage: React.FC = () => {
   const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [employeeName, setEmployeeName] = useState("");
   const [employeePassword, setEmployeePassword] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const handleAddEmployee = () => {
     setIsModalOpen(true);
@@ -35,9 +37,9 @@ const EmployeeMenu: React.FC = () => {
 
   return (
     <div className="admin-dashboard-container">
-      <div className="main-container">
+      <div className="main-container product-main-container">
         <div className="admin-top-header">
-          <h1>Employee</h1>
+          <h1>Product</h1>
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
@@ -45,8 +47,26 @@ const EmployeeMenu: React.FC = () => {
           />
         </div>
         <div className="admin-main-content">
-          <h3>Juan Dela Cruz</h3>
-          <p>Working</p>
+          <div className="product-search-row">
+            <input
+              className="product-search-input"
+              type="text"
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+            <button type="button" className="product-search-btn">
+              Search
+            </button>
+          </div>
+
+          <div className="product-card-wrapper">
+            <POSCard
+              productName="Protein Powder"
+              price={1000}
+              topRight={<span className="product-stock-text">30 stocks</span>}
+            />
+          </div>
         </div>
         <div className="bottom-container">
           <Button
@@ -99,4 +119,4 @@ const EmployeeMenu: React.FC = () => {
     </div>
   );
 };
-export default EmployeeMenu;
+export default ProductPage;

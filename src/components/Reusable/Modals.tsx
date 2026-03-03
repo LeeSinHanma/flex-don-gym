@@ -8,10 +8,9 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   className?: string;
-
-  // ✅ NEW (optional)
-  showCloseButton?: boolean;   // default true
-  closeText?: string;          // default "Close"
+  headerImage?: React.ReactNode;
+  showCloseButton?: boolean;
+  closeText?: string;
 }
 
 export function Modal({
@@ -20,6 +19,7 @@ export function Modal({
   title,
   children,
   className,
+  headerImage,
   showCloseButton = true,
   closeText = "Close",
 }: ModalProps) {
@@ -31,11 +31,10 @@ export function Modal({
         className={`modal-content ${className ?? ""}`}
         onClick={(e) => e.stopPropagation()}
       >
+        {headerImage && <div className="modal-header-image">{headerImage}</div>}
         {title && <h2 className="modal-title">{title}</h2>}
 
         <div className="modal-body">{children}</div>
-
-        {/* ✅ only show this when you want */}
         {showCloseButton && (
           <button className="modal-close-btn" onClick={onClose}>
             {closeText}
