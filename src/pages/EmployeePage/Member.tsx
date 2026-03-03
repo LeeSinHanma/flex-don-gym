@@ -18,6 +18,7 @@ const MemberMenu: React.FC = () => {
   const [contactNumber, setContactNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [membershipType, setMembershipType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [acceptedData, setAcceptedData] = useState<{
@@ -136,6 +137,25 @@ const MemberMenu: React.FC = () => {
               value={lastName}
               onChange={(e: any) => setLastName(e.target.value)}
             />
+
+            <select
+              className="input-username"
+              value={membershipType}
+              onChange={(e: any) => setMembershipType(e.target.value)}
+            >
+              <option value="walkin" style={{ fontWeight: "bold" }}>
+                Walk-in
+              </option>
+              <option value="prepaid" style={{ fontWeight: "bold" }}>
+                Prepaid
+              </option>
+              <option value="annual" style={{ fontWeight: "bold" }}>
+                Annual
+              </option>
+              <option value="member" style={{ fontWeight: "bold" }}>
+                Member
+              </option>
+            </select>
           </div>
 
           <div className="bottom-container">

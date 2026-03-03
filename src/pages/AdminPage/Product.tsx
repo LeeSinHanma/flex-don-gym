@@ -144,7 +144,7 @@ const ProductPage: React.FC = () => {
                 // optional: keep, but filtering already happens as you type
               }}
             >
-              Search
+              Scan
             </button>
           </div>
 
@@ -171,7 +171,11 @@ const ProductPage: React.FC = () => {
         </div>
 
         <div className="bottom-container">
-          <Button className="btn btn-submit" type="button" onClick={openAddProductModal}>
+          <Button
+            className="btn btn-submit"
+            type="button"
+            onClick={openAddProductModal}
+          >
             Add Product
           </Button>
         </div>
@@ -253,7 +257,11 @@ const ProductPage: React.FC = () => {
           </div>
 
           <div className="form-actions" style={{ display: "flex", gap: 10 }}>
-            <Button type="button" className="btn-modal btn-submit-modal" onClick={closeModal}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={closeModal}
+            >
               Cancel
             </Button>
 

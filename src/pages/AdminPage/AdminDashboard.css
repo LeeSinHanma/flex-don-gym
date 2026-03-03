@@ -24,6 +24,13 @@
   text-align: center;
 }
 
+.admin-top-header .btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .admin-top-header .menu-icon {
   position: absolute;
   right: 1.5rem;

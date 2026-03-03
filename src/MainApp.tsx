@@ -25,6 +25,7 @@ import LoadingScreen from "./pages/LoadingScreen";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import ProductPage from "./pages/AdminPage/Product";
 import MembershipPage from "./pages/AdminPage/Membership";
+import ItemInfoPage from "./pages/AdminPage/ItemInfo";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -69,6 +70,7 @@ const MainApp: React.FC = () => (
             <Route exact path="/admin-dashboard" component={AdminDashboard} />
             <Route exact path="/admin-product" component={ProductPage} />
             <Route exact path="/admin-membership" component={MembershipPage} />
+            <Route exact path="/admin-item-info" component={ItemInfoPage} />
             {/* Folder/Page route - should be last */}
             <Route exact path="/folder/:name" component={Page} />
           </Switch>
