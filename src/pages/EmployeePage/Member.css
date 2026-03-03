@@ -70,6 +70,10 @@ input:focus {
   outline: none;
 }
 
+.form-container select.input-username {
+  padding: 12px 14px;
+}
+
 .accepted-details {
   width: 100%;
   display: flex;

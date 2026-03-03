@@ -9,7 +9,8 @@ import {
 } from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
 import PosNav from "../../components/Reusable/NavItems";
-import { IonImg } from "@ionic/react";
+import { IonIcon, IonImg } from "@ionic/react";
+import { search } from "ionicons/icons";
 import dondonLogo from "../../resource/dondon-logo.png";
 
 type MemberInfo = {
@@ -69,6 +70,9 @@ const QRScannerHome: React.FC = () => {
         <div className="text-container">
           <IonImg src={dondonLogo} className="login-logo" />
           <p>Scan QR code</p>
+          <div className="search-icon">
+            <IonIcon icon={search} />
+          </div>
         </div>
 
         <div className="camera-container">
