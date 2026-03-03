@@ -37,7 +37,7 @@ export async function createMember(
   membership_type: number,
   membership_plan_id: number,
   credits: number,
-  registered_by: number
+  registered_by: number,
 ): Promise<APIResponse> {
   try {
     const body = {
@@ -68,6 +68,21 @@ export async function getMembers(): Promise<Member[]> {
   }
 }
 
+// ✅ GET /members/search?name_query=...
+export async function getMemberByName(name: string): Promise<Member[]> {
+  try {
+    const res = await api.get<Member[]>("/members/search", {
+      params: {
+        name_query: name, // 👈 MUST match backend exactly
+      },
+    });
+
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
 // ✅ GET /members/by-id/{member_id}  (returns Member[])
 export async function getMemberById(memberId: string): Promise<Member> {
   try {
@@ -81,9 +96,7 @@ export async function getMemberById(memberId: string): Promise<Member> {
 // ✅ DELETE /members/delete/{member_id}
 export async function deleteMember(memberId: string): Promise<APIResponse> {
   try {
-    const res = await api.delete<APIResponse>(
-      `/members/delete/${memberId}`
-    );
+    const res = await api.delete<APIResponse>(`/members/delete/${memberId}`);
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
@@ -94,7 +107,7 @@ export async function deleteMember(memberId: string): Promise<APIResponse> {
 export async function updateMember(member_id: string, payload: any) {
   const res = await api.put(
     `/members/update/${encodeURIComponent(member_id)}`,
-    payload
+    payload,
   );
 
   return res.data;

@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
-import QRScanner from "../../components/Reusable/QRScannerNav";
 import "./StatusMember.css";
-import { Button } from "../../components/Reusable/Button";
-import { searchOutline } from "ionicons/icons";
-import { IonIcon } from "@ionic/react";
 import PosNav from "../../components/Reusable/NavItems";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
-  const [members, setMembers] = useState<Member[]>([]);
+
+  const [allMembers, setAllMembers] = useState<Member[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const load = async () => {
       try {
         const data = await getMembers();
-        setMembers(data);
+        setAllMembers(data);
       } catch (e) {
         console.error(e);
       }
@@ -24,14 +22,42 @@ const StatusMemberPage: React.FC = () => {
     load();
   }, []);
 
-return (
+  // ✅ filter cards based on search
+  const filteredMembers = useMemo(() => {
+    const q = (search ?? "").trim().toLowerCase();
+    if (!q) return allMembers;
+
+    return allMembers.filter((m) => {
+      const first = (m.first_name ?? "").toLowerCase();
+      const last = (m.last_name ?? "").toLowerCase();
+      const email = (m.email ?? "").toLowerCase();
+      const fullName = `${first} ${last}`.trim();
+
+      return (
+        first.includes(q) ||
+        last.includes(q) ||
+        fullName.includes(q) ||
+        email.includes(q)
+      );
+    });
+  }, [search, allMembers]);
+
+  return (
     <div className="manage-member-container">
       <div className="main-container">
         <div className="top-header">
           <h2>Manage Member</h2>
+
           <div className="search-bar">
-            <input className="search-input" type="text" placeholder="Search" />
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
+
           <div className="nav-carousel">
             <div className="nav-item">Currently Active</div>
             <div className="nav-item">Member</div>
@@ -41,7 +67,11 @@ return (
         </div>
 
         <div className="cards-container">
-          {members.map((m) => (
+          {filteredMembers.length === 0 && (
+            <p style={{ textAlign: "center" }}>No members found.</p>
+          )}
+
+          {filteredMembers.map((m) => (
             <div
               key={m.member_id}
               className="status-card"
@@ -63,7 +93,9 @@ return (
                 </div>
               </div>
 
-              <div className="client-status">{m.is_active ? "active" : "inactive"}</div>
+              <div className="client-status">
+                {m.is_active ? "active" : "inactive"}
+              </div>
             </div>
           ))}
         </div>
