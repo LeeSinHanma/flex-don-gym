@@ -3,7 +3,10 @@ import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals"; // ✅ use this modal
-import { startQrScanner, stopQrScanner } from "../../logicHandlers/qrScannerModule";
+import {
+  startQrScanner,
+  stopQrScanner,
+} from "../../logicHandlers/qrScannerModule";
 import { getMemberByID } from "../../logicHandlers/userServices";
 import PosNav from "../../components/Reusable/NavItems";
 import { IonImg } from "@ionic/react";
@@ -48,8 +51,8 @@ const QRScannerHome: React.FC = () => {
   }, []);
 
   const restartScanner = useCallback(async () => {
-    await stopQrScanner();                 // ensure fully stopped
-    await startQrScanner(handleDecoded);   // start clean
+    await stopQrScanner(); // ensure fully stopped
+    await startQrScanner(handleDecoded); // start clean
   }, [handleDecoded]);
 
   useEffect(() => {
@@ -86,9 +89,21 @@ const QRScannerHome: React.FC = () => {
           <div className="pos-footer">
             <PosNav
               items={[
-                { label: "POS", path: "/pos", className: "pos-nav-item-container" },
-                { label: "QR Scanner", path: "/qr", className: "qr-nav-item-container" },
-                { label: "Status", path: "/status-member", className: "status-item-nav-container" },
+                {
+                  label: "POS",
+                  path: "/pos",
+                  className: "pos-nav-item-container",
+                },
+                {
+                  label: "QR Scanner",
+                  path: "/qr",
+                  className: "qr-nav-item-container",
+                },
+                {
+                  label: "Status",
+                  path: "/status-member",
+                  className: "status-item-nav-container",
+                },
               ]}
             />
           </div>
@@ -121,7 +136,8 @@ const QRScannerHome: React.FC = () => {
               <b>Credits:</b> {member.credits ?? ""}
             </p>
             <p>
-              <b>Amount to Pay:</b> {"50.00"} {/* Placeholder for amount, replace with actual logic */}
+              <b>Amount to Pay:</b> {"50.00"}{" "}
+              {/* Placeholder for amount, replace with actual logic */}
             </p>
 
             {/* Optional: Add a confirm button */}
