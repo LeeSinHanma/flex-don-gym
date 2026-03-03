@@ -69,7 +69,7 @@ const POSCard: React.FC<POSCardProps> = ({
     // if counter props are provided, show counter
     if (onCountChange !== undefined) {
       return (
-        <div className="pos-counter">
+        <div className="pos-card-counter">
           <button
             className="pos-counter-btn"
             onClick={handleDecrement}
@@ -120,8 +120,8 @@ const POSCard: React.FC<POSCardProps> = ({
         >
           <div className="pos-status-info">
             <div className="pos-left-info">
-              <h2 className="pos-product-name">{productName}</h2>
-              <p className="pos-product-price">
+              <h2 className="pos-card-product-name">{productName}</h2>
+              <p className="pos-card-product-price">
                 ₱
                 {Number(price).toLocaleString("en-PH", {
                   minimumFractionDigits: 2,

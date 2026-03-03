@@ -7,14 +7,16 @@ import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { menuOutline } from "ionicons/icons";
+import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
-import "./Employee.css";
+import "./Product.css";
 
-const EmployeeMenu: React.FC = () => {
+const MembershipPage: React.FC = () => {
   const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [employeeName, setEmployeeName] = useState("");
   const [employeePassword, setEmployeePassword] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const handleAddEmployee = () => {
     setIsModalOpen(true);
@@ -35,9 +37,9 @@ const EmployeeMenu: React.FC = () => {
 
   return (
     <div className="admin-dashboard-container">
-      <div className="main-container">
+      <div className="main-container product-main-container">
         <div className="admin-top-header">
-          <h1>Employee</h1>
+          <h1>Membership Plans</h1>
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
@@ -45,8 +47,32 @@ const EmployeeMenu: React.FC = () => {
           />
         </div>
         <div className="admin-main-content">
-          <h3>Juan Dela Cruz</h3>
-          <p>Working</p>
+          <div className="product-card-wrapper">
+            <POSCard
+              productName="Annual Membership"
+              price={1500}
+              buttonLabel="Edit amount"
+              onButtonClick={() => console.log("Add product")}
+            />
+            <POSCard
+              productName="Monthly Membership"
+              price={55}
+              buttonLabel="Edit amount"
+              onButtonClick={() => console.log("Add product")}
+            />
+            <POSCard
+              productName="Walk-in Membership"
+              price={55}
+              buttonLabel="Edit amount"
+              onButtonClick={() => console.log("Add product")}
+            />
+            <POSCard
+              productName="Prepaid Membership"
+              price={55}
+              buttonLabel="Edit amount"
+              onButtonClick={() => console.log("Add product")}
+            />
+          </div>
         </div>
         <div className="bottom-container">
           <Button
@@ -54,7 +80,7 @@ const EmployeeMenu: React.FC = () => {
             type="button"
             onClick={handleAddEmployee}
           >
-            Add employee
+            Add product
           </Button>
         </div>
       </div>
@@ -62,26 +88,26 @@ const EmployeeMenu: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="Add New Employee"
+        title="Add New Product"
         showCloseButton={false}
       >
         <div className="employee-form">
           <div className="form-group">
-            <label htmlFor="employee-name">Employee Name</label>
+            <label htmlFor="employee-name">Brand Name</label>
             <UsernameInput
               id="employee-name"
               className="employee-input"
-              placeholder="Enter employee name"
+              placeholder="Enter brand name"
               value={employeeName}
               onChange={(e) => setEmployeeName(e.target.value)}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="employee-password">Password</label>
-            <PasswordInput
+            <label htmlFor="employee-password">Expiry date</label>
+            <UsernameInput
               id="employee-password"
               className="employee-input"
-              placeholder="Enter password"
+              placeholder="Enter expiry date"
               value={employeePassword}
               onChange={(e) => setEmployeePassword(e.target.value)}
             />
@@ -99,4 +125,4 @@ const EmployeeMenu: React.FC = () => {
     </div>
   );
 };
-export default EmployeeMenu;
+export default MembershipPage;

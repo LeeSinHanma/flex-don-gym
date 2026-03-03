@@ -22,6 +22,9 @@ import PosPage from "./pages/EmployeePage/Pos";
 import PosItemPage from "./pages/EmployeePage/PosItem";
 import LoginRegisterErrorPage from "./components/Reusable/LoginRegisterError";
 import LoadingScreen from "./pages/LoadingScreen";
+import AdminDashboard from "./pages/AdminPage/AdminDashboard";
+import ProductPage from "./pages/AdminPage/Product";
+import MembershipPage from "./pages/AdminPage/Membership";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -35,7 +38,6 @@ const MainApp: React.FC = () => (
             <Route exact path="/">
               <Redirect to="/folder/Inbox" />
             </Route>
-
             {/* Employee Routes */}
             <Route exact path="/login" component={LoginRegister} />
             <Route exact path="/menu" component={MenuButtons} />
@@ -44,7 +46,7 @@ const MainApp: React.FC = () => (
             <Route exact path="/prepaid" component={PrepaidMenu} />
             <Route exact path="/qr" component={QRScannerHome} />
             <Route exact path="/admin-page" component={StartingPageAdmin} />
-            <Route exact path="/employee" component={EmployeeMenu} />
+            <Route exact path="/employee-page" component={EmployeeMenu} />
             <Route exact path="/admin" component={AdminMenu} />
             <Route exact path="/menu-admin" component={MenuAdminButtons} />
             <Route exact path="/status-member" component={StatusMemberPage} />
@@ -55,17 +57,18 @@ const MainApp: React.FC = () => (
             />
             <Route exact path="/pos" component={PosPage} />
             <Route exact path="/pos-item" component={PosItemPage} />
-
             <Route
               exact
               path="/error-page"
               component={LoginRegisterErrorPage}
             />
-
             {/* QR Generator */}
             <Route exact path="/generator" component={App} />
             <Route exact path="/loading" component={LoadingScreen} />
-
+            {/*Admin*/}
+            <Route exact path="/admin-dashboard" component={AdminDashboard} />
+            <Route exact path="/admin-product" component={ProductPage} />
+            <Route exact path="/admin-membership" component={MembershipPage} />
             {/* Folder/Page route - should be last */}
             <Route exact path="/folder/:name" component={Page} />
           </Switch>
