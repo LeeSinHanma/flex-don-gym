@@ -1,8 +1,5 @@
-import React, { useState } from "react";
-import { UsernameInput } from "../../components/Reusable/Username";
-import { PasswordInput } from "../../components/Reusable/Password";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "../../components/Reusable/Button";
-import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
@@ -11,28 +8,112 @@ import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
 
+import {
+  createInventoryItem,
+  getInventoryItems,
+  InventoryItem,
+  CreateInventoryItem,
+} from "../../logicHandlers/itemInvCrud"; // ✅ make sure this is the correct path
+
 const ProductPage: React.FC = () => {
   const history = useHistory();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [employeeName, setEmployeeName] = useState("");
-  const [employeePassword, setEmployeePassword] = useState("");
+
+  // list state
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // search
   const [searchValue, setSearchValue] = useState("");
 
-  const handleAddEmployee = () => {
+  // form states
+  const [itemId, setItemId] = useState("");
+  const [itemName, setItemName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(0);
+  const [addedBy, setAddedBy] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const loadItems = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getInventoryItems();
+      setItems(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadItems();
+  }, []);
+
+  const filteredItems = useMemo(() => {
+    const q = searchValue.trim().toLowerCase();
+    if (!q) return items;
+
+    return items.filter((it) => {
+      const name = (it.item_name ?? "").toLowerCase();
+      const desc = (it.description ?? "").toLowerCase();
+      const id = (it.item_id ?? "").toLowerCase();
+      return name.includes(q) || desc.includes(q) || id.includes(q);
+    });
+  }, [items, searchValue]);
+
+  const openAddProductModal = () => {
     setIsModalOpen(true);
+    setErrorMessage("");
   };
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
     setIsModalOpen(false);
-    setEmployeeName("");
-    setEmployeePassword("");
+    setItemId("");
+    setItemName("");
+    setDescription("");
+    setPrice(0);
+    setQuantity(0);
+    setAddedBy("");
+    setErrorMessage("");
   };
 
-  const handleSubmit = () => {
-    // Add your submit logic here
-    console.log("Employee Name:", employeeName);
-    console.log("Employee Password:", employeePassword);
-    handleCloseModal();
+  const handleCreateProduct = async () => {
+    if (!itemId.trim() || !itemName.trim() || !addedBy.trim()) {
+      setErrorMessage("Item ID, Item Name, and Added By are required.");
+      return;
+    }
+    if (price < 0 || quantity < 0) {
+      setErrorMessage("Price and Quantity cannot be negative.");
+      return;
+    }
+
+    const payload: CreateInventoryItem = {
+      item_id: itemId.trim(),
+      item_name: itemName.trim(),
+      description: description.trim(),
+      price: Number(price),
+      quantity: Number(quantity),
+      added_by: addedBy.trim(),
+    };
+
+    try {
+      setIsSaving(true);
+      setErrorMessage("");
+
+      await createInventoryItem(payload);
+
+      closeModal();
+      await loadItems(); // ✅ refresh list so new product appears
+    } catch (e: any) {
+      setErrorMessage(e?.message || "Create product failed");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -46,72 +127,143 @@ const ProductPage: React.FC = () => {
             onClick={() => history.push("/admin-dashboard")}
           />
         </div>
+
         <div className="admin-main-content">
           <div className="product-search-row">
             <input
               className="product-search-input"
               type="text"
-              placeholder="Search"
+              placeholder="Search by name / id / description"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
-            <button type="button" className="product-search-btn">
+            <button
+              type="button"
+              className="product-search-btn"
+              onClick={() => {
+                // optional: keep, but filtering already happens as you type
+              }}
+            >
               Search
             </button>
           </div>
 
           <div className="product-card-wrapper">
-            <POSCard
-              productName="Protein Powder"
-              price={1000}
-              topRight={<span className="product-stock-text">30 stocks</span>}
-            />
+            {isLoading && <p style={{ textAlign: "center" }}>Loading...</p>}
+
+            {!isLoading && filteredItems.length === 0 && (
+              <p style={{ textAlign: "center" }}>No products found.</p>
+            )}
+
+            {filteredItems.map((item) => (
+              <POSCard
+                key={item.item_id}
+                productName={item.item_name}
+                price={item.price}
+                topRight={
+                  <span className="product-stock-text">
+                    {item.quantity} stocks
+                  </span>
+                }
+              />
+            ))}
           </div>
         </div>
+
         <div className="bottom-container">
-          <Button
-            className="btn btn-submit"
-            type="button"
-            onClick={handleAddEmployee}
-          >
-            Add employee
+          <Button className="btn btn-submit" type="button" onClick={openAddProductModal}>
+            Add Product
           </Button>
         </div>
       </div>
 
+      {/* ✅ Add Product Modal */}
       <Modal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        title="Add New Employee"
+        onClose={closeModal}
+        title="Add New Product"
         showCloseButton={false}
+        className="confirm-modal"
       >
         <div className="employee-form">
+          {errorMessage && (
+            <p style={{ color: "red", margin: 0, textAlign: "center" }}>
+              {errorMessage}
+            </p>
+          )}
+
           <div className="form-group">
-            <label htmlFor="employee-name">Employee Name</label>
-            <UsernameInput
-              id="employee-name"
+            <label>Item ID *</label>
+            <input
               className="employee-input"
-              placeholder="Enter employee name"
-              value={employeeName}
-              onChange={(e) => setEmployeeName(e.target.value)}
+              placeholder="e.g. ITEM-001"
+              value={itemId}
+              onChange={(e) => setItemId(e.target.value)}
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="employee-password">Password</label>
-            <PasswordInput
-              id="employee-password"
+            <label>Item Name *</label>
+            <input
               className="employee-input"
-              placeholder="Enter password"
-              value={employeePassword}
-              onChange={(e) => setEmployeePassword(e.target.value)}
+              placeholder="e.g. Protein Powder"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
             />
           </div>
-          <div className="form-actions">
+
+          <div className="form-group">
+            <label>Description</label>
+            <input
+              className="employee-input"
+              placeholder="Optional"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Price</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Quantity</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Added By *</label>
+            <input
+              className="employee-input"
+              placeholder="e.g. admin"
+              value={addedBy}
+              onChange={(e) => setAddedBy(e.target.value)}
+            />
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button type="button" className="btn-modal btn-submit-modal" onClick={closeModal}>
+              Cancel
+            </Button>
+
             <Button
+              type="button"
               className="btn-modal btn-submit-modal"
-              onClick={handleSubmit}
+              onClick={handleCreateProduct}
+              disabled={isSaving}
             >
-              Confirm
+              {isSaving ? "Saving..." : "Confirm"}
             </Button>
           </div>
         </div>
@@ -119,4 +271,5 @@ const ProductPage: React.FC = () => {
     </div>
   );
 };
+
 export default ProductPage;
