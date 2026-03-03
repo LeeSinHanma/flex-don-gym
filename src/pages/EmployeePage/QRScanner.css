@@ -154,10 +154,34 @@
   text-align: center;
   color: #04354f;
   z-index: 2;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .text-container p {
   margin: 0;
+}
+
+.search-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.search-icon ion-icon {
+  width: 40px;
+  height: 40px;
+  color: #04354f;
 }
 
 #qr-reader {
