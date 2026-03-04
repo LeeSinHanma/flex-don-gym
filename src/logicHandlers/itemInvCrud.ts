@@ -39,6 +39,15 @@ export async function getInventoryItems(): Promise<InventoryItem[]> {
   }
 }
 
+// ✅ DELETE /inventory-items/delete/{item_id}
+export async function deleteInventoryItem(itemId: string): Promise<void> {
+  try {
+    await api.delete(`/inventory-items/delete/${itemId}`);
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
 function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
     const detail = (err.response?.data as any)?.detail;
