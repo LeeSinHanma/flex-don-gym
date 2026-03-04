@@ -25,6 +25,7 @@ import EditMemberPage from "./pages/AdminPage/EditMemberPage";
 
 import PosPage from "./pages/EmployeePage/Pos";
 import PosItemPage from "./pages/EmployeePage/PosItem";
+import PosCheckout from "./pages/EmployeePage/PosCheckout";
 
 /* Ionic Core CSS */
 import "@ionic/react/css/core.css";
@@ -75,7 +76,7 @@ const App: React.FC = () => {
             <Route exact path="/status-member" component={StatusMemberPage} />
             <Route exact path="/pos" component={PosPage} />
             <Route exact path="/pos-item" component={PosItemPage} />
-
+            <Route exact path="/pos-checkout" component={PosCheckout} />
             {/* Admin Routes */}
             <Route exact path="/admin-page" component={StartingPageAdmin} />
             <Route exact path="/employee-page" component={EmployeeMenu} />

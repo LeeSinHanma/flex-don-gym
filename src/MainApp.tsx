@@ -26,6 +26,7 @@ import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import ProductPage from "./pages/AdminPage/Product";
 import MembershipPage from "./pages/AdminPage/Membership";
 import ItemInfoPage from "./pages/AdminPage/ItemInfo";
+import PosCheckout from "./pages/EmployeePage/PosCheckout";
 
 const MainApp: React.FC = () => (
   <IonApp>
@@ -58,6 +59,7 @@ const MainApp: React.FC = () => (
             />
             <Route exact path="/pos" component={PosPage} />
             <Route exact path="/pos-item" component={PosItemPage} />
+            <Route exact path="/pos-checkout" component={PosCheckout} />
             <Route
               exact
               path="/error-page"

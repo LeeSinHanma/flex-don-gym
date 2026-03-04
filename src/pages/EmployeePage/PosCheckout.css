@@ -1,0 +1,52 @@
+.pos-checkout-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* Hide the button/right side in checkout cards */
+.pos-checkout-info .pos-card-top-right {
+  display: none;
+}
+
+/* Stretch card info to full width */
+.pos-checkout-info .pos-status-info {
+  width: 100%;
+}
+
+.pos-checkout-info .pos-left-info {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Footer */
+.pos-checkout-footer {
+  height: 115px;
+  background-color: #bebebe;
+  border-radius: 12px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  margin-top: auto;
+}
+
+.pos-checkout-footer-text {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #04354f;
+}
+
+.pos-checkout-btn {
+  width: 140px;
+  height: 50px;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: bold;
+}

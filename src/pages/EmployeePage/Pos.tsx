@@ -18,7 +18,11 @@ const PosPage: React.FC = () => {
             className="menu-icon"
             onClick={() => history.push("/pos-item")}
           />
-          <Button type="button" className="btn-checkout">
+          <Button
+            type="button"
+            className="btn-checkout"
+            onClick={() => history.push("/pos-checkout")}
+          >
             Checkout
           </Button>
         </div>
