@@ -156,16 +156,19 @@ const ProductPage: React.FC = () => {
             )}
 
             {filteredItems.map((item) => (
-              <POSCard
+              <div
                 key={item.item_id}
-                productName={item.item_name}
-                price={item.price}
-                topRight={
-                  <span className="product-stock-text">
-                    {item.quantity} stocks
-                  </span>
-                }
-              />
+                onClick={() => history.push("/admin-item-info", { item })}
+                style={{ cursor: "pointer" }}
+              >
+                <POSCard
+                  productName={item.item_name}
+                  price={item.price}
+                  topRight={
+                    <span className="product-stock-text">{item.quantity} stocks</span>
+                  }
+                />
+              </div>
             ))}
           </div>
         </div>
