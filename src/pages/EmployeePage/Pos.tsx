@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
 import "./Pos.css";
@@ -7,8 +7,26 @@ import { cartOutline, menuOutline } from "ionicons/icons";
 import PosNav from "../../components/Reusable/NavItems";
 import POSCard from "../../components/Reusable/PosCard";
 
+import {
+  startQrScanner,
+  stopQrScanner,
+} from "../../logicHandlers/qrScannerModule";
+
 const PosPage: React.FC = () => {
   const history = useHistory();
+
+  useEffect(() => {
+    const handleScan = async (decodedText: string) => {
+      console.log("Scanned barcode:", decodedText);
+    };
+
+    startQrScanner("product", handleScan);
+
+    return () => {
+      stopQrScanner();
+    };
+  }, []);
+
   return (
     <div className="pos-main-container">
       <div className="pos-container">
@@ -26,9 +44,12 @@ const PosPage: React.FC = () => {
             Checkout
           </Button>
         </div>
+
+        {/* ✅ BARCODE CAMERA */}
         <div className="barcode">
-          <p></p>
+          <div id="qr-reader" style={{ width: "100%" }}></div>
         </div>
+
         <div className="shopping-info">
           <div className="cart">
             <IonIcon icon={cartOutline} className="cart-icon" />
@@ -49,6 +70,7 @@ const PosPage: React.FC = () => {
             onCountChange={(count) => console.log("count changed:", count)}
           />
         </div>
+
         <div className="pos-footer">
           <PosNav
             items={[
