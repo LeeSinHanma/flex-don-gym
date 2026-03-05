@@ -64,7 +64,7 @@ const MemberMenu: React.FC = () => {
         0,
         1,
         0,
-        1,
+        "1",
       );
 
       const qrValue = response?.member_id;

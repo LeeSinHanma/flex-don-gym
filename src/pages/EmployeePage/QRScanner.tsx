@@ -53,11 +53,11 @@ const QRScannerHome: React.FC = () => {
 
   const restartScanner = useCallback(async () => {
     await stopQrScanner(); // ensure fully stopped
-    await startQrScanner(handleDecoded); // start clean
+    await startQrScanner("member", handleDecoded); // start clean
   }, [handleDecoded]);
 
   useEffect(() => {
-    startQrScanner(handleDecoded);
+    startQrScanner("member", handleDecoded);
 
     return () => {
       stopQrScanner();

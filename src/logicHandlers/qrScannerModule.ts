@@ -1,10 +1,25 @@
-import { Html5Qrcode } from "html5-qrcode";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 let qr: Html5Qrcode | null = null;
 let isStarting = false;
 let isHandlingScan = false;
 
+export type ScanMode = "member" | "product";
+
+const FORMATS: Record<ScanMode, Html5QrcodeSupportedFormats[]> = {
+  member: [Html5QrcodeSupportedFormats.QR_CODE],
+  product: [
+    Html5QrcodeSupportedFormats.CODE_128,
+    Html5QrcodeSupportedFormats.CODE_39,
+    Html5QrcodeSupportedFormats.EAN_13,
+    Html5QrcodeSupportedFormats.EAN_8,
+    Html5QrcodeSupportedFormats.UPC_A,
+    Html5QrcodeSupportedFormats.UPC_E,
+  ],
+};
+
 export async function startQrScanner(
+  mode: ScanMode,
   onScan: (decodedText: string) => void,
   onError?: (err: string) => void,
 ) {
@@ -13,7 +28,15 @@ export async function startQrScanner(
 
   try {
     const elementId = "qr-reader";
-    qr = new Html5Qrcode(elementId);
+
+    // ✅ In your version, "verbose" is required by typings
+    qr = new Html5Qrcode(elementId, {
+      verbose: false,
+      formatsToSupport: FORMATS[mode],
+      // optional (if supported in your version):
+      // useBarCodeDetectorIfSupported: true,
+    });
+
     isHandlingScan = false;
 
     await qr.start(
@@ -31,9 +54,7 @@ export async function startQrScanner(
           await stopQrScanner(); // stop after first scan
         }
       },
-      (errorMessage) => {
-        onError?.(errorMessage);
-      },
+      (errorMessage) => onError?.(errorMessage),
     );
   } catch (e: any) {
     onError?.(e?.message ?? String(e));

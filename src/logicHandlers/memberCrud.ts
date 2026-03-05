@@ -37,7 +37,7 @@ export async function createMember(
   membership_type: number,
   membership_plan_id: number,
   credits: number,
-  registered_by: number,
+  registered_by: string,
 ): Promise<APIResponse> {
   try {
     const body = {
