@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UsernameInput } from "../../components/Reusable/Username";
-import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
-import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
@@ -10,29 +8,76 @@ import { menuOutline } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
+import {
+  createMembershipType,
+  getMembershipTypes,
+  MembershipTypeResponse,
+} from "../../logicHandlers/membershipCrud";
 
 const MembershipPage: React.FC = () => {
   const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [employeeName, setEmployeeName] = useState("");
-  const [employeePassword, setEmployeePassword] = useState("");
-  const [searchValue, setSearchValue] = useState("");
 
-  const handleAddEmployee = () => {
+  const [memberships, setMemberships] = useState<MembershipTypeResponse[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const [name, setName] = useState("");
+  const [type, setType] = useState(0);
+  const [price, setPrice] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [durationMonths, setDurationMonths] = useState(0);
+
+  const loadMemberships = async () => {
+    try {
+      setLoading(true);
+      const data = await getMembershipTypes();
+      setMemberships(data);
+    } catch (error) {
+      console.error("Failed to fetch membership types:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMemberships();
+  }, []);
+
+  const handleAddMembership = () => {
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setEmployeeName("");
-    setEmployeePassword("");
+    setName("");
+    setType(0);
+    setPrice(0);
+    setDiscountAmount(0);
+    setDurationMonths(0);
   };
 
-  const handleSubmit = () => {
-    // Add your submit logic here
-    console.log("Employee Name:", employeeName);
-    console.log("Employee Password:", employeePassword);
-    handleCloseModal();
+  const handleSubmit = async () => {
+    try {
+      if (!name.trim() || price < 0 || discountAmount < 0 || durationMonths < 0) {
+        alert("Please fill out all required fields properly.");
+        return;
+      }
+
+      const res = await createMembershipType({
+        name,
+        type,
+        price,
+        discount_amount: discountAmount,
+        duration_months: durationMonths,
+      });
+
+      console.log("Membership created:", res);
+
+      handleCloseModal();
+      loadMemberships(); // refresh cards after add
+    } catch (error) {
+      console.error("Failed to create membership type:", error);
+    }
   };
 
   return (
@@ -46,41 +91,36 @@ const MembershipPage: React.FC = () => {
             onClick={() => history.push("/admin-dashboard")}
           />
         </div>
+
         <div className="admin-main-content">
           <div className="product-card-wrapper">
-            <POSCard
-              productName="Annual Membership"
-              price={1500}
-              buttonLabel="Edit amount"
-              onButtonClick={() => console.log("Add product")}
-            />
-            <POSCard
-              productName="Monthly Membership"
-              price={55}
-              buttonLabel="Edit amount"
-              onButtonClick={() => console.log("Add product")}
-            />
-            <POSCard
-              productName="Walk-in Membership"
-              price={55}
-              buttonLabel="Edit amount"
-              onButtonClick={() => console.log("Add product")}
-            />
-            <POSCard
-              productName="Prepaid Membership"
-              price={55}
-              buttonLabel="Edit amount"
-              onButtonClick={() => console.log("Add product")}
-            />
+            {loading ? (
+              <p>Loading membership types...</p>
+            ) : memberships.length > 0 ? (
+              memberships.map((membership) => (
+                <POSCard
+                  key={membership.membership_id}
+                  productName={membership.name}
+                  price={membership.price}
+                  buttonLabel="Edit amount"
+                  onButtonClick={() =>
+                    history.push(`/admin-edit-membership/${membership.membership_id}`)
+                  }
+                />
+              ))
+            ) : (
+              <p>No membership types found.</p>
+            )}
           </div>
         </div>
+
         <div className="bottom-container">
           <Button
             className="btn btn-submit"
             type="button"
-            onClick={handleAddEmployee}
+            onClick={handleAddMembership}
           >
-            Add product
+            Add Membership Type
           </Button>
         </div>
       </div>
@@ -88,30 +128,69 @@ const MembershipPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="Add New Product"
+        title="Add New Membership Type"
         showCloseButton={false}
       >
         <div className="employee-form">
           <div className="form-group">
-            <label htmlFor="employee-name">Brand Name</label>
+            <label htmlFor="membership-name">Membership Name</label>
             <UsernameInput
-              id="employee-name"
+              id="membership-name"
               className="employee-input"
-              placeholder="Enter brand name"
-              value={employeeName}
-              onChange={(e) => setEmployeeName(e.target.value)}
+              placeholder="Enter membership name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
           </div>
+
           <div className="form-group">
-            <label htmlFor="employee-password">Expiry date</label>
+            <label htmlFor="membership-type">Type</label>
             <UsernameInput
-              id="employee-password"
+              id="membership-type"
               className="employee-input"
-              placeholder="Enter expiry date"
-              value={employeePassword}
-              onChange={(e) => setEmployeePassword(e.target.value)}
+              placeholder="Enter type"
+              type="number"
+              value={type}
+              onChange={(e) => setType(Number(e.target.value))}
             />
           </div>
+
+          <div className="form-group">
+            <label htmlFor="membership-price">Price</label>
+            <UsernameInput
+              id="membership-price"
+              className="employee-input"
+              placeholder="Enter price"
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="membership-discount">Discount Amount</label>
+            <UsernameInput
+              id="membership-discount"
+              className="employee-input"
+              placeholder="Enter discount amount"
+              type="number"
+              value={discountAmount}
+              onChange={(e) => setDiscountAmount(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="membership-duration">Duration Months</label>
+            <UsernameInput
+              id="membership-duration"
+              className="employee-input"
+              placeholder="Enter duration in months"
+              type="number"
+              value={durationMonths}
+              onChange={(e) => setDurationMonths(Number(e.target.value))}
+            />
+          </div>
+
           <div className="form-actions">
             <Button
               className="btn-modal btn-submit-modal"
@@ -125,4 +204,5 @@ const MembershipPage: React.FC = () => {
     </div>
   );
 };
+
 export default MembershipPage;

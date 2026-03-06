@@ -18,6 +18,7 @@ import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminMenu from "./pages/AdminPage/Admin";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import ItemInfoPage from "./pages/AdminPage/ItemInfo";
+import AdminEditMembership from "./pages/AdminPage/AdminEditMembership";
 
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
@@ -86,6 +87,10 @@ const App: React.FC = () => {
             <Route
               path="/manage-status/:memberId"
               component={ManageStatusMemPage}
+            />
+            <Route
+              path="/admin-edit-membership/:membershipId"
+              component={AdminEditMembership}
             />
             <Route path="/members/edit/:memberId" component={EditMemberPage} />
             <Route exact path="/admin-dashboard" component={AdminDashboard} />
