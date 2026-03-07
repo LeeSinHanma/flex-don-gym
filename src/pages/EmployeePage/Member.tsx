@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
@@ -7,6 +7,10 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import { createMember } from "../../logicHandlers/memberCrud"; // adjust path if different
+import {
+  getMembershipTypes,
+  MembershipTypeResponse,
+} from "../../logicHandlers/membershipCrud";
 import LoadingScreen from "../LoadingScreen";
 import QRCode from "react-qr-code";
 import "./Member.css";
@@ -18,8 +22,12 @@ const MemberMenu: React.FC = () => {
   const [contactNumber, setContactNumber] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [membershipType, setMembershipType] = useState("");
+  const [membershipType, setMembershipType] = useState<number>(0);
+  const [credits, setCredits] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [membershipTypes, setMembershipTypes] = useState<
+    MembershipTypeResponse[]
+  >([]);
 
   const [acceptedData, setAcceptedData] = useState<{
     email: string;
@@ -28,6 +36,19 @@ const MemberMenu: React.FC = () => {
     lastName: string;
     qrValue: string;
   } | null>(null);
+
+  useEffect(() => {
+    const loadMemberships = async () => {
+      try {
+        const data = await getMembershipTypes();
+        setMembershipTypes(data);
+      } catch (err) {
+        console.error("Failed to load membership types", err);
+      }
+    };
+
+    loadMemberships();
+  }, []);
 
   const handleAddMember = async () => {
     console.log("Add button clicked");
@@ -47,6 +68,11 @@ const MemberMenu: React.FC = () => {
       return;
     }
 
+    if (membershipType === 0) {
+      alert("Please select a membership.");
+      return;
+    }
+
     const accepted = {
       email: trimmedEmail,
       contactNumber: trimmedContact,
@@ -56,16 +82,17 @@ const MemberMenu: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await createMember(
-        trimmedEmail,
-        trimmedContact,
-        trimmedFirstName,
-        trimmedLastName,
-        0,
-        1,
-        0,
-        "1",
-      );
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+      const response = await createMember({
+        email: trimmedEmail,
+        contact_number: trimmedContact,
+        first_name: trimmedFirstName,
+        last_name: trimmedLastName,
+        membership_plan_id: membershipType,
+        credits,
+        registered_by: String(user.user_id),
+      });
 
       const qrValue = response?.member_id;
       if (!qrValue) {
@@ -141,21 +168,27 @@ const MemberMenu: React.FC = () => {
             <select
               className="input-username"
               value={membershipType}
-              onChange={(e: any) => setMembershipType(e.target.value)}
+              onChange={(e) => setMembershipType(Number(e.target.value))}
             >
-              <option value="walkin" style={{ fontWeight: "bold" }}>
-                Walk-in
-              </option>
-              <option value="prepaid" style={{ fontWeight: "bold" }}>
-                Prepaid
-              </option>
-              <option value="annual" style={{ fontWeight: "bold" }}>
-                Annual
-              </option>
-              <option value="member" style={{ fontWeight: "bold" }}>
-                Member
-              </option>
+              <option value={0}>Select Membership</option>
+
+              {membershipTypes.map((membership) => (
+                <option
+                  key={membership.membership_id}
+                  value={membership.membership_id}
+                  style={{ fontWeight: "bold" }}
+                >
+                  {membership.name}
+                </option>
+              ))}
             </select>
+            <UsernameInput
+              className="input-username"
+              placeholder="Credit"
+              type="number"
+              value={credits}
+              onChange={(e: any) => setCredits(Number(e.target.value))}
+            />
           </div>
 
           <div className="bottom-container">
@@ -180,6 +213,7 @@ const MemberMenu: React.FC = () => {
             setContactNumber("");
             setFirstName("");
             setLastName("");
+            setCredits(0);
           }}
           title="Member Details"
         >
