@@ -27,6 +27,12 @@ const MembershipPage: React.FC = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [durationMonths, setDurationMonths] = useState(0);
 
+  const membershipTypeLabel: Record<number, string> = {
+    0: "Postpaid",
+    1: "Prepaid",
+    2: "Discount",
+  };
+
   const loadMemberships = async () => {
     try {
       setLoading(true);
@@ -58,7 +64,12 @@ const MembershipPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!name.trim() || price < 0 || discountAmount < 0 || durationMonths < 0) {
+      if (
+        !name.trim() ||
+        price < 0 ||
+        discountAmount < 0 ||
+        durationMonths < 0
+      ) {
         alert("Please fill out all required fields properly.");
         return;
       }
@@ -104,7 +115,9 @@ const MembershipPage: React.FC = () => {
                   price={membership.price}
                   buttonLabel="Edit amount"
                   onButtonClick={() =>
-                    history.push(`/admin-edit-membership/${membership.membership_id}`)
+                    history.push(
+                      `/admin-edit-membership/${membership.membership_id}`,
+                    )
                   }
                 />
               ))
@@ -128,7 +141,7 @@ const MembershipPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title="Add New Membership Type"
+        title="Add New Membership Plan"
         showCloseButton={false}
       >
         <div className="employee-form">
@@ -145,14 +158,17 @@ const MembershipPage: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="membership-type">Type</label>
-            <UsernameInput
+
+            <select
               id="membership-type"
               className="employee-input"
-              placeholder="Enter type"
-              type="number"
               value={type}
               onChange={(e) => setType(Number(e.target.value))}
-            />
+            >
+              <option value={0}>Postpaid</option>
+              <option value={1}>Prepaid</option>
+              <option value={2}>Discount</option>
+            </select>
           </div>
 
           <div className="form-group">

@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
-import { createMember } from "../../logicHandlers/memberCrud"; // adjust path if different
+import { createMember } from "../../logicHandlers/memberCrud";
 import {
   getMembershipTypes,
   MembershipTypeResponse,
@@ -23,8 +23,7 @@ const MemberMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [membershipType, setMembershipType] = useState<number>(0);
-  const [paymentType, setPaymentType] = useState<string>("");
-  const [credits, setCredits] = useState<number>(0);
+  const [credits, setCredits] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
   const [membershipTypes, setMembershipTypes] = useState<
     MembershipTypeResponse[]
@@ -74,13 +73,6 @@ const MemberMenu: React.FC = () => {
       return;
     }
 
-    const accepted = {
-      email: trimmedEmail,
-      contactNumber: trimmedContact,
-      firstName: trimmedFirstName,
-      lastName: trimmedLastName,
-    };
-
     setIsLoading(true);
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -91,7 +83,7 @@ const MemberMenu: React.FC = () => {
         first_name: trimmedFirstName,
         last_name: trimmedLastName,
         membership_plan_id: membershipType,
-        credits,
+        credits: credits === "" ? 0 : credits,
         registered_by: String(user.user_id),
       });
 
@@ -114,13 +106,12 @@ const MemberMenu: React.FC = () => {
       console.log("API ERROR:", err.message);
       alert(err.message || "Failed to add member");
     } finally {
-      setIsLoading(false); // ✅ always runs
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      {" "}
       {isLoading && <LoadingScreen />}
       <div className="member-menu-container">
         <div className="main-container">
@@ -173,7 +164,7 @@ const MemberMenu: React.FC = () => {
                 value={membershipType}
                 onChange={(e) => setMembershipType(Number(e.target.value))}
               >
-                <option value={0}>Membership</option>
+                <option value={0}>Select Membership</option>
 
                 {membershipTypes.map((membership) => (
                   <option
@@ -194,7 +185,9 @@ const MemberMenu: React.FC = () => {
                 placeholder="Credit"
                 type="number"
                 value={credits}
-                onChange={(e: any) => setCredits(Number(e.target.value))}
+                onChange={(e: any) =>
+                  setCredits(e.target.value === "" ? "" : Number(e.target.value))
+                }
               />
             </div>
           </div>
@@ -210,7 +203,6 @@ const MemberMenu: React.FC = () => {
           </div>
         </div>
 
-        {/* MODAL */}
         <Modal
           className="modal-box"
           isOpen={showModal}
@@ -221,7 +213,7 @@ const MemberMenu: React.FC = () => {
             setContactNumber("");
             setFirstName("");
             setLastName("");
-            setCredits(0);
+            setCredits("");
           }}
           title="Member Details"
         >
@@ -240,7 +232,6 @@ const MemberMenu: React.FC = () => {
                 <b>Last Name:</b> {acceptedData.lastName}
               </p>
 
-              {/* ✅ Add this at the bottom */}
               <div className="qr-section">
                 <p className="qr-label">QR Code:</p>
 
