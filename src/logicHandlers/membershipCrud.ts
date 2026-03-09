@@ -35,6 +35,17 @@ export const getMembershipTypes = async (): Promise<MembershipTypeResponse[]> =>
   return res.data;
 };
 
+// ✅ GET /membership-types/{membership_id} (specific membership type)
+export const getMembershipTypeById = async (
+  membership_id: number
+): Promise<MembershipTypeResponse> => {
+  const res = await api.get<MembershipTypeResponse>(
+    `/membership-types/${membership_id}`
+  );
+
+  return res.data;
+};
+
 // ✅ PUT /membership-types/update/{membership_id}
 export const updateMembershipType = async (
   membershipId: number,
