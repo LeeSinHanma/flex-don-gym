@@ -23,6 +23,7 @@ const MemberMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [membershipType, setMembershipType] = useState<number>(0);
+  const [paymentType, setPaymentType] = useState<string>("");
   const [credits, setCredits] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [membershipTypes, setMembershipTypes] = useState<
@@ -131,7 +132,7 @@ const MemberMenu: React.FC = () => {
               >
                 <IonIcon icon={arrowBackOutline} />
               </BackButton>
-              <h1>Member</h1>
+              <h1>ADD MEMBER</h1>
             </div>
           </div>
 
@@ -165,30 +166,37 @@ const MemberMenu: React.FC = () => {
               onChange={(e: any) => setLastName(e.target.value)}
             />
 
-            <select
-              className="input-username"
-              value={membershipType}
-              onChange={(e) => setMembershipType(Number(e.target.value))}
-            >
-              <option value={0}>Select Membership</option>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select
+                className="input-username"
+                style={{ flex: 1, fontSize: "12px" }}
+                value={membershipType}
+                onChange={(e) => setMembershipType(Number(e.target.value))}
+              >
+                <option value={0}>Membership</option>
 
-              {membershipTypes.map((membership) => (
-                <option
-                  key={membership.membership_id}
-                  value={membership.membership_id}
-                  style={{ fontWeight: "bold" }}
-                >
-                  {membership.name}
-                </option>
-              ))}
-            </select>
-            <UsernameInput
-              className="input-username"
-              placeholder="Credit"
-              type="number"
-              value={credits}
-              onChange={(e: any) => setCredits(Number(e.target.value))}
-            />
+                {membershipTypes.map((membership) => (
+                  <option
+                    key={membership.membership_id}
+                    value={membership.membership_id}
+                    style={{ fontWeight: "bold" }}
+                  >
+                    {membership.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="credit-group">
+              <h3>Credits</h3>
+              <UsernameInput
+                className="input-username"
+                placeholder="Credit"
+                type="number"
+                value={credits}
+                onChange={(e: any) => setCredits(Number(e.target.value))}
+              />
+            </div>
           </div>
 
           <div className="bottom-container">
