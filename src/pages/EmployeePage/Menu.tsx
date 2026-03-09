@@ -21,9 +21,8 @@ const MenuButtons: React.FC = () => {
           </BackButton>
         </div>
         <div className="menu-container">
-          <Button onClick={() => history.push("/member")}>MEMBER</Button>
+          <Button onClick={() => history.push("/member")}>ADD MEMBER</Button>
           <Button onClick={() => history.push("/walkin")}>WALK-IN</Button>
-          <Button onClick={() => history.push("/prepaid")}>PREPAID</Button>
         </div>
       </div>
 

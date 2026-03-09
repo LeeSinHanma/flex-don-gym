@@ -93,6 +93,18 @@ input:focus {
   word-break: break-word; /* long emails won't overflow */
 }
 
+.credit-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-container h3 {
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
 .qr-section {
   margin-top: 16px;
   text-align: center;
