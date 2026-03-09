@@ -23,7 +23,7 @@ const MemberMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [membershipType, setMembershipType] = useState<number>(0);
-  const [credits, setCredits] = useState<number>(0);
+  const [credits, setCredits] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
   const [membershipTypes, setMembershipTypes] = useState<
     MembershipTypeResponse[]
@@ -90,7 +90,7 @@ const MemberMenu: React.FC = () => {
         first_name: trimmedFirstName,
         last_name: trimmedLastName,
         membership_plan_id: membershipType,
-        credits,
+        credits: credits === "" ? 0 : credits,
         registered_by: String(user.user_id),
       });
 
@@ -187,7 +187,9 @@ const MemberMenu: React.FC = () => {
               placeholder="Credit"
               type="number"
               value={credits}
-              onChange={(e: any) => setCredits(Number(e.target.value))}
+              onChange={(e: any) =>
+                setCredits(e.target.value === "" ? "" : Number(e.target.value))
+              }
             />
           </div>
 

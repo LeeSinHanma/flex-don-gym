@@ -128,6 +128,7 @@ const ManageStatusMemPage: React.FC = () => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         title="Confirm Delete"
+        showCloseButton={false}
         className="confirm-modal"
       >
         <p>Are you sure you want to delete this member?</p>
@@ -169,6 +170,7 @@ const ManageStatusMemPage: React.FC = () => {
           setShowSuccessModal(false);
           history.push("/status-member");
         }}
+        showCloseButton={false}
         title="Member Deleted"
       >
         <p style={{ textAlign: "center" }}>

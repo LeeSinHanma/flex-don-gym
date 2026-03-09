@@ -34,6 +34,12 @@ const AdminEditMembership: React.FC = () => {
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [durationMonths, setDurationMonths] = useState<number>(0);
 
+  const membershipTypeLabel: Record<number, string> = {
+    0: "Postpaid",
+    1: "Prepaid",
+    2: "Discount",
+  };
+
   const [acceptedData, setAcceptedData] = useState<{
     name: string;
     type: number;
@@ -49,7 +55,7 @@ const AdminEditMembership: React.FC = () => {
         const memberships = await getMembershipTypes();
 
         const selectedMembership = memberships.find(
-          (item) => item.membership_id === Number(membershipId)
+          (item) => item.membership_id === Number(membershipId),
         );
 
         if (!selectedMembership) {
@@ -115,12 +121,12 @@ const AdminEditMembership: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-        await deleteMembershipType(Number(membershipId));
-        history.push("/admin-membership");
+      await deleteMembershipType(Number(membershipId));
+      history.push("/admin-membership");
     } catch (err) {
-        console.error("Delete failed", err);
+      console.error("Delete failed", err);
     }
-    };
+  };
 
   return (
     <>
@@ -182,18 +188,14 @@ const AdminEditMembership: React.FC = () => {
           </div>
 
           <div className="bottom-container">
-            <Button
-                className="btn-cancel"
-                type="button"
-                onClick={handleDelete}
-            >
-                Delete
+            <Button className="btn-cancel" type="button" onClick={handleDelete}>
+              Delete
             </Button>
 
             <Button className="btn-submit" type="button" onClick={handleUpdate}>
-                Save
+              Save
             </Button>
-            </div>
+          </div>
         </div>
 
         <Modal
@@ -212,7 +214,9 @@ const AdminEditMembership: React.FC = () => {
                 <b>Name:</b> {acceptedData.name}
               </p>
               <p>
-                <b>Type:</b> {acceptedData.type}
+                <b>Type:</b>{" "}
+                {membershipTypeLabel[acceptedData.type] || "Unknown"} (
+                {acceptedData.type})
               </p>
               <p>
                 <b>Price:</b> {acceptedData.price}
