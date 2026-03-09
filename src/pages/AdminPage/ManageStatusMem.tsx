@@ -15,6 +15,7 @@ import {
   Member,
   deleteMember,
 } from "../../logicHandlers/memberCrud";
+import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 
 interface RouteParams {
   memberId: string;
@@ -28,12 +29,26 @@ const ManageStatusMemPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [membershipName, setMembershipName] = useState("");
+
+  const formatDateDash = (dateString: string) => {
+    const date = new Date(dateString);
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    const yyyy = date.getFullYear();
+    return `${mm}-${dd}-${yyyy}`;
+  };
 
   useEffect(() => {
     const loadMember = async () => {
       try {
         const data = await getMemberById(memberId);
         setMember(data);
+
+        if (data.membership_plan_id) {
+          const membershipData = await getMembershipTypeById(data.membership_plan_id);
+          setMembershipName(membershipData.name);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -62,14 +77,12 @@ const ManageStatusMemPage: React.FC = () => {
             </h2>
             <div className="member-details">
               <h4 className="member-type">
-                {member
-                  ? member.membership_type === 0
-                    ? "Member"
-                    : "Casual"
-                  : ""}
+                {membershipName || "Loading..."}
               </h4>
               <h4 className="member-duration">
-                {member?.membership_expiry ?? "No Expiry"}
+                {member?.membership_expiry
+                  ? formatDateDash(member.membership_expiry)
+                  : "No Expiry"}
               </h4>
             </div>
           </div>

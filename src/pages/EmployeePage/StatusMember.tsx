@@ -3,26 +3,62 @@ import { useHistory } from "react-router-dom";
 import "./StatusMember.css";
 import PosNav from "../../components/Reusable/NavItems";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
+import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
 
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
+  const [membershipNames, setMembershipNames] = useState<Record<number, string>>({});
+
+  const formatDateDash = (dateString: string | null) => {
+    if (!dateString) return "No Expiry";
+
+    const datePart = dateString.split("T")[0];
+    const [yyyy, mm, dd] = datePart.split("-");
+    return `${mm}-${dd}-${yyyy}`;
+  };
+
+  const getMembershipLabel = (member: Member) => {
+    if (
+      member.membership_plan_id !== null &&
+      member.membership_plan_id !== undefined
+    ) {
+      return `Plan ID: ${member.membership_plan_id}`;
+    }
+
+    return "No Plan";
+  };
 
   useEffect(() => {
     const load = async () => {
       try {
         const data = await getMembers();
         setAllMembers(data);
+
+        const map: Record<number, string> = {};
+
+        for (const m of data) {
+          if (
+            m.membership_plan_id !== null &&
+            m.membership_plan_id !== undefined &&
+            !map[m.membership_plan_id]
+          ) {
+            const membership = await getMembershipTypeById(m.membership_plan_id);
+            map[m.membership_plan_id] = membership.name;
+          }
+        }
+
+        setMembershipNames(map);
       } catch (e) {
         console.error(e);
       }
     };
+
     load();
   }, []);
 
-  // ✅ filter cards based on search
   const filteredMembers = useMemo(() => {
     const q = (search ?? "").trim().toLowerCase();
     if (!q) return allMembers;
@@ -84,10 +120,13 @@ const StatusMemberPage: React.FC = () => {
                   </h2>
                   <div className="client-details">
                     <p className="client-type">
-                      {m.membership_type === 0 ? "Member" : "Casual"}
+                      {m.membership_plan_id !== null &&
+                      membershipNames[m.membership_plan_id]
+                        ? membershipNames[m.membership_plan_id]
+                        : "No Plan"}
                     </p>
                     <p className="client-duration">
-                      {m.membership_expiry ? m.membership_expiry : "No Expiry"}
+                      {formatDateDash(m.membership_expiry)}
                     </p>
                   </div>
                 </div>

@@ -239,7 +239,9 @@ const MemberMenu: React.FC = () => {
                   <QRCode value={acceptedData.qrValue} size={180} />
                 </div>
 
-                <p className="qr-value-text">{acceptedData.qrValue}</p>
+                <p className="qr-value-text">
+                  {acceptedData.firstName} {acceptedData.lastName}
+                </p>
               </div>
             </div>
           ) : (
