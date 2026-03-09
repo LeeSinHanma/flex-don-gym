@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
-import { createMember } from "../../logicHandlers/memberCrud"; // adjust path if different
+import { createMember } from "../../logicHandlers/memberCrud";
 import {
   getMembershipTypes,
   MembershipTypeResponse,
@@ -73,13 +73,6 @@ const MemberMenu: React.FC = () => {
       return;
     }
 
-    const accepted = {
-      email: trimmedEmail,
-      contactNumber: trimmedContact,
-      firstName: trimmedFirstName,
-      lastName: trimmedLastName,
-    };
-
     setIsLoading(true);
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -113,13 +106,12 @@ const MemberMenu: React.FC = () => {
       console.log("API ERROR:", err.message);
       alert(err.message || "Failed to add member");
     } finally {
-      setIsLoading(false); // ✅ always runs
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      {" "}
       {isLoading && <LoadingScreen />}
       <div className="member-menu-container">
         <div className="main-container">
@@ -131,7 +123,7 @@ const MemberMenu: React.FC = () => {
               >
                 <IonIcon icon={arrowBackOutline} />
               </BackButton>
-              <h1>Member</h1>
+              <h1>ADD MEMBER</h1>
             </div>
           </div>
 
@@ -165,32 +157,39 @@ const MemberMenu: React.FC = () => {
               onChange={(e: any) => setLastName(e.target.value)}
             />
 
-            <select
-              className="input-username"
-              value={membershipType}
-              onChange={(e) => setMembershipType(Number(e.target.value))}
-            >
-              <option value={0}>Select Membership</option>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <select
+                className="input-username"
+                style={{ flex: 1, fontSize: "12px" }}
+                value={membershipType}
+                onChange={(e) => setMembershipType(Number(e.target.value))}
+              >
+                <option value={0}>Select Membership</option>
 
-              {membershipTypes.map((membership) => (
-                <option
-                  key={membership.membership_id}
-                  value={membership.membership_id}
-                  style={{ fontWeight: "bold" }}
-                >
-                  {membership.name}
-                </option>
-              ))}
-            </select>
-            <UsernameInput
-              className="input-username"
-              placeholder="Credit"
-              type="number"
-              value={credits}
-              onChange={(e: any) =>
-                setCredits(e.target.value === "" ? "" : Number(e.target.value))
-              }
-            />
+                {membershipTypes.map((membership) => (
+                  <option
+                    key={membership.membership_id}
+                    value={membership.membership_id}
+                    style={{ fontWeight: "bold" }}
+                  >
+                    {membership.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="credit-group">
+              <h3>Credits</h3>
+              <UsernameInput
+                className="input-username"
+                placeholder="Credit"
+                type="number"
+                value={credits}
+                onChange={(e: any) =>
+                  setCredits(e.target.value === "" ? "" : Number(e.target.value))
+                }
+              />
+            </div>
           </div>
 
           <div className="bottom-container">
@@ -204,7 +203,6 @@ const MemberMenu: React.FC = () => {
           </div>
         </div>
 
-        {/* MODAL */}
         <Modal
           className="modal-box"
           isOpen={showModal}
@@ -215,7 +213,7 @@ const MemberMenu: React.FC = () => {
             setContactNumber("");
             setFirstName("");
             setLastName("");
-            setCredits(0);
+            setCredits("");
           }}
           title="Member Details"
         >
@@ -234,7 +232,6 @@ const MemberMenu: React.FC = () => {
                 <b>Last Name:</b> {acceptedData.lastName}
               </p>
 
-              {/* ✅ Add this at the bottom */}
               <div className="qr-section">
                 <p className="qr-label">QR Code:</p>
 
