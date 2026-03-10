@@ -40,6 +40,16 @@ export async function loginUser(
   }
 }
 
+// ✅ GET /users/by-id/{user_id} ... get user by id
+export async function getUserById(userId: string): Promise<User> {
+  try {
+    const res = await api.get<User>(`/users/by-id/${userId}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
 // ✅ GET /users/all ... get all users
 export async function getUsers(): Promise<User[]> {
   try {

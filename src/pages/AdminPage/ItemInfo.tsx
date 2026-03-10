@@ -6,7 +6,11 @@ import { arrowBackOutline } from "ionicons/icons";
 import "./AdminDashboard.css";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
-import { InventoryItem, deleteInventoryItem } from "../../logicHandlers/itemInvCrud";
+import {
+  InventoryItem,
+  deleteInventoryItem,
+  updateInventoryItem,
+} from "../../logicHandlers/itemInvCrud";
 import { Modal } from "../../components/Reusable/Modals";
 
 type LocationState = {
@@ -16,18 +20,19 @@ type LocationState = {
 const ItemInfoPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<LocationState>();
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const passedItem = location.state?.item;
 
-  // local form states
   const [itemName, setItemName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(0);
 
   useEffect(() => {
-    
     if (!passedItem) return;
 
     setItemName(passedItem.item_name ?? "");
@@ -49,6 +54,28 @@ const ItemInfoPage: React.FC = () => {
     }
   };
 
+  const handleSave = async () => {
+    if (!passedItem?.item_id) return;
+
+    try {
+      setIsSaving(true);
+
+      await updateInventoryItem(passedItem.item_id, {
+        item_name: itemName.trim(),
+        description: description.trim(),
+        price,
+        quantity,
+      });
+
+      setShowSaveModal(true);
+    } catch (e: any) {
+      console.error(e);
+      alert(e?.message || "Update failed");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="admin-dashboard-container">
       <div className="admin-main-container">
@@ -63,7 +90,6 @@ const ItemInfoPage: React.FC = () => {
           <h2>Edit Products</h2>
         </div>
 
-        {/* optional guard */}
         {!passedItem && (
           <p style={{ textAlign: "center", color: "red" }}>
             No product selected. Go back and click a product card.
@@ -122,12 +148,18 @@ const ItemInfoPage: React.FC = () => {
               Delete
             </Button>
 
-            <Button type="button" className="cancel-btn">
-              Save
+            <Button
+              type="button"
+              className="cancel-btn"
+              disabled={!passedItem || isSaving}
+              onClick={handleSave}
+            >
+              {isSaving ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
       </div>
+
       <Modal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -148,12 +180,34 @@ const ItemInfoPage: React.FC = () => {
             Cancel
           </Button>
 
+          <Button type="button" className="cancel-btn" onClick={handleDelete}>
+            Confirm Delete
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showSaveModal}
+        onClose={() => {
+          setShowSaveModal(false);
+          history.push("/admin-product");
+        }}
+        title="Success"
+        showCloseButton={false}
+        className="confirm-modal"
+      >
+        <p style={{ textAlign: "center" }}>Product updated successfully.</p>
+
+        <div className="success-actions">
           <Button
             type="button"
             className="cancel-btn"
-            onClick={handleDelete}
+            onClick={() => {
+              setShowSaveModal(false);
+              history.push("/admin-product");
+            }}
           >
-            Confirm Delete
+            OK
           </Button>
         </div>
       </Modal>
