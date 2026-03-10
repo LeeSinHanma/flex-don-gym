@@ -116,7 +116,12 @@ const PosPage: React.FC = () => {
           <Button
             type="button"
             className="btn-checkout"
-            onClick={() => history.push("/pos-checkout")}
+            onClick={() =>
+              history.push("/pos-checkout", {
+                cartItems,
+                totalAmount,
+              })
+            }
           >
             Checkout
           </Button>
