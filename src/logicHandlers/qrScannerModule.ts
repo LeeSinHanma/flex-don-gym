@@ -20,8 +20,9 @@ const FORMATS: Record<ScanMode, Html5QrcodeSupportedFormats[]> = {
 
 export async function startQrScanner(
   mode: ScanMode,
-  onScan: (decodedText: string) => void,
+  onScan: (decodedText: string) => void | Promise<void>,
   onError?: (err: string) => void,
+  stopAfterScan: boolean = false,
 ) {
   if (qr || isStarting) return;
   isStarting = true;
@@ -29,12 +30,9 @@ export async function startQrScanner(
   try {
     const elementId = "qr-reader";
 
-    // ✅ In your version, "verbose" is required by typings
     qr = new Html5Qrcode(elementId, {
       verbose: false,
       formatsToSupport: FORMATS[mode],
-      // optional (if supported in your version):
-      // useBarCodeDetectorIfSupported: true,
     });
 
     isHandlingScan = false;
@@ -47,14 +45,22 @@ export async function startQrScanner(
         isHandlingScan = true;
 
         try {
-          onScan(decodedText);
+          await Promise.resolve(onScan(decodedText));
         } catch (e: any) {
           onError?.(e?.message ?? String(e));
         } finally {
-          await stopQrScanner(); // stop after first scan
+          if (stopAfterScan) {
+            await stopQrScanner();
+          } else {
+            setTimeout(() => {
+              isHandlingScan = false;
+            }, 1500);
+          }
         }
       },
-      (errorMessage) => onError?.(errorMessage),
+      () => {
+        // ignore scan noise
+      },
     );
   } catch (e: any) {
     onError?.(e?.message ?? String(e));
