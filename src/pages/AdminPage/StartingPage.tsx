@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import "./StartingPage.css";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
@@ -13,6 +13,10 @@ const StartingPageAdmin: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const handleLogout = () => {
+    localStorage.clear(); // removes everything
+    history.replace("/"); // prevent going back
+  };
 
   const history = useHistory();
 
@@ -27,6 +31,14 @@ const StartingPageAdmin: React.FC = () => {
       mode: isLogin ? "login" : "register",
     });
   };
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+      history.push("/");
+    }
+  }, []);
 
   return (
     <div className="admin-login-container">
@@ -50,6 +62,14 @@ const StartingPageAdmin: React.FC = () => {
             onClick={() => history.push("/admin-dashboard")}
           >
             Admin Page
+          </Button>
+
+          <Button
+            className="btn btn-signup"
+            type="button"
+            onClick={handleLogout}
+          >
+            Logout
           </Button>
         </div>
       </div>
