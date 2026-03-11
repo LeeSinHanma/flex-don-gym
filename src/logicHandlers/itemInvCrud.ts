@@ -31,7 +31,7 @@ export async function createInventoryItem(
 ): Promise<InventoryItem> {
   try {
     const res = await api.post<InventoryItem>("/inventory-items/create", item);
-    return res.data; // backend returns InventoryItem (with created_at, updated_at)
+    return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
   }
@@ -41,6 +41,18 @@ export async function createInventoryItem(
 export async function getInventoryItems(): Promise<InventoryItem[]> {
   try {
     const res = await api.get<InventoryItem[]>("/inventory-items/");
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+// ✅ GET /inventory-items/{item_id}
+export async function getInventoryItemById(
+  itemId: string,
+): Promise<InventoryItem> {
+  try {
+    const res = await api.get<InventoryItem>(`/inventory-items/${itemId}`);
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
