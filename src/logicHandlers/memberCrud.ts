@@ -29,29 +29,17 @@ function getErrorMessage(err: unknown): string {
 }
 
 // ✅ POST /members/create
-export async function createMember(
-  email: string,
-  contact_number: string,
-  first_name: string,
-  last_name: string,
-  membership_type: number,
-  membership_plan_id: number,
-  credits: number,
-  registered_by: number,
-): Promise<APIResponse> {
+export async function createMember(payload: {
+  email: string;
+  contact_number: string;
+  first_name: string;
+  last_name: string;
+  membership_plan_id: number;
+  credits: number;
+  registered_by: string;
+}): Promise<APIResponse> {
   try {
-    const body = {
-      email,
-      contact_number,
-      first_name,
-      last_name,
-      membership_type,
-      membership_plan_id,
-      credits,
-      registered_by,
-    };
-
-    const res = await api.post<APIResponse>("/members/create", body);
+    const res = await api.post<APIResponse>("/members/create", payload);
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));

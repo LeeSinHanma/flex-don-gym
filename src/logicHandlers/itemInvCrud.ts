@@ -11,6 +11,14 @@ export type CreateInventoryItem = {
   added_by: string;
 };
 
+// ✅ Type for updating
+export type UpdateInventoryItemInput = {
+  item_name: string;
+  description: string;
+  price: number;
+  quantity: number;
+};
+
 // ✅ Full type (returned from backend)
 export type InventoryItem = CreateInventoryItem & {
   created_at: string;
@@ -19,11 +27,11 @@ export type InventoryItem = CreateInventoryItem & {
 
 // ✅ POST /inventory-items/create
 export async function createInventoryItem(
-  item: CreateInventoryItem
+  item: CreateInventoryItem,
 ): Promise<InventoryItem> {
   try {
     const res = await api.post<InventoryItem>("/inventory-items/create", item);
-    return res.data; // backend returns InventoryItem (with created_at, updated_at)
+    return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
   }
@@ -33,6 +41,34 @@ export async function createInventoryItem(
 export async function getInventoryItems(): Promise<InventoryItem[]> {
   try {
     const res = await api.get<InventoryItem[]>("/inventory-items/");
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+// ✅ GET /inventory-items/{item_id}
+export async function getInventoryItemById(
+  itemId: string,
+): Promise<InventoryItem> {
+  try {
+    const res = await api.get<InventoryItem>(`/inventory-items/${itemId}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+// ✅ PUT /inventory-items/update/{item_id}
+export async function updateInventoryItem(
+  itemId: string,
+  item: UpdateInventoryItemInput,
+): Promise<InventoryItem> {
+  try {
+    const res = await api.put<InventoryItem>(
+      `/inventory-items/update/${itemId}`,
+      item,
+    );
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
