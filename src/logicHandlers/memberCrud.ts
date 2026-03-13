@@ -13,7 +13,7 @@ export type Member = {
   membership_plan_id: number;
   membership_expiry: string | null;
   credits: number;
-  registered_by: number;
+  registered_by: string | number;
   is_active: boolean;
   created_at: string;
   updated_at: string;
