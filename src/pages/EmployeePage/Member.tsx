@@ -186,7 +186,9 @@ const MemberMenu: React.FC = () => {
                 type="number"
                 value={credits}
                 onChange={(e: any) =>
-                  setCredits(e.target.value === "" ? "" : Number(e.target.value))
+                  setCredits(
+                    e.target.value === "" ? "" : Number(e.target.value),
+                  )
                 }
               />
             </div>
@@ -206,6 +208,7 @@ const MemberMenu: React.FC = () => {
         <Modal
           className="modal-box"
           isOpen={showModal}
+          showCloseButton={false}
           onClose={() => {
             setShowModal(false);
             setAcceptedData(null);
@@ -218,34 +221,88 @@ const MemberMenu: React.FC = () => {
           title="Member Details"
         >
           {acceptedData ? (
-            <div className="accepted-details">
-              <p>
-                <b>Email:</b> {acceptedData.email}
-              </p>
-              <p>
-                <b>Contact:</b> {acceptedData.contactNumber}
-              </p>
-              <p>
-                <b>First Name:</b> {acceptedData.firstName}
-              </p>
-              <p>
-                <b>Last Name:</b> {acceptedData.lastName}
-              </p>
+            <div className="employee-form">
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  className="employee-input"
+                  value={acceptedData.email}
+                  readOnly
+                />
+              </div>
 
-              <div className="qr-section">
-                <p className="qr-label">QR Code:</p>
+              <div className="form-group">
+                <label>Contact</label>
+                <input
+                  className="employee-input"
+                  value={acceptedData.contactNumber}
+                  readOnly
+                />
+              </div>
 
-                <div className="qr-wrapper">
+              <div className="form-group">
+                <label>First Name</label>
+                <input
+                  className="employee-input"
+                  value={acceptedData.firstName}
+                  readOnly
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Last Name</label>
+                <input
+                  className="employee-input"
+                  value={acceptedData.lastName}
+                  readOnly
+                />
+              </div>
+
+              <div className="form-group">
+                <label>QR Code</label>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 10,
+                  }}
+                >
                   <QRCode value={acceptedData.qrValue} size={180} />
                 </div>
 
-                <p className="qr-value-text">
+                <p style={{ textAlign: "center", marginTop: 10 }}>
                   {acceptedData.firstName} {acceptedData.lastName}
                 </p>
               </div>
+
+              <div
+                className="form-actions"
+                style={{ display: "flex", gap: 10 }}
+              >
+                <Button
+                  type="button"
+                  className="btn-modal btn-submit-modal"
+                  onClick={() => {
+                    setShowModal(false);
+                    setAcceptedData(null);
+                    setEmail("");
+                    setContactNumber("");
+                    setFirstName("");
+                    setLastName("");
+                    setCredits("");
+                  }}
+                >
+                  Close
+                </Button>
+              </div>
             </div>
           ) : (
-            <p>No accepted data.</p>
+            <div className="employee-form">
+              <p style={{ textAlign: "center", margin: 0 }}>
+                No accepted data.
+              </p>
+            </div>
           )}
         </Modal>
       </div>
