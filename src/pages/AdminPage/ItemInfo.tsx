@@ -97,36 +97,49 @@ const ItemInfoPage: React.FC = () => {
         )}
 
         <div className="form-container">
-          <UsernameInput
-            className="input-username"
-            placeholder="Item Name"
-            value={itemName}
-            onChange={(e: any) => setItemName(e.target.value)}
-          />
+          <div className="form-group">
+            <label>Item Name:</label>
+            <UsernameInput
+              className="input-username"
+              placeholder="Item Name"
+              value={itemName}
+              onChange={(e: any) => setItemName(e.target.value)}
+            />
+          </div>
 
-          <UsernameInput
-            className="input-username"
-            placeholder="Description"
-            type="text"
-            value={description}
-            onChange={(e: any) => setDescription(e.target.value)}
-          />
+          <div className="form-group">
+            <label>Item Description:</label>
+            <UsernameInput
+              className="input-username"
+              placeholder="Description"
+              type="text"
+              value={description}
+              onChange={(e: any) => setDescription(e.target.value)}
+            />
+          </div>
 
-          <UsernameInput
-            className="input-username"
-            placeholder="Price"
-            type="number"
-            value={price}
-            onChange={(e: any) => setPrice(Number(e.target.value))}
-          />
+          <div className="form-group">
+            <label>Price:</label>
+            <UsernameInput
+              className="input-username"
+              placeholder="Price"
+              type="number"
+              value={price}
+              onChange={(e: any) => setPrice(Number(e.target.value))}
+            />
+          </div>
 
-          <UsernameInput
-            className="input-username"
-            placeholder="Quantity"
-            type="number"
-            value={quantity}
-            onChange={(e: any) => setQuantity(Number(e.target.value))}
-          />
+          <div className="form-group">
+            <label>Stock:</label>
+            <UsernameInput
+              className="input-username"
+              placeholder="Quantity"
+              type="number"
+              value={quantity}
+              onChange={(e: any) => setQuantity(Number(e.target.value))}
+            />
+          </div>
+
         </div>
 
         <div className="status-button-container">
@@ -141,7 +154,7 @@ const ItemInfoPage: React.FC = () => {
 
             <Button
               type="button"
-              className="renew-btn"
+              className="cancel-btn"
               disabled={!passedItem}
               onClick={() => setShowDeleteModal(true)}
             >
@@ -150,7 +163,7 @@ const ItemInfoPage: React.FC = () => {
 
             <Button
               type="button"
-              className="cancel-btn"
+              className="renew-btn"
               disabled={!passedItem || isSaving}
               onClick={handleSave}
             >

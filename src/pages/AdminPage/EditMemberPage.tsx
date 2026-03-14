@@ -125,36 +125,48 @@ const EditMemberPage: React.FC = () => {
           </div>
 
           <div className="form-container">
-            <UsernameInput
-              className="input-username"
-              placeholder="Email"
-              value={email}
-              onChange={(e: any) => setEmail(e.target.value)}
-            />
+            <div className="form-group">
+              <label>First Name:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="First name"
+                value={firstName}
+                onChange={(e: any) => setFirstName(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Contact number"
-              type="number"
-              value={contactNumber}
-              onChange={(e: any) => setContactNumber(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Last Name:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Last name"
+                value={lastName}
+                onChange={(e: any) => setLastName(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="First name"
-              value={firstName}
-              onChange={(e: any) => setFirstName(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Contact Number:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Contact number"
+                type="number"
+                value={contactNumber}
+                onChange={(e: any) => setContactNumber(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Last name"
-              value={lastName}
-              onChange={(e: any) => setLastName(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Email:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Email"
+                value={email}
+                onChange={(e: any) => setEmail(e.target.value)}
+              />
+            </div>
+
           </div>
-
           <div className="bottom-container">
             <Button className="btn-submit" type="button" onClick={handleUpdate}>
               Save
