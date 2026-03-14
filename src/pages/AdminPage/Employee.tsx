@@ -108,7 +108,7 @@ const EmployeeMenu: React.FC = () => {
             <div
               key={u.id}
               className="status-card"
-              onClick={() => history.push(`/employee/${u.id}`)}
+              onClick={() => history.push(`/employee/edit/${u.id}`)}
             >
               <div className="status-info">
                 <div className="left-info">
@@ -123,7 +123,7 @@ const EmployeeMenu: React.FC = () => {
               </div>
 
               <div className="client-status">
-                {u.role === 0 ? "Admin" : "User"}
+                {u.role === 0 ? "Admin" : "Employee"}
               </div>
             </div>
           ))}
@@ -212,7 +212,7 @@ const EmployeeMenu: React.FC = () => {
               onChange={(e) => setRole(Number(e.target.value))}
             >
               <option value={0}>Admin</option>
-              <option value={1}>User</option>
+              <option value={1}>Employee</option>
             </select>
           </div>
 

@@ -53,6 +53,7 @@ import PrivateRoute from "./PrivateRoute";
 import AdminRoute from "./AdminRoute";
 import ProductPage from "./pages/AdminPage/Product";
 import MembershipPage from "./pages/AdminPage/Membership";
+import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 
 setupIonicReact();
 
@@ -92,6 +93,7 @@ const App: React.FC = () => {
               path="/admin-edit-membership/:membershipId"
               component={AdminEditMembership}
             />
+            <Route path="/employee/edit/:userId" component={EmployeeEdit} exact />
             <Route path="/members/edit/:memberId" component={EditMemberPage} />
             <Route exact path="/admin-dashboard" component={AdminDashboard} />
             <Route exact path="/admin-item-info" component={ItemInfoPage} />

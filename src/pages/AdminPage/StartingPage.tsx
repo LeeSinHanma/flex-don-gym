@@ -54,7 +54,7 @@ const StartingPageAdmin: React.FC = () => {
             type="submit"
             onClick={() => history.push("/qr")}
           >
-            Get started
+            Employee Page
           </Button>
           <Button
             className="btn btn-signup"
