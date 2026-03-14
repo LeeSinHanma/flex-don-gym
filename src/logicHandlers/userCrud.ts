@@ -13,6 +13,15 @@ export interface User {
   updated_at: string;
 }
 
+export type UpdateUserInput = {
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: number;
+  is_active: boolean;
+};
+
 export type APIResponse = any;
 
 // ---------- Helpers ----------
@@ -95,6 +104,19 @@ export async function getUserType(username: string): Promise<number> {
     return res.data.role;
   } catch (err) {
     throw new Error("Failed to get user role");
+  }
+}
+
+// ✅ PUT /users/update/{user_id}
+export async function updateUser(
+  userId: string,
+  data: UpdateUserInput
+): Promise<User> {
+  try {
+    const res = await api.put<User>(`/users/update/${userId}`, data);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
   }
 }
 

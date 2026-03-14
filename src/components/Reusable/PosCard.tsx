@@ -1,4 +1,3 @@
-// POSCard.tsx
 import React, { useState } from "react";
 import "./PosCard.css";
 
@@ -7,6 +6,8 @@ type CardVariant = "default" | "highlighted" | "inactive";
 interface POSCardProps {
   productName: string;
   price: string | number;
+  stock?: number;
+
   initialCount?: number;
   minCount?: number;
   maxCount?: number;
@@ -31,6 +32,7 @@ const variantClass: Record<CardVariant, string> = {
 const POSCard: React.FC<POSCardProps> = ({
   productName,
   price,
+  stock,
   initialCount = 0,
   minCount = 0,
   maxCount = 99,
@@ -66,7 +68,6 @@ const POSCard: React.FC<POSCardProps> = ({
   const renderRightSide = () => {
     if (topRight) return topRight;
 
-    // if counter props are provided, show counter
     if (onCountChange !== undefined) {
       return (
         <div className="pos-card-counter">
@@ -89,7 +90,6 @@ const POSCard: React.FC<POSCardProps> = ({
       );
     }
 
-    // otherwise show button
     return (
       <div className="pos-card-top-right">
         {initialCount !== undefined && initialCount > 0 && (
@@ -127,7 +127,12 @@ const POSCard: React.FC<POSCardProps> = ({
                   minimumFractionDigits: 2,
                 })}
               </p>
+
+              {stock !== undefined && (
+                <p className="pos-card-product-stock">Stock: {stock}</p>
+              )}
             </div>
+
             <div className="pos-card-top-right">{renderRightSide()}</div>
           </div>
 

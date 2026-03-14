@@ -27,6 +27,8 @@ const AdminEditMembership: React.FC = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [name, setName] = useState("");
   const [type, setType] = useState<number>(0);
@@ -47,6 +49,7 @@ const AdminEditMembership: React.FC = () => {
     discountAmount: number;
     durationMonths: number;
   } | null>(null);
+
 
   useEffect(() => {
     const loadMembership = async () => {
@@ -119,12 +122,18 @@ const AdminEditMembership: React.FC = () => {
     }
   };
 
-  const handleDelete = async () => {
+ const handleDelete = async () => {
     try {
+      setIsDeleting(true);
+
       await deleteMembershipType(Number(membershipId));
+
+      setShowDeleteModal(false);
       history.push("/admin-membership");
     } catch (err) {
       console.error("Delete failed", err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -147,48 +156,72 @@ const AdminEditMembership: React.FC = () => {
           </div>
 
           <div className="form-container">
-            <UsernameInput
-              className="input-username"
-              placeholder="Membership name"
-              value={name}
-              onChange={(e: any) => setName(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Membership Name:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Membership name"
+                value={name}
+                onChange={(e: any) => setName(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Type"
-              type="number"
-              value={type}
-              onChange={(e: any) => setType(Number(e.target.value))}
-            />
+            <div className="form-group">
+              <label htmlFor="membership-type">Type:</label>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Price"
-              type="number"
-              value={price}
-              onChange={(e: any) => setPrice(Number(e.target.value))}
-            />
+              <select
+                id="membership-type"
+                className="employee-input"
+                value={type}
+                onChange={(e) => setType(Number(e.target.value))}
+              >
+                <option value={0}>Postpaid</option>
+                <option value={1}>Prepaid</option>
+                <option value={2}>Discount</option>
+              </select>
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Discount amount"
-              type="number"
-              value={discountAmount}
-              onChange={(e: any) => setDiscountAmount(Number(e.target.value))}
-            />
+            <div className="form-group">
+              <label>Price:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Price"
+                type="number"
+                value={price}
+                onChange={(e: any) => setPrice(Number(e.target.value))}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Duration months"
-              type="number"
-              value={durationMonths}
-              onChange={(e: any) => setDurationMonths(Number(e.target.value))}
-            />
+            <div className="form-group">
+              <label>Discount Amount:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Discount amount"
+                type="number"
+                value={discountAmount}
+                onChange={(e: any) => setDiscountAmount(Number(e.target.value))}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Duration in Months:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Duration months"
+                type="number"
+                value={durationMonths}
+                onChange={(e: any) => setDurationMonths(Number(e.target.value))}
+              />
+            </div>
+
           </div>
 
           <div className="bottom-container">
-            <Button className="btn-cancel" type="button" onClick={handleDelete}>
+            <Button
+              className="btn-cancel"
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+            >
               Delete
             </Button>
 
@@ -231,6 +264,39 @@ const AdminEditMembership: React.FC = () => {
           ) : (
             <p>Updated.</p>
           )}
+        </Modal>
+        <Modal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            if (!isDeleting) setShowDeleteModal(false);
+          }}
+          title="Confirm Delete"
+          showCloseButton={false}
+          className="confirm-modal"
+        >
+          <p style={{ textAlign: "center" }}>
+            Are you sure you want to delete this item?
+          </p>
+
+          <div className="success-actions">
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Confirm Delete"}
+            </Button>
+          </div>
         </Modal>
       </div>
     </>
