@@ -16,6 +16,7 @@ import {
   deleteMember,
 } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
+import QRCode from "react-qr-code";
 
 interface RouteParams {
   memberId: string;
@@ -154,9 +155,18 @@ const ManageStatusMemPage: React.FC = () => {
         headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
       >
         <div className="qr-wrapper">
-          <IonImg src={dondonLogo} className="qr-image" alt="QR code" />
+          {member ? (
+            <QRCode value={member.member_id} size={250} />
+          ) : (
+            <p>Loading QR...</p>
+          )}
         </div>
-        <p className="qr-member-name">Juan Dela Cruz</p>
+
+        <p className="qr-member-name">
+          {member
+            ? `${member.first_name} ${member.last_name}`
+            : "Loading..."}
+        </p>
       </Modal>
 
       <Modal

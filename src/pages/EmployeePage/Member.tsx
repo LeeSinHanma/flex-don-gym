@@ -7,6 +7,8 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import { createMember } from "../../logicHandlers/memberCrud";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resource/dondon-logo.png";
 import {
   getMembershipTypes,
   MembershipTypeResponse,
@@ -25,6 +27,7 @@ const MemberMenu: React.FC = () => {
   const [membershipType, setMembershipType] = useState<number>(0);
   const [credits, setCredits] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const [membershipTypes, setMembershipTypes] = useState<
     MembershipTypeResponse[]
   >([]);
@@ -211,6 +214,7 @@ const MemberMenu: React.FC = () => {
           showCloseButton={false}
           onClose={() => {
             setShowModal(false);
+            setShowQrModal(false);
             setAcceptedData(null);
             setEmail("");
             setContactNumber("");
@@ -261,19 +265,13 @@ const MemberMenu: React.FC = () => {
               <div className="form-group">
                 <label>QR Code</label>
 
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: 10,
-                  }}
+                <Button
+                  type="button"
+                  className="btn-modal btn-submit-modal"
+                  onClick={() => setShowQrModal(true)}
                 >
-                  <QRCode value={acceptedData.qrValue} size={180} />
-                </div>
-
-                <p style={{ textAlign: "center", marginTop: 10 }}>
-                  {acceptedData.firstName} {acceptedData.lastName}
-                </p>
+                  Show QR Code
+                </Button>
               </div>
 
               <div
@@ -302,6 +300,44 @@ const MemberMenu: React.FC = () => {
               <p style={{ textAlign: "center", margin: 0 }}>
                 No accepted data.
               </p>
+            </div>
+          )}
+        </Modal>
+
+        <Modal
+          className="modal-box"
+          isOpen={showQrModal}
+          showCloseButton={false}
+          onClose={() => setShowQrModal(false)}
+          title="DONDON'S FITNESS GYM"
+          headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
+        >
+          {acceptedData ? (
+            <>
+              <div className="qr-wrapper">
+                <QRCode value={acceptedData.qrValue} size={250} />
+              </div>
+
+              <p className="qr-member-name">
+                {acceptedData.firstName} {acceptedData.lastName}
+              </p>
+
+              <div
+                className="form-actions"
+                style={{ display: "flex", gap: 10, marginTop: 15 }}
+              >
+                <Button
+                  type="button"
+                  className="btn-modal btn-submit-modal"
+                  onClick={() => setShowQrModal(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="employee-form">
+              <p style={{ textAlign: "center", margin: 0 }}>No QR data.</p>
             </div>
           )}
         </Modal>
