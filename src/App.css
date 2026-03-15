@@ -35,3 +35,8 @@ button {
   cursor: pointer;
   transition: background-color 0.2s;
 }
+
+p {
+  align-items: center;
+  color: #04354f;
+}

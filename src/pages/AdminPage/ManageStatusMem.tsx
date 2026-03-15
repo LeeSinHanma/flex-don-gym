@@ -58,7 +58,9 @@ const ManageStatusMemPage: React.FC = () => {
         setMember(data);
 
         if (data.membership_plan_id) {
-          const membershipData = await getMembershipTypeById(data.membership_plan_id);
+          const membershipData = await getMembershipTypeById(
+            data.membership_plan_id,
+          );
           setMembershipName(membershipData.name);
         }
 
@@ -83,20 +85,17 @@ const ManageStatusMemPage: React.FC = () => {
           </BackButton>
           <h2>Manage Member</h2>
         </div>
-        <div className="member-container">
+        <div className="member-container member-container-member">
           <div className="member-info">
-
             <h2 className="member-name">
-              <strong>Name:</strong>
               <div>
                 {member
                   ? `${member.first_name} ${member.last_name}`
                   : "Loading..."}
-              </div>  
+              </div>
             </h2>
 
             <div className="member-details">
-
               <h4 className="member-type">
                 <strong>Contact Number:</strong>{" "}
                 {member?.contact_number || "Loading..."}
@@ -104,14 +103,12 @@ const ManageStatusMemPage: React.FC = () => {
 
               <h4 className="member-type">
                 <strong>Membership Type:</strong>{" "}
-                {membershipName || "Loading..."}  
+                {membershipName || "Loading..."}
               </h4>
 
               <h4 className="member-type">
-                <strong>Credits:</strong>{" "}
-                {member?.credits ?? 0}
+                <strong>Credits:</strong> {member?.credits ?? 0}
               </h4>
-              
 
               <h4 className="member-duration">
                 <strong>End of Membership:</strong>{" "}
@@ -119,9 +116,7 @@ const ManageStatusMemPage: React.FC = () => {
                   ? formatDateDash(member.membership_expiry)
                   : "No Expiry"}
               </h4>
-
             </div>
-
           </div>
         </div>
         <div className="middle-container">
@@ -200,9 +195,7 @@ const ManageStatusMemPage: React.FC = () => {
         </div>
 
         <p className="qr-member-name">
-          {member
-            ? `${member.first_name} ${member.last_name}`
-            : "Loading..."}
+          {member ? `${member.first_name} ${member.last_name}` : "Loading..."}
         </p>
       </Modal>
 

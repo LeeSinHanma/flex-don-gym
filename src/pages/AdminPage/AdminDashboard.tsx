@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { IonIcon } from "@ionic/react";
-import { menuOutline } from "ionicons/icons";
+import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { Modal } from "../../components/Reusable/Modals";
 import { Button } from "../../components/Reusable/Button";
+import { BackButton } from "../../components/Reusable/BackButton";
 import "./AdminDashboard.css";
 
 const AdminDashboard: React.FC = () => {
@@ -22,6 +23,14 @@ const AdminDashboard: React.FC = () => {
     <div className="admin-dashboard-container">
       <div className="admin-main-container">
         <div className="admin-top-header">
+          <BackButton
+            className="btn"
+            type="button"
+            onClick={() => history.push("/admin-page")}
+          >
+            <IonIcon icon={arrowBackOutline} />
+          </BackButton>
+
           <h1>Dashboard</h1>
           <IonIcon
             icon={menuOutline}

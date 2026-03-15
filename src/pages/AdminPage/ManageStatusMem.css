@@ -47,10 +47,9 @@
 }
 
 .status-btn-back {
-  border: none;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
   cursor: pointer;
 }
 
@@ -58,6 +57,15 @@
   width: 100%;
   display: flex;
   justify-content: flex-start;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff, #f3f6f9);
+  border: 1px solid #d7e0e8;
+  box-shadow: 0 10px 24px rgba(4, 53, 79, 0.12);
+}
+
+.member-container-employee {
+  background: linear-gradient(145deg, #ffffff, #faf7ef);
 }
 
 .member-info {
@@ -70,32 +78,45 @@
 .member-name {
   margin: 0;
   font-family: "Inter", sans-serif;
-  font-size: 32px;
+  font-size: 30px;
   font-weight: bold;
   color: #04354f;
+  line-height: 1.2;
 }
 
 .member-details {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  gap: 14px;
+  margin-top: 14px;
+  gap: 10px;
+}
+
+.member-details-employee {
+  display: grid;
+  gap: 8px;
+}
+
+.member-details h4 {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+
+  color: #0a4666;
+  font-weight: 600;
 }
 
 .member-type {
-  margin: 0;
   font-family: "Inter", sans-serif;
-  font-size: 26px;
+  font-size: 20px;
   font-weight: bold;
-  color: #0084c9;
+  color: #0a4666;
 }
 
 .member-duration {
-  margin: 0;
   font-family: "Inter", sans-serif;
-  font-size: 22px;
-  font-weight: normal;
-  color: #0084c9;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0a4666;
 }
 
 .middle-container {
@@ -226,13 +247,22 @@
 
 .qr-wrapper {
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: clamp(8px, 2.5vw, 12px);
   border: 3px solid #0084c9;
   border-radius: 10px;
   margin: 0 auto;
-  width: 35vh;
-  height: 30vh;
+  width: min(82vw, 320px);
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+.qr-wrapper svg {
+  width: 100%;
+  height: 100%;
+  max-width: 260px;
+  max-height: 260px;
 }
 
 .qr-image {
@@ -248,4 +278,16 @@
   font-weight: 700;
   color: #04354f;
   margin-top: 12px;
+}
+
+@media (max-width: 480px) {
+  .qr-wrapper {
+    width: min(88vw, 280px);
+    border-width: 2px;
+    border-radius: 8px;
+  }
+
+  .qr-member-name {
+    font-size: 18px;
+  }
 }

@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "../../components/Reusable/Button";
+import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
-import { menuOutline } from "ionicons/icons";
+import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
@@ -120,6 +121,14 @@ const ProductPage: React.FC = () => {
     <div className="admin-dashboard-container">
       <div className="main-container product-main-container">
         <div className="admin-top-header">
+          <BackButton
+            className="btn"
+            type="button"
+            onClick={() => history.push("/admin-dashboard")}
+          >
+            <IonIcon icon={arrowBackOutline} />
+          </BackButton>
+
           <h1>Product</h1>
           <IonIcon
             icon={menuOutline}
@@ -165,7 +174,9 @@ const ProductPage: React.FC = () => {
                   productName={item.item_name}
                   price={item.price}
                   topRight={
-                    <span className="product-stock-text">{item.quantity} stocks</span>
+                    <span className="product-stock-text">
+                      {item.quantity} stocks
+                    </span>
                   }
                 />
               </div>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
+import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
-import { menuOutline } from "ionicons/icons";
+import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
@@ -91,15 +92,41 @@ const MembershipPage: React.FC = () => {
     }
   };
 
+  const topMembership = memberships[0];
+
   return (
     <div className="admin-dashboard-container">
       <div className="main-container product-main-container">
         <div className="admin-top-header">
-          <h1>Membership Plans</h1>
+          <BackButton
+            className="btn"
+            type="button"
+            onClick={() => history.push("/admin-dashboard")}
+          >
+            <IonIcon icon={arrowBackOutline} />
+          </BackButton>
+
+          <h1>
+            Membership <br />
+            Plans
+          </h1>
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
             onClick={() => history.push("/admin-dashboard")}
+          />
+        </div>
+
+        <div className="membership-top-card">
+          <POSCard
+            productName={"Daily Rate"}
+            price={55}
+            buttonLabel="Edit amount"
+            onButtonClick={() =>
+              history.push(
+                `/admin-edit-membership/${topMembership.membership_id}`,
+              )
+            }
           />
         </div>
 
@@ -108,19 +135,21 @@ const MembershipPage: React.FC = () => {
             {loading ? (
               <p>Loading membership types...</p>
             ) : memberships.length > 0 ? (
-              memberships.map((membership) => (
-                <POSCard
-                  key={membership.membership_id}
-                  productName={membership.name}
-                  price={membership.price}
-                  buttonLabel="Edit amount"
-                  onButtonClick={() =>
-                    history.push(
-                      `/admin-edit-membership/${membership.membership_id}`,
-                    )
-                  }
-                />
-              ))
+              <>
+                {memberships.map((membership) => (
+                  <POSCard
+                    key={membership.membership_id}
+                    productName={membership.name}
+                    price={membership.price}
+                    buttonLabel="Edit amount"
+                    onButtonClick={() =>
+                      history.push(
+                        `/admin-edit-membership/${membership.membership_id}`,
+                      )
+                    }
+                  />
+                ))}
+              </>
             ) : (
               <p>No membership types found.</p>
             )}

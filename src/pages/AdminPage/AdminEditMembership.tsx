@@ -50,7 +50,6 @@ const AdminEditMembership: React.FC = () => {
     durationMonths: number;
   } | null>(null);
 
-
   useEffect(() => {
     const loadMembership = async () => {
       setIsLoading(true);
@@ -122,7 +121,7 @@ const AdminEditMembership: React.FC = () => {
     }
   };
 
- const handleDelete = async () => {
+  const handleDelete = async () => {
     try {
       setIsDeleting(true);
 
@@ -213,7 +212,6 @@ const AdminEditMembership: React.FC = () => {
                 onChange={(e: any) => setDurationMonths(Number(e.target.value))}
               />
             </div>
-
           </div>
 
           <div className="bottom-container">
