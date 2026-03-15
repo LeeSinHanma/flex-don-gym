@@ -80,6 +80,15 @@
 }
 
 .btn-cancel {
+  width: 400px;
+  height: 60px;
+  border-radius: 15px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
   background-color: #d32f2f;
   color: white;
 }
@@ -127,8 +136,8 @@
 }
 
 .login-logo {
-  width: 80px;
-  height: 80px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
 }
 
@@ -150,38 +159,90 @@
 
 .text-container {
   margin: 0;
-  font-size: 14px;
-  text-align: center;
   color: #04354f;
   z-index: 2;
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   width: 100%;
 }
 
-.text-container p {
-  margin: 0;
+.header-action-group,
+.header-title-group {
+  display: flex;
+  align-items: center;
 }
 
-.search-icon {
+.header-action-group {
+  position: relative;
+  gap: 8px;
+  min-width: auto;
+}
+
+.header-title-group {
+  margin-top: 20px;
   position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+}
+
+.header-title-group p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  color: #04354f;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
 }
 
-.search-icon ion-icon {
-  width: 40px;
-  height: 40px;
-  color: #04354f;
+.icon-button:hover {
+  background-color: rgba(4, 53, 79, 0.1);
+}
+
+.icon-button ion-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.btn-logout {
+  height: 36px;
+  min-width: 92px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: none;
+  background-color: #af2828;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.logout-float-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
 #qr-reader {
@@ -259,6 +320,32 @@
 }
 
 @media (max-width: 480px) {
+  .text-container {
+    gap: 6px;
+  }
+
+  .header-action-group {
+    min-width: auto;
+  }
+
+  .header-title-group {
+    gap: 6px;
+  }
+
+  .header-title-group p {
+    font-size: 14px;
+  }
+
+  .login-logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .btn-logout {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
   .menu-qr-container {
     width: 100%;
     box-sizing: border-box;

@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "../../components/Reusable/Button";
+import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
-import { menuOutline } from "ionicons/icons";
+import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import "./AdminDashboard.css";
 import "./Employee.css";
 
@@ -81,6 +82,14 @@ const EmployeeMenu: React.FC = () => {
     <div className="admin-dashboard-container">
       <div className="main-container">
         <div className="admin-top-header">
+          <BackButton
+            className="btn"
+            type="button"
+            onClick={() => history.push("/admin-dashboard")}
+          >
+            <IonIcon icon={arrowBackOutline} />
+          </BackButton>
+
           <h1>Employee</h1>
           <IonIcon
             icon={menuOutline}

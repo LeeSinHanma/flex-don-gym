@@ -10,8 +10,9 @@ import {
 import { scanVisit } from "../../logicHandlers/visits";
 import PosNav from "../../components/Reusable/NavItems";
 import { IonIcon, IonImg } from "@ionic/react";
-import { search } from "ionicons/icons";
+import { search, logOut } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
+import { logout } from "../../logicHandlers/userServices";
 import dondonLogo from "../../resource/dondon-logo.png";
 
 type ScanVisitResult = {
@@ -39,6 +40,7 @@ const QRScannerHome: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showLogoutButton, setShowLogoutButton] = useState(false);
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
@@ -113,16 +115,46 @@ const QRScannerHome: React.FC = () => {
     <div className="main-qr-container">
       <div className="main-container">
         <div className="text-container">
-          <IonImg src={dondonLogo} className="login-logo" />
-          <p>Scan QR code</p>
+          <div className="header-action-group">
+            <button
+              type="button"
+              className="icon-button logout-icon"
+              onClick={() => setShowLogoutButton((prev) => !prev)}
+              aria-label="Toggle logout button"
+            >
+              <IonIcon icon={logOut} />
+            </button>
 
-          <div
-            className="search-icon"
+            {showLogoutButton && (
+              <div className="logout-float-panel">
+                <Button
+                  type="button"
+                  className="btn-logout"
+                  onClick={async () => {
+                    await stopQrScanner();
+                    logout();
+                    history.replace("/login");
+                  }}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="header-title-group">
+            <IonImg src={dondonLogo} className="login-logo" />
+            <p>Scan QR code</p>
+          </div>
+
+          <button
+            type="button"
+            className="icon-button search-icon"
             onClick={() => setShowSearchModal(true)}
-            style={{ cursor: "pointer" }}
+            aria-label="Search member"
           >
             <IonIcon icon={search} />
-          </div>
+          </button>
         </div>
 
         <div className="camera-container">
@@ -179,7 +211,6 @@ const QRScannerHome: React.FC = () => {
       >
         {visitResult ? (
           <div className="visit-result-card">
-
             <div className="visit-result-row">
               <span>Name</span>
               <strong>{visitResult.member_name}</strong>
@@ -198,7 +229,9 @@ const QRScannerHome: React.FC = () => {
             {!visitResult.visit.access_granted && (
               <div className="visit-result-row">
                 <span>Reason</span>
-                <strong>{visitResult.visit.denial_reason || "No reason provided."}</strong>
+                <strong>
+                  {visitResult.visit.denial_reason || "No reason provided."}
+                </strong>
               </div>
             )}
 
@@ -279,6 +312,7 @@ const QRScannerHome: React.FC = () => {
                 background: "#fff",
                 maxHeight: "250px",
                 overflowY: "auto",
+                color: "#04354F",
               }}
             >
               {!searchText.trim() ? (
