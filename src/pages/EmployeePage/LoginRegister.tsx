@@ -29,8 +29,8 @@ const LoginRegister: React.FC = () => {
 
       console.log("User already logged in:", parsed); // ✅
 
-      if (parsed.userType === 0) history.push("/qr");
-      else if (parsed.userType === 1) history.push("/admin-page");
+      if (parsed.userType === 0) history.push("/admin-dashboard");
+      else if (parsed.userType === 1) history.push("/qr");
     }
 
     const onOnline = () => setIsOnline(true);
@@ -75,8 +75,8 @@ const LoginRegister: React.FC = () => {
       // ✅ Console log here
       console.log("Logged in user:", loggedUser);
 
-      if (userType === 0) history.push("/qr");
-      else if (userType === 1) history.push("/admin-page");
+      if (userType === 0) history.push("/admin-dashboard");
+      else if (userType === 1) history.push("/qr");
       else setErrorMessage("Unknown user type");
     } catch (error: any) {
       // ✅ show better message if it's likely internet issue

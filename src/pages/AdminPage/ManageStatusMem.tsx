@@ -10,6 +10,7 @@ import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
+import { getVisitsByMemberId, Visit } from "../../logicHandlers/visits";
 import {
   getMemberById,
   Member,
@@ -17,6 +18,7 @@ import {
   updateMember,
 } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
+
 import QRCode from "react-qr-code";
 
 interface RouteParams {
@@ -34,6 +36,7 @@ const ManageStatusMemPage: React.FC = () => {
   const [membershipName, setMembershipName] = useState("");
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [addCredits, setAddCredits] = useState("");
+  const [visits, setVisits] = useState<Visit[]>([]);
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -41,6 +44,11 @@ const ManageStatusMemPage: React.FC = () => {
     const dd = String(date.getDate()).padStart(2, "0");
     const yyyy = date.getFullYear();
     return `${mm}-${dd}-${yyyy}`;
+  };
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString();
   };
 
   useEffect(() => {
@@ -55,6 +63,9 @@ const ManageStatusMemPage: React.FC = () => {
           );
           setMembershipName(membershipData.name);
         }
+
+        const visitData = await getVisitsByMemberId(memberId);
+        setVisits(visitData);
       } catch (err) {
         console.error(err);
       }
@@ -111,6 +122,25 @@ const ManageStatusMemPage: React.FC = () => {
         <div className="middle-container">
           <div className="history-box">
             <p className="history-info">History:</p>
+
+            {visits.length === 0 ? (
+              <p>No visit history found.</p>
+            ) : (
+              visits.map((visit) => (
+                <div key={visit.visit_id} className="history-item">
+                  <p>
+                    <strong>{visit.direction}</strong> - {formatDateTime(visit.created_at)}
+                  </p>
+                  <p>
+                    Access: {visit.access_granted ? "Granted" : "Denied"}
+                  </p>
+                  {!visit.access_granted && visit.denial_reason && (
+                    <p>Reason: {visit.denial_reason}</p>
+                  )}
+                  {visit.amount_paid > 0 && <p>Amount Paid: ₱{visit.amount_paid}</p>}
+                </div>
+              ))
+            )}
           </div>
 
           <Button

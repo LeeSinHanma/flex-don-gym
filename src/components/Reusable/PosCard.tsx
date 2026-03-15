@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./PosCard.css";
 
 type CardVariant = "default" | "highlighted" | "inactive";
@@ -7,7 +7,6 @@ interface POSCardProps {
   productName: string;
   price: string | number;
   stock?: number;
-
   initialCount?: number;
   minCount?: number;
   maxCount?: number;
@@ -48,6 +47,10 @@ const POSCard: React.FC<POSCardProps> = ({
   children,
 }) => {
   const [count, setCount] = useState(initialCount);
+
+  useEffect(() => {
+    setCount(initialCount);
+  }, [initialCount]);
 
   const handleIncrement = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -91,8 +94,8 @@ const POSCard: React.FC<POSCardProps> = ({
     }
 
     return (
-      <div className="pos-card-top-right">
-        {initialCount !== undefined && initialCount > 0 && (
+      <>
+        {initialCount > 0 && (
           <span className="pos-card-count">{initialCount}</span>
         )}
         <button
@@ -107,7 +110,7 @@ const POSCard: React.FC<POSCardProps> = ({
           )}
           {buttonLabel}
         </button>
-      </div>
+      </>
     );
   };
 

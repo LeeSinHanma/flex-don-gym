@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../../components/Reusable/Button";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import "./Pos.css";
 import { IonIcon } from "@ionic/react";
 import { cartOutline, menuOutline } from "ionicons/icons";
@@ -20,11 +20,22 @@ type CartItem = InventoryItem & {
   cartQuantity: number;
 };
 
+type PosLocationState = {
+  cartItems?: CartItem[];
+};
+
 const PosPage: React.FC = () => {
   const history = useHistory();
+  const location = useLocation<PosLocationState>();
   const isProcessingScan = useRef(false);
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  useEffect(() => {
+    if (location.state?.cartItems) {
+      setCartItems(location.state.cartItems);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const handleScan = async (decodedText: string) => {
@@ -36,10 +47,7 @@ const PosPage: React.FC = () => {
         const itemId = decodedText.trim();
         if (!itemId) return;
 
-        console.log("Scanned barcode:", itemId);
-
         const item = await getInventoryItemById(itemId);
-        console.log("Item found:", item);
 
         setCartItems((prev) => {
           const existingItem = prev.find(
@@ -111,7 +119,11 @@ const PosPage: React.FC = () => {
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
-            onClick={() => history.push("/pos-item")}
+            onClick={() =>
+              history.push("/pos-item", {
+                cartItems,
+              })
+            }
           />
           <Button
             type="button"
