@@ -169,7 +169,7 @@ const QRScannerHome: React.FC = () => {
       <Modal
         className="modal-box"
         isOpen={showModal}
-        title="Member Details"
+        title="Visit Result"
         showCloseButton={false}
         onClose={async () => {
           setShowModal(false);
@@ -178,73 +178,48 @@ const QRScannerHome: React.FC = () => {
         }}
       >
         {visitResult ? (
-          <div className="employee-form">
-            <div className="form-group">
-              <label>Member ID</label>
-              <input
-                className="employee-input"
-                value={visitResult.visit.member_id}
-                readOnly
-              />
+          <div className="visit-result-card">
+
+            <div className="visit-result-row">
+              <span>Name</span>
+              <strong>{visitResult.member_name}</strong>
             </div>
 
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                className="employee-input"
-                value={visitResult.member_name}
-                readOnly
-              />
+            <div className="visit-result-row">
+              <span>Membership Type</span>
+              <strong>{getMembershipLabel(visitResult.membership_type)}</strong>
             </div>
 
-            <div className="form-group">
-              <label>Membership Type</label>
-              <input
-                className="employee-input"
-                value={getMembershipLabel(visitResult.membership_type)}
-                readOnly
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Access Granted</label>
-              <input
-                className="employee-input"
-                value={visitResult.visit.access_granted ? "YES" : "NO"}
-                readOnly
-              />
+            <div className="visit-result-row">
+              <span>Access Granted</span>
+              <strong>{visitResult.visit.access_granted ? "YES" : "NO"}</strong>
             </div>
 
             {!visitResult.visit.access_granted && (
-              <div className="form-group">
-                <label>Reason</label>
-                <input
-                  className="employee-input"
-                  value={visitResult.visit.denial_reason || ""}
-                  readOnly
-                />
+              <div className="visit-result-row">
+                <span>Reason</span>
+                <strong>{visitResult.visit.denial_reason || "No reason provided."}</strong>
               </div>
             )}
 
-            <div className="form-group">
-              <label>Amount Paid</label>
-              <input
-                className="employee-input"
-                value={String(visitResult.visit.amount_paid)}
-                readOnly
-              />
+            <div className="visit-result-row">
+              <span>Amount Paid</span>
+              <strong>{visitResult.visit.amount_paid}</strong>
             </div>
 
             <div className="form-group">
-              <label>Message</label>
-              <input
-                className="employee-input"
-                value={visitResult.message}
-                readOnly
-              />
+              <div
+                className={`employee-message ${
+                  visitResult?.visit?.access_granted
+                    ? "employee-message-success"
+                    : "employee-message-error"
+                }`}
+              >
+                {visitResult?.message || "No message available."}
+              </div>
             </div>
 
-            <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <div className="form-actions" style={{ marginTop: "16px" }}>
               <Button
                 type="button"
                 className="btn-modal btn-submit-modal"
