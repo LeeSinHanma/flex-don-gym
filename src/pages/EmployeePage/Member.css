@@ -54,15 +54,15 @@ h1 {
 }
 
 .form-container {
-  background-color: #efefef; /* White */
+  background-color: #efefef;
   padding: 2rem;
   border-radius: 30px;
-  height: 630px;
   width: 100%;
   max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  box-sizing: border-box;
 }
 
 .input-username,

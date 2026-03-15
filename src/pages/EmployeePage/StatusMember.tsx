@@ -95,9 +95,9 @@ const StatusMemberPage: React.FC = () => {
           </div>
 
           <div className="nav-carousel">
-            <div className="nav-item">Currently Active</div>
-            <div className="nav-item">Member</div>
-            <div className="nav-item">Casual</div>
+            <div className="nav-item">Active</div>
+            <div className="nav-item">Inactive</div>
+            <div className="nav-item">Discounted</div>
             <div className="nav-item">All</div>
           </div>
         </div>

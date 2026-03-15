@@ -39,6 +39,8 @@ const QRScannerHome: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
@@ -300,25 +302,9 @@ const QRScannerHome: React.FC = () => {
                       borderBottom: "1px solid #eee",
                       cursor: "pointer",
                     }}
-                    onClick={async () => {
-                      try {
-                        const result = await scanVisit({
-                          member_id: member.member_id,
-                          direction: "inbound",
-                        });
-
-                        setShowSearchModal(false);
-                        setSearchText("");
-                        setSearchResults([]);
-
-                        setVisitResult(result);
-                        setShowModal(true);
-                      } catch (err: any) {
-                        console.error(
-                          "Failed to scan selected member:",
-                          err?.message || err,
-                        );
-                      }
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setShowConfirmModal(true);
                     }}
                   >
                     <div style={{ fontWeight: "bold" }}>
@@ -346,6 +332,76 @@ const QRScannerHome: React.FC = () => {
               }}
             >
               Close
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        className="modal-box"
+        isOpen={showConfirmModal}
+        showCloseButton={false}
+        title="Confirm Admission"
+        onClose={() => {
+          setShowConfirmModal(false);
+          setSelectedMember(null);
+        }}
+      >
+        <div className="employee-form">
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+              Admit this Member?
+            </p>
+
+            {selectedMember && (
+              <p style={{ marginTop: "10px", color: "#666", fontSize: "25px" }}>
+                {selectedMember.first_name} {selectedMember.last_name}
+              </p>
+            )}
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={async () => {
+                if (!selectedMember) return;
+
+                try {
+                  const result = await scanVisit({
+                    member_id: selectedMember.member_id,
+                    direction: "inbound",
+                  });
+
+                  setShowConfirmModal(false);
+                  setShowSearchModal(false);
+                  setSelectedMember(null);
+                  setSearchText("");
+                  setSearchResults([]);
+                  setIsSearching(false);
+
+                  setVisitResult(result);
+                  setShowModal(true);
+                } catch (err: any) {
+                  console.error(
+                    "Failed to scan selected member:",
+                    err?.message || err,
+                  );
+                }
+              }}
+            >
+              Yes
+            </Button>
+
+            <Button
+              type="button"
+              className="btn-modal"
+              onClick={() => {
+                setShowConfirmModal(false);
+                setSelectedMember(null);
+              }}
+            >
+              No
             </Button>
           </div>
         </div>

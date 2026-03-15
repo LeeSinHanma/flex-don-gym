@@ -80,14 +80,6 @@ const AdminDashboard: React.FC = () => {
           <Button
             className="menu-btn"
             onClick={() => {
-              // Add navigation or action here
-            }}
-          >
-            EQUIPMENT
-          </Button>
-          <Button
-            className="menu-btn"
-            onClick={() => {
               history.push("/admin-membership");
               // Add navigation or action here
             }}
@@ -101,7 +93,7 @@ const AdminDashboard: React.FC = () => {
               // Add navigation or action here
             }}
           >
-            PROFILE
+            LOGOUT
           </Button>
 
           <Button className="menu-btn menu-btn-close" onClick={handleCloseMenu}>
