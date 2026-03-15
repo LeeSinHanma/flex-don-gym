@@ -43,6 +43,7 @@ const QRScannerHome: React.FC = () => {
   const [showLogoutButton, setShowLogoutButton] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
@@ -132,10 +133,9 @@ const QRScannerHome: React.FC = () => {
                 <Button
                   type="button"
                   className="btn-logout"
-                  onClick={async () => {
-                    await stopQrScanner();
-                    logout();
-                    history.replace("/login");
+                  onClick={() => {
+                    setShowLogoutButton(false);
+                    setShowLogoutConfirm(true);
                   }}
                 >
                   Logout
@@ -434,6 +434,48 @@ const QRScannerHome: React.FC = () => {
                 setShowConfirmModal(false);
                 setSelectedMember(null);
               }}
+            >
+              No
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        className="modal-box"
+        isOpen={showLogoutConfirm}
+        showCloseButton={false}
+        title="Confirm Logout"
+        onClose={() => setShowLogoutConfirm(false)}
+      >
+        <div className="employee-form">
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+              Are you sure you want to log out?
+            </p>
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={async () => {
+                try {
+                  await stopQrScanner();
+                  await logout();
+                  setShowLogoutConfirm(false);
+                  history.replace("/login");
+                } catch (err: any) {
+                  console.error("Logout failed:", err?.message || err);
+                }
+              }}
+            >
+              Yes
+            </Button>
+
+            <Button
+              type="button"
+              className="btn-modal"
+              onClick={() => setShowLogoutConfirm(false)}
             >
               No
             </Button>

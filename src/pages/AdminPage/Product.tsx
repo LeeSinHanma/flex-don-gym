@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
+import AdminMenu from "../../components/Reusable/AdminMenu";
 import "./AdminDashboard.css";
 import "./Product.css";
 
@@ -35,6 +36,7 @@ const ProductPage: React.FC = () => {
   const [price, setPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(0);
   const [addedBy, setAddedBy] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -82,6 +84,15 @@ const ProductPage: React.FC = () => {
     setAddedBy("");
     setErrorMessage("");
   };
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(true);
+  };
+
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
+  };
+
 
   const handleCreateProduct = async () => {
     if (!itemId.trim() || !itemName.trim() || !addedBy.trim()) {
@@ -133,7 +144,7 @@ const ProductPage: React.FC = () => {
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
-            onClick={() => history.push("/admin-dashboard")}
+            onClick={handleMenuClick}
           />
         </div>
 
@@ -290,6 +301,7 @@ const ProductPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };

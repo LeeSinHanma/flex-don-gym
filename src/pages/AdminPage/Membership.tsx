@@ -14,6 +14,7 @@ import {
   getMembershipTypes,
   MembershipTypeResponse,
 } from "../../logicHandlers/membershipCrud";
+import AdminMenu from "../../components/Reusable/AdminMenu";
 
 const MembershipPage: React.FC = () => {
   const history = useHistory();
@@ -27,6 +28,10 @@ const MembershipPage: React.FC = () => {
   const [price, setPrice] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [durationMonths, setDurationMonths] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditDailyRateOpen, setIsEditDailyRateOpen] = useState(false);
+  const [isConfirmDailyRateOpen, setIsConfirmDailyRateOpen] = useState(false);
+  const [dailyRateInput, setDailyRateInput] = useState("");
 
   const membershipTypeLabel: Record<number, string> = {
     0: "Postpaid",
@@ -61,6 +66,14 @@ const MembershipPage: React.FC = () => {
     setPrice(0);
     setDiscountAmount(0);
     setDurationMonths(0);
+  };
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(true);
+  };
+
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
   };
 
   const handleSubmit = async () => {
@@ -113,7 +126,7 @@ const MembershipPage: React.FC = () => {
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
-            onClick={() => history.push("/admin-dashboard")}
+            onClick={handleMenuClick}
           />
         </div>
 
@@ -122,11 +135,10 @@ const MembershipPage: React.FC = () => {
             productName={"Daily Rate"}
             price={55}
             buttonLabel="Edit amount"
-            onButtonClick={() =>
-              history.push(
-                `/admin-edit-membership/${topMembership.membership_id}`,
-              )
-            }
+            onButtonClick={() => {
+              setDailyRateInput(String(topMembership.price ?? 55));
+              setIsEditDailyRateOpen(true);
+            }}
           />
         </div>
 
@@ -246,6 +258,101 @@ const MembershipPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+      <Modal
+        className="modal-box"
+        isOpen={isEditDailyRateOpen}
+        showCloseButton={false}
+        title="Daily Rate"
+        onClose={() => setIsEditDailyRateOpen(false)}
+      >
+        <div className="employee-form">
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+              Enter new Daily Rate
+            </p>
+
+            <input
+              type="number"
+              value={dailyRateInput}
+              onChange={(e) => setDailyRateInput(e.target.value)}
+              placeholder="Enter daily rate"
+              style={{
+                marginTop: "15px",
+                padding: "12px",
+                borderRadius: "10px",
+                border: "1px solid #ccc",
+                fontSize: "16px",
+                width: "100%",
+                color: "#333",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={() => {
+                setIsEditDailyRateOpen(false);
+                setIsConfirmDailyRateOpen(true);
+              }}
+            >
+              Confirm
+            </Button>
+
+            <Button
+              type="button"
+              className="btn-modal"
+              onClick={() => setIsEditDailyRateOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        className="modal-box"
+        isOpen={isConfirmDailyRateOpen}
+        showCloseButton={false}
+        title="Confirm Update"
+        onClose={() => setIsConfirmDailyRateOpen(false)}
+      >
+        <div className="employee-form">
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+              Update Daily Rate?
+            </p>
+
+            <p style={{ marginTop: "10px", color: "#666", fontSize: "25px" }}>
+              ₱{dailyRateInput}
+            </p>
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={() => {
+                console.log("New Daily Rate:", dailyRateInput);
+                setIsConfirmDailyRateOpen(false);
+              }}
+            >
+              Yes
+            </Button>
+
+            <Button
+              type="button"
+              className="btn-modal"
+              onClick={() => setIsConfirmDailyRateOpen(false)}
+            >
+              No
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };
