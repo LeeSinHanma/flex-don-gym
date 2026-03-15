@@ -179,6 +179,21 @@
   margin-bottom: 16px;
 }
 
+.renew-modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.renew-modal-content .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.renew-modal-content input {
+  width: 100%;
+}
+
 .modal-box {
   height: auto;
   overflow: hidden;

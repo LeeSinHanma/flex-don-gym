@@ -14,6 +14,7 @@ import {
   getMemberById,
   Member,
   deleteMember,
+  updateMember,
 } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 import QRCode from "react-qr-code";
@@ -31,6 +32,8 @@ const ManageStatusMemPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [membershipName, setMembershipName] = useState("");
+  const [showRenewModal, setShowRenewModal] = useState(false);
+  const [addCredits, setAddCredits] = useState("");
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -133,7 +136,11 @@ const ManageStatusMemPage: React.FC = () => {
             >
               Edit
             </Button>
-            <Button type="button" className="renew-btn">
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={() => setShowRenewModal(true)}
+            >
               Renew
             </Button>
             <Button
@@ -233,6 +240,78 @@ const ManageStatusMemPage: React.FC = () => {
           >
             OK
           </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showRenewModal}
+        onClose={() => setShowRenewModal(false)}
+        title="Add Credit / Duration"
+        showCloseButton={false}
+        className="confirm-modal"
+      >
+        <div className="renew-modal-content">
+          <div className="form-group">
+            <label>Add Credits</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={addCredits}
+              onChange={(e) => setAddCredits(e.target.value)}
+              placeholder="Enter credits"
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={async () => {
+                if (!member) return;
+
+                try {
+                  const creditsToAdd = Number(addCredits);
+
+                  if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
+                    alert("Please enter a valid credit amount.");
+                    return;
+                  }
+
+                  const payload = {
+                    first_name: member.first_name,
+                    last_name: member.last_name,
+                    email: member.email,
+                    contact_number: member.contact_number,
+                    membership_plan_id: member.membership_plan_id,
+                    membership_expiry: member.membership_expiry,
+                    credits: (member.credits ?? 0) + creditsToAdd,
+                  };
+
+                  const updated = await updateMember(member.member_id, payload);
+
+                  setMember(updated);
+                  setAddCredits("");
+                  setShowRenewModal(false);
+                } catch (error) {
+                  console.error(error);
+                  alert("Failed to update member.");
+                }
+              }}
+            >
+              Confirm
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              onClick={() => {
+                setShowRenewModal(false);
+                setAddCredits("");
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

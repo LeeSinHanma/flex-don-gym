@@ -202,6 +202,62 @@
   border-radius: 25px;
 }
 
+.visit-result-card {
+  padding: 20px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.visit-result-title {
+  margin-bottom: 16px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.visit-result-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.visit-result-row span {
+  color: #666;
+  font-size: 14px;
+}
+
+.visit-result-row strong {
+  color: #111;
+  font-size: 14px;
+  text-align: right;
+}
+
+.employee-message {
+  width: 100%;
+  min-height: 45px;
+  padding: 12px 14px;
+  margin-top: 6px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+}
+
+.employee-message-success {
+  background-color: #eafaf0;
+  border: 1px solid #7bd88f;
+  color: #1f7a3d;
+}
+
+.employee-message-error {
+  background-color: #fff1f1;
+  border: 1px solid #ff9b9b;
+  color: #b42318;
+}
+
 @media (max-width: 480px) {
   .menu-qr-container {
     width: 100%;
