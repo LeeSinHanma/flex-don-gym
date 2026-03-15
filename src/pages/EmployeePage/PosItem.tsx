@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IonIcon } from "@ionic/react";
 import { searchOutline, arrowBackOutline } from "ionicons/icons";
 import "./PosItem.css";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import POSCard from "../../components/Reusable/PosCard";
 import { BackButton } from "../../components/Reusable/BackButton";
 import {
@@ -10,11 +10,23 @@ import {
   InventoryItem,
 } from "../../logicHandlers/itemInvCrud";
 
+type CartItem = InventoryItem & {
+  cartQuantity: number;
+};
+
+type PosItemLocationState = {
+  cartItems?: CartItem[];
+};
+
 const PosItemPage: React.FC = () => {
   const history = useHistory();
+  const location = useLocation<PosItemLocationState>();
 
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchText, setSearchText] = useState("");
+  const [cartItems, setCartItems] = useState<CartItem[]>(
+    location.state?.cartItems || [],
+  );
 
   useEffect(() => {
     const loadItems = async () => {
@@ -29,6 +41,42 @@ const PosItemPage: React.FC = () => {
     loadItems();
   }, []);
 
+  const addToCart = (item: InventoryItem) => {
+    const existingItem = cartItems.find(
+      (cartItem) => cartItem.item_id === item.item_id,
+    );
+
+    let updatedCart: CartItem[];
+
+    if (existingItem) {
+      updatedCart = cartItems.map((cartItem) =>
+        cartItem.item_id === item.item_id
+          ? {
+              ...cartItem,
+              cartQuantity: Math.min(
+                cartItem.cartQuantity + 1,
+                cartItem.quantity,
+              ),
+            }
+          : cartItem,
+      );
+    } else {
+      updatedCart = [
+        ...cartItems,
+        {
+          ...item,
+          cartQuantity: item.quantity > 0 ? 1 : 0,
+        },
+      ];
+    }
+
+    setCartItems(updatedCart);
+
+    history.push("/pos", {
+      cartItems: updatedCart,
+    });
+  };
+
   const filteredItems = items.filter((item) =>
     item.item_name.toLowerCase().includes(searchText.toLowerCase()),
   );
@@ -41,7 +89,11 @@ const PosItemPage: React.FC = () => {
             <BackButton
               className="pos-btn-back"
               type="submit"
-              onClick={() => history.push("/pos")}
+              onClick={() =>
+                history.push("/pos", {
+                  cartItems,
+                })
+              }
             >
               <IonIcon icon={arrowBackOutline} />
             </BackButton>
@@ -67,10 +119,10 @@ const PosItemPage: React.FC = () => {
               key={item.item_id}
               productName={item.item_name}
               price={item.price}
-              stock={item.quantity} // stock
+              stock={item.quantity}
               buttonLabel="Add to cart"
               buttonIcon={<IonIcon icon={searchOutline} />}
-              onButtonClick={() => console.log("Add to cart:", item)}
+              onButtonClick={() => addToCart(item)}
             />
           ))}
         </div>

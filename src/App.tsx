@@ -15,7 +15,6 @@ import QRScannerHome from "./pages/EmployeePage/QRScanner";
 
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
-import AdminMenu from "./pages/AdminPage/Admin";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import ItemInfoPage from "./pages/AdminPage/ItemInfo";
 import AdminEditMembership from "./pages/AdminPage/AdminEditMembership";
@@ -54,6 +53,7 @@ import AdminRoute from "./AdminRoute";
 import ProductPage from "./pages/AdminPage/Product";
 import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
+import GetStarted from "./pages/EmployeePage/GetStarted";
 
 setupIonicReact();
 
@@ -65,7 +65,7 @@ const App: React.FC = () => {
           <Switch>
             {/* Default Redirect */}
             <Route exact path="/">
-              <Redirect to="/login" />
+              <Redirect to="/get-started" />
             </Route>
 
             {/* Employee Routes */}
@@ -79,10 +79,10 @@ const App: React.FC = () => {
             <Route exact path="/pos" component={PosPage} />
             <Route exact path="/pos-item" component={PosItemPage} />
             <Route exact path="/pos-checkout" component={PosCheckout} />
+            <Route exact path="/get-started" component={GetStarted} />
             {/* Admin Routes */}
             <Route exact path="/admin-page" component={StartingPageAdmin} />
             <Route exact path="/employee-page" component={EmployeeMenu} />
-            <AdminRoute exact path="/admin-page" component={AdminMenu} />
             <Route exact path="/admin-product" component={ProductPage} />
             <Route exact path="/admin-membership" component={MembershipPage} />
             <Route

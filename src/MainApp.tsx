@@ -14,7 +14,6 @@ import PrepaidMenu from "./pages/EmployeePage/Prepaid";
 import QRScannerHome from "./pages/EmployeePage/QRScanner";
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
-import AdminMenu from "./pages/AdminPage/Admin";
 import MenuAdminButtons from "./pages/AdminPage/MenuAdmin";
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
@@ -49,7 +48,6 @@ const MainApp: React.FC = () => (
             <Route exact path="/qr" component={QRScannerHome} />
             <Route exact path="/admin-page" component={StartingPageAdmin} />
             <Route exact path="/employee-page" component={EmployeeMenu} />
-            <Route exact path="/admin" component={AdminMenu} />
             <Route exact path="/menu-admin" component={MenuAdminButtons} />
             <Route exact path="/status-member" component={StatusMemberPage} />
             <Route

@@ -139,7 +139,6 @@ const ItemInfoPage: React.FC = () => {
               onChange={(e: any) => setQuantity(Number(e.target.value))}
             />
           </div>
-
         </div>
 
         <div className="status-button-container">

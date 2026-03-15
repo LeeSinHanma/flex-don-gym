@@ -7,7 +7,7 @@ import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import "./ManageStatusMem.css";
 
-import { getUserById, updateUser} from "../../logicHandlers/userCrud";
+import { getUserById, updateUser } from "../../logicHandlers/userCrud";
 
 interface RouteParams {
   userId: string;
@@ -126,7 +126,7 @@ const EmployeeEdit: React.FC = () => {
           <h2>Edit Employee</h2>
         </div>
 
-        <div className="member-container">
+        <div className="member-container member-container-employee">
           <div className="member-info">
             <h2 className="member-name">
               {employee
@@ -134,7 +134,7 @@ const EmployeeEdit: React.FC = () => {
                 : "Loading..."}
             </h2>
 
-            <div className="member-details" style={{ display: "block" }}>
+            <div className="member-details member-details-employee">
               <h4>
                 <strong>Name:</strong>{" "}
                 {employee
@@ -168,14 +168,6 @@ const EmployeeEdit: React.FC = () => {
               onClick={() => setShowDeleteModal(true)}
             >
               Delete
-            </Button>
-
-            <Button
-              type="button"
-              className="renew-btn"
-              onClick={() => history.push("/employee-page")}
-            >
-              Back
             </Button>
           </div>
         </div>
@@ -287,11 +279,7 @@ const EmployeeEdit: React.FC = () => {
             Cancel
           </Button>
 
-          <Button
-            type="button"
-            className="cancel-btn"
-            onClick={handleDelete}
-          >
+          <Button type="button" className="cancel-btn" onClick={handleDelete}>
             Confirm Delete
           </Button>
         </div>

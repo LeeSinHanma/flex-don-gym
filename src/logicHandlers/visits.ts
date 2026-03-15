@@ -38,3 +38,9 @@ export async function scanVisit(
     throw error;
   }
 }
+
+// ✅ GET /visits/member/{member_id}
+export async function getVisitsByMemberId(member_id: string): Promise<Visit[]> {
+  const res = await api.get(`/visits/member/${encodeURIComponent(member_id)}`);
+  return res.data;
+}

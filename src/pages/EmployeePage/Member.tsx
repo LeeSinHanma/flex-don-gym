@@ -7,6 +7,8 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import { createMember } from "../../logicHandlers/memberCrud";
+import { IonImg } from "@ionic/react";
+import dondonLogo from "../../resource/dondon-logo.png";
 import {
   getMembershipTypes,
   MembershipTypeResponse,
@@ -25,6 +27,7 @@ const MemberMenu: React.FC = () => {
   const [membershipType, setMembershipType] = useState<number>(0);
   const [credits, setCredits] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
   const [membershipTypes, setMembershipTypes] = useState<
     MembershipTypeResponse[]
   >([]);
@@ -128,39 +131,52 @@ const MemberMenu: React.FC = () => {
           </div>
 
           <div className="form-container">
-            <UsernameInput
-              className="input-username"
-              placeholder="Email"
-              value={email}
-              onChange={(e: any) => setEmail(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Email</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e: any) => setEmail(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Contact number"
-              type="number"
-              value={contactNumber}
-              onChange={(e: any) => setContactNumber(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Contact Number</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Enter contact number"
+                type="number"
+                value={contactNumber}
+                onChange={(e: any) => setContactNumber(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="First name"
-              value={firstName}
-              onChange={(e: any) => setFirstName(e.target.value)}
-            />
+            <div className="form-group">
+              <label>First Name</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Enter first name"
+                value={firstName}
+                onChange={(e: any) => setFirstName(e.target.value)}
+              />
+            </div>
 
-            <UsernameInput
-              className="input-username"
-              placeholder="Last name"
-              value={lastName}
-              onChange={(e: any) => setLastName(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Last Name</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Enter last name"
+                value={lastName}
+                onChange={(e: any) => setLastName(e.target.value)}
+              />
+            </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="form-group">
+              <label>Membership Type</label>
               <select
                 className="input-username"
-                style={{ flex: 1, fontSize: "12px" }}
+                style={{ fontSize: "12px" }}
                 value={membershipType}
                 onChange={(e) => setMembershipType(Number(e.target.value))}
               >
@@ -178,11 +194,11 @@ const MemberMenu: React.FC = () => {
               </select>
             </div>
 
-            <div className="credit-group">
-              <h3>Credits</h3>
+            <div className="form-group">
+              <label>Credits</label>
               <UsernameInput
                 className="input-username"
-                placeholder="Credit"
+                placeholder="Enter credit amount"
                 type="number"
                 value={credits}
                 onChange={(e: any) =>
@@ -192,6 +208,7 @@ const MemberMenu: React.FC = () => {
                 }
               />
             </div>
+
           </div>
 
           <div className="bottom-container">
@@ -211,6 +228,7 @@ const MemberMenu: React.FC = () => {
           showCloseButton={false}
           onClose={() => {
             setShowModal(false);
+            setShowQrModal(false);
             setAcceptedData(null);
             setEmail("");
             setContactNumber("");
@@ -261,19 +279,13 @@ const MemberMenu: React.FC = () => {
               <div className="form-group">
                 <label>QR Code</label>
 
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: 10,
-                  }}
+                <Button
+                  type="button"
+                  className="btn-modal btn-submit-modal"
+                  onClick={() => setShowQrModal(true)}
                 >
-                  <QRCode value={acceptedData.qrValue} size={180} />
-                </div>
-
-                <p style={{ textAlign: "center", marginTop: 10 }}>
-                  {acceptedData.firstName} {acceptedData.lastName}
-                </p>
+                  Show QR Code
+                </Button>
               </div>
 
               <div
@@ -302,6 +314,44 @@ const MemberMenu: React.FC = () => {
               <p style={{ textAlign: "center", margin: 0 }}>
                 No accepted data.
               </p>
+            </div>
+          )}
+        </Modal>
+
+        <Modal
+          className="modal-box"
+          isOpen={showQrModal}
+          showCloseButton={false}
+          onClose={() => setShowQrModal(false)}
+          title="DONDON'S FITNESS GYM"
+          headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
+        >
+          {acceptedData ? (
+            <>
+              <div className="qr-wrapper">
+                <QRCode value={acceptedData.qrValue} size={250} />
+              </div>
+
+              <p className="qr-member-name">
+                {acceptedData.firstName} {acceptedData.lastName}
+              </p>
+
+              <div
+                className="form-actions"
+                style={{ display: "flex", gap: 10, marginTop: 15 }}
+              >
+                <Button
+                  type="button"
+                  className="btn-modal btn-submit-modal"
+                  onClick={() => setShowQrModal(false)}
+                >
+                  Close
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="employee-form">
+              <p style={{ textAlign: "center", margin: 0 }}>No QR data.</p>
             </div>
           )}
         </Modal>

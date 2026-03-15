@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import "./StatusMember.css";
 import PosNav from "../../components/Reusable/NavItems";
+import { BackButton } from "../../components/Reusable/BackButton";
+import { IonIcon } from "@ionic/react";
+import { arrowBackOutline } from "ionicons/icons";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 
@@ -10,7 +13,9 @@ const StatusMemberPage: React.FC = () => {
 
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
-  const [membershipNames, setMembershipNames] = useState<Record<number, string>>({});
+  const [membershipNames, setMembershipNames] = useState<
+    Record<number, string>
+  >({});
 
   const formatDateDash = (dateString: string | null) => {
     if (!dateString) return "No Expiry";
@@ -45,7 +50,9 @@ const StatusMemberPage: React.FC = () => {
             m.membership_plan_id !== undefined &&
             !map[m.membership_plan_id]
           ) {
-            const membership = await getMembershipTypeById(m.membership_plan_id);
+            const membership = await getMembershipTypeById(
+              m.membership_plan_id,
+            );
             map[m.membership_plan_id] = membership.name;
           }
         }
@@ -82,7 +89,17 @@ const StatusMemberPage: React.FC = () => {
     <div className="manage-member-container">
       <div className="main-container">
         <div className="top-header">
-          <h2>Manage Member</h2>
+          <div className="status-header-row">
+            <BackButton
+              className="status-page-back"
+              type="button"
+              onClick={() => history.goBack()}
+            >
+              <IonIcon icon={arrowBackOutline} />
+            </BackButton>
+
+            <h2>Manage Member</h2>
+          </div>
 
           <div className="search-bar">
             <input
@@ -95,9 +112,9 @@ const StatusMemberPage: React.FC = () => {
           </div>
 
           <div className="nav-carousel">
-            <div className="nav-item">Currently Active</div>
-            <div className="nav-item">Member</div>
-            <div className="nav-item">Casual</div>
+            <div className="nav-item">Active</div>
+            <div className="nav-item">Inactive</div>
+            <div className="nav-item">Discounted</div>
             <div className="nav-item">All</div>
           </div>
         </div>

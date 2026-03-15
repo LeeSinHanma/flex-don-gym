@@ -10,12 +10,16 @@ import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
+import { getVisitsByMemberId, Visit } from "../../logicHandlers/visits";
 import {
   getMemberById,
   Member,
   deleteMember,
+  updateMember,
 } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
+
+import QRCode from "react-qr-code";
 
 interface RouteParams {
   memberId: string;
@@ -30,6 +34,9 @@ const ManageStatusMemPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [membershipName, setMembershipName] = useState("");
+  const [showRenewModal, setShowRenewModal] = useState(false);
+  const [addCredits, setAddCredits] = useState("");
+  const [visits, setVisits] = useState<Visit[]>([]);
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -39,6 +46,11 @@ const ManageStatusMemPage: React.FC = () => {
     return `${mm}-${dd}-${yyyy}`;
   };
 
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString();
+  };
+
   useEffect(() => {
     const loadMember = async () => {
       try {
@@ -46,9 +58,14 @@ const ManageStatusMemPage: React.FC = () => {
         setMember(data);
 
         if (data.membership_plan_id) {
-          const membershipData = await getMembershipTypeById(data.membership_plan_id);
+          const membershipData = await getMembershipTypeById(
+            data.membership_plan_id,
+          );
           setMembershipName(membershipData.name);
         }
+
+        const visitData = await getVisitsByMemberId(memberId);
+        setVisits(visitData);
       } catch (err) {
         console.error(err);
       }
@@ -68,20 +85,17 @@ const ManageStatusMemPage: React.FC = () => {
           </BackButton>
           <h2>Manage Member</h2>
         </div>
-        <div className="member-container">
+        <div className="member-container member-container-member">
           <div className="member-info">
-
             <h2 className="member-name">
-              <strong>Name:</strong>
               <div>
                 {member
                   ? `${member.first_name} ${member.last_name}`
                   : "Loading..."}
-              </div>  
+              </div>
             </h2>
 
             <div className="member-details">
-
               <h4 className="member-type">
                 <strong>Contact Number:</strong>{" "}
                 {member?.contact_number || "Loading..."}
@@ -89,14 +103,12 @@ const ManageStatusMemPage: React.FC = () => {
 
               <h4 className="member-type">
                 <strong>Membership Type:</strong>{" "}
-                {membershipName || "Loading..."}  
+                {membershipName || "Loading..."}
               </h4>
 
               <h4 className="member-type">
-                <strong>Credits:</strong>{" "}
-                {member?.credits ?? 0}
+                <strong>Credits:</strong> {member?.credits ?? 0}
               </h4>
-              
 
               <h4 className="member-duration">
                 <strong>End of Membership:</strong>{" "}
@@ -104,14 +116,31 @@ const ManageStatusMemPage: React.FC = () => {
                   ? formatDateDash(member.membership_expiry)
                   : "No Expiry"}
               </h4>
-
             </div>
-
           </div>
         </div>
         <div className="middle-container">
           <div className="history-box">
             <p className="history-info">History:</p>
+
+            {visits.length === 0 ? (
+              <p>No visit history found.</p>
+            ) : (
+              visits.map((visit) => (
+                <div key={visit.visit_id} className="history-item">
+                  <p>
+                    <strong>{visit.direction}</strong> - {formatDateTime(visit.created_at)}
+                  </p>
+                  <p>
+                    Access: {visit.access_granted ? "Granted" : "Denied"}
+                  </p>
+                  {!visit.access_granted && visit.denial_reason && (
+                    <p>Reason: {visit.denial_reason}</p>
+                  )}
+                  {visit.amount_paid > 0 && <p>Amount Paid: ₱{visit.amount_paid}</p>}
+                </div>
+              ))
+            )}
           </div>
 
           <Button
@@ -132,7 +161,11 @@ const ManageStatusMemPage: React.FC = () => {
             >
               Edit
             </Button>
-            <Button type="button" className="renew-btn">
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={() => setShowRenewModal(true)}
+            >
               Renew
             </Button>
             <Button
@@ -154,9 +187,16 @@ const ManageStatusMemPage: React.FC = () => {
         headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
       >
         <div className="qr-wrapper">
-          <IonImg src={dondonLogo} className="qr-image" alt="QR code" />
+          {member ? (
+            <QRCode value={member.member_id} size={250} />
+          ) : (
+            <p>Loading QR...</p>
+          )}
         </div>
-        <p className="qr-member-name">Juan Dela Cruz</p>
+
+        <p className="qr-member-name">
+          {member ? `${member.first_name} ${member.last_name}` : "Loading..."}
+        </p>
       </Modal>
 
       <Modal
@@ -223,6 +263,78 @@ const ManageStatusMemPage: React.FC = () => {
           >
             OK
           </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showRenewModal}
+        onClose={() => setShowRenewModal(false)}
+        title="Add Credit / Duration"
+        showCloseButton={false}
+        className="confirm-modal"
+      >
+        <div className="renew-modal-content">
+          <div className="form-group">
+            <label>Add Credits</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={addCredits}
+              onChange={(e) => setAddCredits(e.target.value)}
+              placeholder="Enter credits"
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={async () => {
+                if (!member) return;
+
+                try {
+                  const creditsToAdd = Number(addCredits);
+
+                  if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
+                    alert("Please enter a valid credit amount.");
+                    return;
+                  }
+
+                  const payload = {
+                    first_name: member.first_name,
+                    last_name: member.last_name,
+                    email: member.email,
+                    contact_number: member.contact_number,
+                    membership_plan_id: member.membership_plan_id,
+                    membership_expiry: member.membership_expiry,
+                    credits: (member.credits ?? 0) + creditsToAdd,
+                  };
+
+                  const updated = await updateMember(member.member_id, payload);
+
+                  setMember(updated);
+                  setAddCredits("");
+                  setShowRenewModal(false);
+                } catch (error) {
+                  console.error(error);
+                  alert("Failed to update member.");
+                }
+              }}
+            >
+              Confirm
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              onClick={() => {
+                setShowRenewModal(false);
+                setAddCredits("");
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

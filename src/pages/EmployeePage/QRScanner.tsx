@@ -10,8 +10,9 @@ import {
 import { scanVisit } from "../../logicHandlers/visits";
 import PosNav from "../../components/Reusable/NavItems";
 import { IonIcon, IonImg } from "@ionic/react";
-import { search } from "ionicons/icons";
+import { search, logOut } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
+import { logout } from "../../logicHandlers/userServices";
 import dondonLogo from "../../resource/dondon-logo.png";
 
 type ScanVisitResult = {
@@ -39,6 +40,10 @@ const QRScannerHome: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showLogoutButton, setShowLogoutButton] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
@@ -113,16 +118,45 @@ const QRScannerHome: React.FC = () => {
     <div className="main-qr-container">
       <div className="main-container">
         <div className="text-container">
-          <IonImg src={dondonLogo} className="login-logo" />
-          <p>Scan QR code</p>
+          <div className="header-action-group">
+            <button
+              type="button"
+              className="icon-button logout-icon"
+              onClick={() => setShowLogoutButton((prev) => !prev)}
+              aria-label="Toggle logout button"
+            >
+              <IonIcon icon={logOut} />
+            </button>
 
-          <div
-            className="search-icon"
+            {showLogoutButton && (
+              <div className="logout-float-panel">
+                <Button
+                  type="button"
+                  className="btn-logout"
+                  onClick={() => {
+                    setShowLogoutButton(false);
+                    setShowLogoutConfirm(true);
+                  }}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="header-title-group">
+            <IonImg src={dondonLogo} className="login-logo" />
+            <p>Scan QR code</p>
+          </div>
+
+          <button
+            type="button"
+            className="icon-button search-icon"
             onClick={() => setShowSearchModal(true)}
-            style={{ cursor: "pointer" }}
+            aria-label="Search member"
           >
             <IonIcon icon={search} />
-          </div>
+          </button>
         </div>
 
         <div className="camera-container">
@@ -169,7 +203,7 @@ const QRScannerHome: React.FC = () => {
       <Modal
         className="modal-box"
         isOpen={showModal}
-        title="Member Details"
+        title="Visit Result"
         showCloseButton={false}
         onClose={async () => {
           setShowModal(false);
@@ -178,73 +212,49 @@ const QRScannerHome: React.FC = () => {
         }}
       >
         {visitResult ? (
-          <div className="employee-form">
-            <div className="form-group">
-              <label>Member ID</label>
-              <input
-                className="employee-input"
-                value={visitResult.visit.member_id}
-                readOnly
-              />
+          <div className="visit-result-card">
+            <div className="visit-result-row">
+              <span>Name</span>
+              <strong>{visitResult.member_name}</strong>
             </div>
 
-            <div className="form-group">
-              <label>Name</label>
-              <input
-                className="employee-input"
-                value={visitResult.member_name}
-                readOnly
-              />
+            <div className="visit-result-row">
+              <span>Membership Type</span>
+              <strong>{getMembershipLabel(visitResult.membership_type)}</strong>
             </div>
 
-            <div className="form-group">
-              <label>Membership Type</label>
-              <input
-                className="employee-input"
-                value={getMembershipLabel(visitResult.membership_type)}
-                readOnly
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Access Granted</label>
-              <input
-                className="employee-input"
-                value={visitResult.visit.access_granted ? "YES" : "NO"}
-                readOnly
-              />
+            <div className="visit-result-row">
+              <span>Access Granted</span>
+              <strong>{visitResult.visit.access_granted ? "YES" : "NO"}</strong>
             </div>
 
             {!visitResult.visit.access_granted && (
-              <div className="form-group">
-                <label>Reason</label>
-                <input
-                  className="employee-input"
-                  value={visitResult.visit.denial_reason || ""}
-                  readOnly
-                />
+              <div className="visit-result-row">
+                <span>Reason</span>
+                <strong>
+                  {visitResult.visit.denial_reason || "No reason provided."}
+                </strong>
               </div>
             )}
 
-            <div className="form-group">
-              <label>Amount Paid</label>
-              <input
-                className="employee-input"
-                value={String(visitResult.visit.amount_paid)}
-                readOnly
-              />
+            <div className="visit-result-row">
+              <span>Amount Paid</span>
+              <strong>{visitResult.visit.amount_paid}</strong>
             </div>
 
             <div className="form-group">
-              <label>Message</label>
-              <input
-                className="employee-input"
-                value={visitResult.message}
-                readOnly
-              />
+              <div
+                className={`employee-message ${
+                  visitResult?.visit?.access_granted
+                    ? "employee-message-success"
+                    : "employee-message-error"
+                }`}
+              >
+                {visitResult?.message || "No message available."}
+              </div>
             </div>
 
-            <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <div className="form-actions" style={{ marginTop: "16px" }}>
               <Button
                 type="button"
                 className="btn-modal btn-submit-modal"
@@ -304,6 +314,7 @@ const QRScannerHome: React.FC = () => {
                 background: "#fff",
                 maxHeight: "250px",
                 overflowY: "auto",
+                color: "#04354F",
               }}
             >
               {!searchText.trim() ? (
@@ -325,25 +336,9 @@ const QRScannerHome: React.FC = () => {
                       borderBottom: "1px solid #eee",
                       cursor: "pointer",
                     }}
-                    onClick={async () => {
-                      try {
-                        const result = await scanVisit({
-                          member_id: member.member_id,
-                          direction: "inbound",
-                        });
-
-                        setShowSearchModal(false);
-                        setSearchText("");
-                        setSearchResults([]);
-
-                        setVisitResult(result);
-                        setShowModal(true);
-                      } catch (err: any) {
-                        console.error(
-                          "Failed to scan selected member:",
-                          err?.message || err,
-                        );
-                      }
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setShowConfirmModal(true);
                     }}
                   >
                     <div style={{ fontWeight: "bold" }}>
@@ -371,6 +366,118 @@ const QRScannerHome: React.FC = () => {
               }}
             >
               Close
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        className="modal-box"
+        isOpen={showConfirmModal}
+        showCloseButton={false}
+        title="Confirm Admission"
+        onClose={() => {
+          setShowConfirmModal(false);
+          setSelectedMember(null);
+        }}
+      >
+        <div className="employee-form">
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+              Admit this Member?
+            </p>
+
+            {selectedMember && (
+              <p style={{ marginTop: "10px", color: "#666", fontSize: "25px" }}>
+                {selectedMember.first_name} {selectedMember.last_name}
+              </p>
+            )}
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={async () => {
+                if (!selectedMember) return;
+
+                try {
+                  const result = await scanVisit({
+                    member_id: selectedMember.member_id,
+                    direction: "inbound",
+                  });
+
+                  setShowConfirmModal(false);
+                  setShowSearchModal(false);
+                  setSelectedMember(null);
+                  setSearchText("");
+                  setSearchResults([]);
+                  setIsSearching(false);
+
+                  setVisitResult(result);
+                  setShowModal(true);
+                } catch (err: any) {
+                  console.error(
+                    "Failed to scan selected member:",
+                    err?.message || err,
+                  );
+                }
+              }}
+            >
+              Yes
+            </Button>
+
+            <Button
+              type="button"
+              className="btn-modal"
+              onClick={() => {
+                setShowConfirmModal(false);
+                setSelectedMember(null);
+              }}
+            >
+              No
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        className="modal-box"
+        isOpen={showLogoutConfirm}
+        showCloseButton={false}
+        title="Confirm Logout"
+        onClose={() => setShowLogoutConfirm(false)}
+      >
+        <div className="employee-form">
+          <div className="form-group" style={{ textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+              Are you sure you want to log out?
+            </p>
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={async () => {
+                try {
+                  await stopQrScanner();
+                  await logout();
+                  setShowLogoutConfirm(false);
+                  history.replace("/login");
+                } catch (err: any) {
+                  console.error("Logout failed:", err?.message || err);
+                }
+              }}
+            >
+              Yes
+            </Button>
+
+            <Button
+              type="button"
+              className="btn-modal"
+              onClick={() => setShowLogoutConfirm(false)}
+            >
+              No
             </Button>
           </div>
         </div>

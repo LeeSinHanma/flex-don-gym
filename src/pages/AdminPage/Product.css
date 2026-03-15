@@ -42,6 +42,23 @@
   width: 100%;
 }
 
+.membership-top-card {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.membership-top-card .pos-card-product-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.membership-top-card .pos-card-product-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
 .product-stock-text {
   font-size: 14px;
   font-weight: 600;

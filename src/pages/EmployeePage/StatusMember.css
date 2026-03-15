@@ -43,6 +43,19 @@
   gap: 0.5rem; /* Reduced from 1rem */
 }
 
+.status-header-row {
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-page-back {
+  position: absolute;
+  left: 0;
+}
+
 .top-header h2 {
   margin-bottom: 10px;
   font-size: 30px;
@@ -50,9 +63,16 @@
   color: #04354f;
 }
 
+.search-input::placeholder {
+  color: #04354f;
+  font-family: "Inter", sans-serif;
+}
+
 .search-input {
   border-radius: 15px;
   background-color: #c5c5c5;
+  color: #04354f;
+  font-weight: 600;
   border: none;
   width: 400px;
   height: 50px;

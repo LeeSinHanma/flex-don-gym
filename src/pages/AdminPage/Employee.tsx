@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "../../components/Reusable/Button";
+import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
-import { menuOutline } from "ionicons/icons";
+import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import AdminMenu from "../../components/Reusable/AdminMenu";
 import "./AdminDashboard.css";
 import "./Employee.css";
 
@@ -24,6 +26,7 @@ const EmployeeMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<number>(1);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -36,6 +39,14 @@ const EmployeeMenu: React.FC = () => {
     } catch (error) {
       console.error("Failed to load users:", error);
     }
+  };
+
+  const handleMenuClick = () => {
+    setIsMenuOpen(true);
+  };
+
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
   };
 
   const filteredUsers = useMemo(() => {
@@ -81,11 +92,19 @@ const EmployeeMenu: React.FC = () => {
     <div className="admin-dashboard-container">
       <div className="main-container">
         <div className="admin-top-header">
+          <BackButton
+            className="btn"
+            type="button"
+            onClick={() => history.push("/admin-dashboard")}
+          >
+            <IonIcon icon={arrowBackOutline} />
+          </BackButton>
+
           <h1>Employee</h1>
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
-            onClick={() => history.push("/admin-dashboard")}
+            onClick={handleMenuClick}
           />
         </div>
 
@@ -226,6 +245,7 @@ const EmployeeMenu: React.FC = () => {
           </div>
         </div>
       </Modal>
+      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };

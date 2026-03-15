@@ -13,6 +13,7 @@ const StartingPageAdmin: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loggedUser, setLoggedUser] = useState<string | null>(null);
   const handleLogout = () => {
     localStorage.clear(); // removes everything
     history.replace("/"); // prevent going back
@@ -37,8 +38,11 @@ const StartingPageAdmin: React.FC = () => {
 
     if (!user) {
       history.push("/");
+    } else {
+      const parsedUser = JSON.parse(user);
+      setLoggedUser(parsedUser.username);
     }
-  }, []);
+  }, [history]);
 
   return (
     <div className="admin-login-container">
@@ -47,6 +51,9 @@ const StartingPageAdmin: React.FC = () => {
           <IonImg src={dondonLogo} className="dondon-logo" alt="Logo" />
 
           <h1 className="admin-gym-name">DONDON'S FITNESS GYM</h1>
+          <h1 className="admin-gym-name">
+            Logged in as: {loggedUser}
+          </h1>
         </div>
         <div className="admin-button-group">
           <Button
