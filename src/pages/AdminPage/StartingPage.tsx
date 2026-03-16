@@ -1,22 +1,22 @@
 import React, { use, useEffect, useState } from "react";
 import "./StartingPage.css";
-import { UsernameInput } from "../../components/Reusable/Username";
-import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
+import LogoutModal from "../../components/Reusable/LogoutModal";
 
 const StartingPageAdmin: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loggedUser, setLoggedUser] = useState<string | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const handleLogout = () => {
-    localStorage.clear(); // removes everything
-    history.replace("/"); // prevent going back
+    localStorage.clear();
+    history.replace("/");
   };
 
   const history = useHistory();
@@ -72,14 +72,18 @@ const StartingPageAdmin: React.FC = () => {
           </Button>
 
           <Button
-            className="btn btn-signup"
+            className="btn-logout"
             type="button"
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
           >
             Logout
           </Button>
         </div>
       </div>
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </div>
   );
 };

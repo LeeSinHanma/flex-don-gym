@@ -93,7 +93,7 @@ const StatusMemberPage: React.FC = () => {
             <BackButton
               className="status-page-back"
               type="button"
-              onClick={() => history.goBack()}
+              onClick={() => history.push("/qr")}
             >
               <IonIcon icon={arrowBackOutline} />
             </BackButton>

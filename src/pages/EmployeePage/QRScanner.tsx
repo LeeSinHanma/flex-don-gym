@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
+import LogoutModal from "../../components/Reusable/LogoutModal";
 import {
   startQrScanner,
   stopQrScanner,
@@ -12,7 +13,6 @@ import PosNav from "../../components/Reusable/NavItems";
 import { IonIcon, IonImg } from "@ionic/react";
 import { search, logOut } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
-import { logout } from "../../logicHandlers/userServices";
 import dondonLogo from "../../resource/dondon-logo.png";
 
 type ScanVisitResult = {
@@ -42,8 +42,8 @@ const QRScannerHome: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [showLogoutButton, setShowLogoutButton] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
@@ -133,10 +133,7 @@ const QRScannerHome: React.FC = () => {
                 <Button
                   type="button"
                   className="btn-logout"
-                  onClick={() => {
-                    setShowLogoutButton(false);
-                    setShowLogoutConfirm(true);
-                  }}
+                  onClick={() => setShowLogoutModal(true)}
                 >
                   Logout
                 </Button>
@@ -440,48 +437,10 @@ const QRScannerHome: React.FC = () => {
           </div>
         </div>
       </Modal>
-      <Modal
-        className="modal-box"
-        isOpen={showLogoutConfirm}
-        showCloseButton={false}
-        title="Confirm Logout"
-        onClose={() => setShowLogoutConfirm(false)}
-      >
-        <div className="employee-form">
-          <div className="form-group" style={{ textAlign: "center" }}>
-            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-              Are you sure you want to log out?
-            </p>
-          </div>
-
-          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
-            <Button
-              type="button"
-              className="btn-modal btn-submit-modal"
-              onClick={async () => {
-                try {
-                  await stopQrScanner();
-                  await logout();
-                  setShowLogoutConfirm(false);
-                  history.replace("/login");
-                } catch (err: any) {
-                  console.error("Logout failed:", err?.message || err);
-                }
-              }}
-            >
-              Yes
-            </Button>
-
-            <Button
-              type="button"
-              className="btn-modal"
-              onClick={() => setShowLogoutConfirm(false)}
-            >
-              No
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </div>
   );
 };
