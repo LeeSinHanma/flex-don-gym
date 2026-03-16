@@ -28,7 +28,6 @@ const MemberProfilePage: React.FC = () => {
 
         <PosNav
           items={[
-            { label: "POS", path: "/pos" },
             { label: "QR Scanner", path: "/qr" },
             { label: "Status", path: "/status-member" },
           ]}
