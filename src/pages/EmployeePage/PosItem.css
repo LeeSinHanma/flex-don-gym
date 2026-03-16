@@ -36,6 +36,7 @@
   border: none;
   width: 400px;
   height: 50px;
+  color: #04354f;
 }
 
 .pos-search-input:focus {
