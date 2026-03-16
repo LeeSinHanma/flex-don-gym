@@ -4,7 +4,7 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import { createMember } from "../../logicHandlers/memberCrud";
 import { IonImg } from "@ionic/react";
@@ -124,7 +124,7 @@ const MemberMenu: React.FC = () => {
                 className="btn btn-back"
                 onClick={() => history.push("/menu")}
               >
-                <IonIcon icon={arrowBackOutline} />
+                <IonIcon icon={arrowBack} />
               </BackButton>
               <h1>ADD MEMBER</h1>
             </div>
@@ -208,7 +208,6 @@ const MemberMenu: React.FC = () => {
                 }
               />
             </div>
-
           </div>
 
           <div className="bottom-container">
@@ -324,7 +323,9 @@ const MemberMenu: React.FC = () => {
           showCloseButton={false}
           onClose={() => setShowQrModal(false)}
           title="DONDON'S FITNESS GYM"
-          headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
+          headerImage={
+            <IonImg src={dondonLogo} className="modal-dondon-logo" />
+          }
         >
           {acceptedData ? (
             <>

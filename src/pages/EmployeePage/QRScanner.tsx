@@ -11,7 +11,7 @@ import { scanVisit } from "../../logicHandlers/visits";
 import PosNav from "../../components/Reusable/NavItems";
 import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
 import { IonIcon, IonImg } from "@ionic/react";
-import { search, menuOutline } from "ionicons/icons";
+import { search, menu } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
 import dondonLogo from "../../resource/dondon-logo.png";
 
@@ -117,22 +117,6 @@ const QRScannerHome: React.FC = () => {
     <div className="main-qr-container">
       <div className="main-container">
         <div className="text-container">
-          <div className="header-action-group">
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setShowEmployeeMenu(true)}
-              aria-label="Open menu"
-            >
-              <IonIcon icon={menuOutline} />
-            </button>
-          </div>
-
-          <div className="header-title-group">
-            <IonImg src={dondonLogo} className="login-logo" />
-            <p>Scan QR code</p>
-          </div>
-
           <button
             type="button"
             className="icon-button search-icon"
@@ -141,6 +125,20 @@ const QRScannerHome: React.FC = () => {
           >
             <IonIcon icon={search} />
           </button>
+          <div className="header-title-group">
+            <IonImg src={dondonLogo} className="login-logo" />
+            <p>Scan QR code</p>
+          </div>
+          <div className="header-action-group">
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          </div>
         </div>
 
         <div className="camera-container">

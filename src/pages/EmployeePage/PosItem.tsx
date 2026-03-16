@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { IonIcon } from "@ionic/react";
-import { searchOutline, arrowBackOutline } from "ionicons/icons";
+import { search, arrowBack } from "ionicons/icons";
 import "./PosItem.css";
 import { useHistory, useLocation } from "react-router-dom";
 import POSCard from "../../components/Reusable/PosCard";
@@ -95,7 +95,7 @@ const PosItemPage: React.FC = () => {
                 })
               }
             >
-              <IonIcon icon={arrowBackOutline} />
+              <IonIcon icon={arrowBack} />
             </BackButton>
             <h2>All items</h2>
           </div>
@@ -113,15 +113,14 @@ const PosItemPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="pos-card-item">
+        <div className="pos-item-card-list">
           {filteredItems.map((item) => (
             <POSCard
               key={item.item_id}
               productName={item.item_name}
-              price={item.price}
               stock={item.quantity}
+              price={item.price}
               buttonLabel="Add to cart"
-              buttonIcon={<IonIcon icon={searchOutline} />}
               onButtonClick={() => addToCart(item)}
             />
           ))}

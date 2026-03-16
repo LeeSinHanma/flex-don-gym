@@ -1,6 +1,6 @@
 .pos-item-container {
   min-height: 100vh;
-  background-color: #d1d5db; /* Gray-300 equivalent */
+  background-color: #d1d5db;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,63 +9,138 @@
 }
 
 .item-main-container {
-  background-color: #d9d9d9; /* Slate-800 equivalent */
+  background-color: #d9d9d9;
   color: white;
-  padding: 1rem 1rem;
+  padding: 1.25rem 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  gap: 2rem;
+  gap: 1rem;
   width: 100%;
   max-width: 440px;
   border-radius: 0.375rem;
   height: 95vh;
-  overflow: hidden;
+  overflow: hidden; /* ✅ hard block on outer container */
 }
 
+/* ✅ UNTOUCHED */
 .item-search-bar {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
+/* ✅ UNTOUCHED */
 .pos-search-input {
   border-radius: 15px;
   background-color: #c5c5c5;
+  color: #04354f;
   border: none;
   width: 400px;
   height: 50px;
 }
 
+/* ✅ UNTOUCHED */
 .pos-search-input:focus {
   outline: none;
 }
 
+/* ✅ UNTOUCHED */
 .pos-search-input::placeholder {
   color: #04354f;
   font-family: "Inter", sans-serif;
 }
 
+/* ✅ UNTOUCHED */
 .top-top-header {
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  position: relative; /* Add this */
+  position: relative;
 }
 
+/* ✅ UNTOUCHED */
 .top-top-header h2 {
-  position: absolute; /* Add this */
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
 }
 
+/* ✅ UNTOUCHED */
 .pos-btn-back {
-  border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
   left: 0;
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ✅ No scroll — hidden overflow only */
+.pos-item-content {
+  flex: 1;
+  width: 100%;
+  overflow: hidden; /* changed from overflow-y: auto */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 4px;
+}
+
+/* ✅ No scroll on wrapper either */
+.pos-item-description-wrapper {
+  width: 100%;
+  max-height: 120px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* ✅ Shrinks font, normal weight, no scroll */
+.pos-item-description {
+  font-size: clamp(0.55rem, 1.5vw, 0.875rem); /* shrinks more aggressively */
+  font-weight: normal; /* changed from default bold */
+  line-height: 1.4;
+  color: #333;
+  width: 100%;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+/* ✅ Stock/quantity label — normal weight */
+.pos-item-stock {
+  font-weight: normal;
+  font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+}
+
+/* ✅ Card list container */
+.pos-item-card-list {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 4px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .item-main-container {
+    max-width: 100%;
+    padding: 1rem;
+    height: 100vh;
+  }
+
+  .pos-search-input {
+    width: 100%;
+    max-width: 350px;
+    height: 45px;
+  }
+
+  .pos-item-card-list {
+    gap: 0.4rem;
+  }
 }

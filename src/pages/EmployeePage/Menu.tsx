@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import "./Menu.css";
 
 const MenuButtons: React.FC = () => {
@@ -17,7 +17,7 @@ const MenuButtons: React.FC = () => {
             className="btn btn-back"
             onClick={() => history.push("/qr")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
         </div>
         <div className="menu-container">
@@ -33,7 +33,7 @@ const MenuButtons: React.FC = () => {
             type="submit"
             onClick={() => history.push("/menu")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
         </div>
         

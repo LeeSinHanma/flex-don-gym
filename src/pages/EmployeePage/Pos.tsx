@@ -3,9 +3,9 @@ import { Button } from "../../components/Reusable/Button";
 import { useHistory, useLocation } from "react-router-dom";
 import "./Pos.css";
 import { IonIcon } from "@ionic/react";
-import { cartOutline, menuOutline } from "ionicons/icons";
-import PosNav from "../../components/Reusable/NavItems";
+import { filter, menu } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
+import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
 
 import {
   startQrScanner,
@@ -30,6 +30,7 @@ const PosPage: React.FC = () => {
   const isProcessingScan = useRef(false);
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   useEffect(() => {
     if (location.state?.cartItems) {
@@ -116,27 +117,26 @@ const PosPage: React.FC = () => {
     <div className="pos-main-container">
       <div className="pos-container">
         <div className="pos-header">
-          <IonIcon
-            icon={menuOutline}
-            className="menu-icon"
+          <button
+            type="button"
+            className="icon-button"
             onClick={() =>
               history.push("/pos-item", {
                 cartItems,
               })
             }
-          />
-          <Button
-            type="button"
-            className="btn-checkout"
-            onClick={() =>
-              history.push("/pos-checkout", {
-                cartItems,
-                totalAmount,
-              })
-            }
+            aria-label="Filter items"
           >
-            Checkout
-          </Button>
+            <IonIcon icon={filter} />
+          </button>
+          <button
+            type="button"
+            className="icon-button"
+            onClick={() => setShowEmployeeMenu(true)}
+            aria-label="Open menu"
+          >
+            <IonIcon icon={menu} />
+          </button>
         </div>
 
         <div className="barcode">
@@ -145,11 +145,7 @@ const PosPage: React.FC = () => {
 
         <div className="shopping-info">
           <div className="cart">
-            <IonIcon icon={cartOutline} className="cart-icon" />
             <h2 className="shop-cart">Shopping Cart</h2>
-          </div>
-          <div className="total-amount">
-            <h2 className="amount">₱{totalAmount.toFixed(2)}</h2>
           </div>
         </div>
 
@@ -172,7 +168,31 @@ const PosPage: React.FC = () => {
             ))
           )}
         </div>
+
+        <div className="pos-checkout-footer">
+          <p className="pos-checkout-footer-text">
+            Total: ₱{totalAmount.toFixed(2)}
+          </p>
+          <Button
+            className="btn-checkout"
+            type="button"
+            onClick={() =>
+              history.push("/pos-checkout", {
+                cartItems,
+                totalAmount,
+              })
+            }
+          >
+            Checkout
+          </Button>
+        </div>
       </div>
+
+      <EmployeeMenu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+        onBeforeLogout={() => stopQrScanner()}
+      />
     </div>
   );
 };

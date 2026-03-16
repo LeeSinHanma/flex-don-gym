@@ -93,3 +93,36 @@
 .menu-btn-close:hover {
   background-color: #4b5563;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .admin-dashboard-container {
+    padding: 0.5rem;
+  }
+
+  .admin-top-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .admin-top-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .admin-top-header .menu-icon {
+    right: 1rem;
+    font-size: 1.5rem;
+  }
+
+  .admin-main-content {
+    padding: 1rem;
+  }
+
+  .admin-main-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .menu-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}

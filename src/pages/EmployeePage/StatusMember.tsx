@@ -4,9 +4,10 @@ import "./StatusMember.css";
 import PosNav from "../../components/Reusable/NavItems";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
+import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
@@ -16,6 +17,7 @@ const StatusMemberPage: React.FC = () => {
   const [membershipNames, setMembershipNames] = useState<
     Record<number, string>
   >({});
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const formatDateDash = (dateString: string | null) => {
     if (!dateString) return "No Expiry";
@@ -95,10 +97,19 @@ const StatusMemberPage: React.FC = () => {
               type="button"
               onClick={() => history.goBack()}
             >
-              <IonIcon icon={arrowBackOutline} />
+              <IonIcon icon={arrowBack} />
             </BackButton>
 
             <h2>Manage Member</h2>
+
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
           </div>
 
           <div className="search-bar">
@@ -156,6 +167,11 @@ const StatusMemberPage: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <EmployeeMenu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
     </div>
   );
 };
