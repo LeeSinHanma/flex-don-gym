@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Modal } from "../../components/Reusable/Modals";
 import { Button } from "../../components/Reusable/Button";
-import { logout } from "../../logicHandlers/userServices";
+import LogoutModal from "../../components/Reusable/LogoutModal";
 
 interface AdminMenuProps {
   isOpen: boolean;
@@ -21,16 +21,6 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
   const handleLogoutClick = () => {
     onClose();
     setShowLogoutConfirm(true);
-  };
-
-  const handleConfirmLogout = async () => {
-    try {
-      await logout();
-      setShowLogoutConfirm(false);
-      history.push("/login");
-    } catch (err: any) {
-      console.error("Logout failed:", err?.message || err);
-    }
   };
 
   return (
@@ -62,6 +52,13 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
             MEMBERSHIP PLANS
           </Button>
 
+          <Button
+            className="menu-btn"
+            onClick={() => console.log("Access Manager clicked")}
+          >
+            ACCESS MANAGER
+          </Button>
+
           <Button className="menu-btn" onClick={handleLogoutClick}>
             LOGOUT
           </Button>
@@ -72,39 +69,11 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
         </div>
       </Modal>
 
-      <Modal
-        className="modal-box"
+      {/* Reusable Logout Modal */}
+      <LogoutModal
         isOpen={showLogoutConfirm}
-        showCloseButton={false}
-        title="Confirm Logout"
         onClose={() => setShowLogoutConfirm(false)}
-      >
-        <div className="employee-form">
-          <div className="form-group" style={{ textAlign: "center" }}>
-            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-              Are you sure you want to log out?
-            </p>
-          </div>
-
-          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
-            <Button
-              type="button"
-              className="btn-modal btn-submit-modal"
-              onClick={handleConfirmLogout}
-            >
-              Yes
-            </Button>
-
-            <Button
-              type="button"
-              className="btn-modal"
-              onClick={() => setShowLogoutConfirm(false)}
-            >
-              No
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      />
     </>
   );
 };

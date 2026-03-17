@@ -5,7 +5,6 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
-import PosNav from "../../components/Reusable/NavItems";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import { IonImg } from "@ionic/react";

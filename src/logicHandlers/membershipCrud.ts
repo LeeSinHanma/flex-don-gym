@@ -1,5 +1,4 @@
 import api from "../api/axios";
-import axios from "axios";
 
 export interface MembershipTypeResponse {
   membership_id: number;
