@@ -4,7 +4,7 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import "./Member.css";
 
 const WalkInMenu: React.FC = () => {
@@ -18,7 +18,7 @@ const WalkInMenu: React.FC = () => {
             type="submit"
             onClick={() => history.push("/menu")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
           <h1>Walk-in</h1>
         </div>

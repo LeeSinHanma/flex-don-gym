@@ -49,7 +49,6 @@ import "@ionic/react/css/palettes/dark.system.css";
 /* Theme */
 import "./theme/variables.css";
 import PrivateRoute from "./PrivateRoute";
-import AdminRoute from "./AdminRoute";
 import ProductPage from "./pages/AdminPage/Product";
 import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
@@ -68,35 +67,32 @@ const App: React.FC = () => {
               <Redirect to="/get-started" />
             </Route>
 
-            {/* Employee Routes */}
-            <Route exact path="/login" component={LoginRegister} />
-            <Route exact path="/menu" component={MenuButtons} />
-            <Route exact path="/member" component={MemberMenu} />
-            <Route exact path="/walkin" component={WalkInMenu} />
-            <Route exact path="/prepaid" component={PrepaidMenu} />
-            <PrivateRoute path="/qr" component={QRScannerHome} />
-            <Route exact path="/status-member" component={StatusMemberPage} />
-            <Route exact path="/pos" component={PosPage} />
-            <Route exact path="/pos-item" component={PosItemPage} />
-            <Route exact path="/pos-checkout" component={PosCheckout} />
+            {/* Public routes */}
             <Route exact path="/get-started" component={GetStarted} />
+            <Route exact path="/login" component={LoginRegister} />
+
+            {/* Employee Routes */}
+            <PrivateRoute exact path="/menu" component={MenuButtons} />
+            <PrivateRoute exact path="/member" component={MemberMenu} />
+            <PrivateRoute exact path="/walkin" component={WalkInMenu} />
+            <PrivateRoute exact path="/prepaid" component={PrepaidMenu} />
+            <PrivateRoute path="/qr" component={QRScannerHome} />
+            <PrivateRoute exact path="/status-member" component={StatusMemberPage} />
+            <PrivateRoute exact path="/pos" component={PosPage} />
+            <PrivateRoute exact path="/pos-item" component={PosItemPage} />
+            <PrivateRoute exact path="/pos-checkout" component={PosCheckout} />
+            <PrivateRoute exact path="/get-started" component={GetStarted} />
             {/* Admin Routes */}
-            <Route exact path="/admin-page" component={StartingPageAdmin} />
-            <Route exact path="/employee-page" component={EmployeeMenu} />
-            <Route exact path="/admin-product" component={ProductPage} />
-            <Route exact path="/admin-membership" component={MembershipPage} />
-            <Route
-              path="/manage-status/:memberId"
-              component={ManageStatusMemPage}
-            />
-            <Route
-              path="/admin-edit-membership/:membershipId"
-              component={AdminEditMembership}
-            />
-            <Route path="/employee/edit/:userId" component={EmployeeEdit} exact />
-            <Route path="/members/edit/:memberId" component={EditMemberPage} />
-            <Route exact path="/admin-dashboard" component={AdminDashboard} />
-            <Route exact path="/admin-item-info" component={ItemInfoPage} />
+            <PrivateRoute exact path="/admin-page" component={StartingPageAdmin} />
+            <PrivateRoute exact path="/employee-page" component={EmployeeMenu} />
+            <PrivateRoute exact path="/admin-product" component={ProductPage} />
+            <PrivateRoute exact path="/admin-membership" component={MembershipPage} />
+            <PrivateRoute path="/manage-status/:memberId" component={ManageStatusMemPage}/>
+            <PrivateRoute path="/admin-edit-membership/:membershipId" component={AdminEditMembership}/>
+            <PrivateRoute path="/employee/edit/:userId" component={EmployeeEdit} exact />
+            <PrivateRoute path="/members/edit/:memberId" component={EditMemberPage} />
+            <PrivateRoute exact path="/admin-dashboard" component={AdminDashboard} />
+            <PrivateRoute exact path="/admin-item-info" component={ItemInfoPage} />
             {/* Folder Route (keep last) */}
             <Route exact path="/folder/:name" component={Page} />
           </Switch>

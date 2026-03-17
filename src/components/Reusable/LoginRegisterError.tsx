@@ -10,11 +10,8 @@ import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 
 const LoginRegisterErrorPage: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const history = useHistory();
 

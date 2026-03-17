@@ -14,6 +14,31 @@
   background-color: transparent;
 }
 
+.admin-dashboard-container .main-container {
+  background-color: #d9d9d9;
+  width: 100%;
+  max-width: 440px;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cards-container {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.cards-container::-webkit-scrollbar {
+  display: none;
+}
+
 .admin-main-content h3 {
   margin: 0;
   font-size: 1.5rem;
@@ -113,6 +138,17 @@
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.employee-form::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
 }
 
 .form-group {
@@ -189,4 +225,70 @@
 
 .btn-modal:active {
   transform: translateY(0);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .admin-dashboard-container .main-container {
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cards-container {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .admin-main-content {
+    padding: 0.75rem;
+  }
+
+  .admin-main-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .admin-main-content p {
+    font-size: 0.9rem;
+  }
+
+  .product-search-input {
+    height: 45px;
+    padding: 0 0.75rem;
+    font-size: 14px;
+  }
+
+  .product-search-btn {
+    width: 75px;
+    height: 45px;
+    font-size: 12px;
+  }
+
+  .bottom-container {
+    padding: 1rem 1rem 2rem 1rem;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bottom-container .btn-submit {
+    width: 100%;
+    max-width: 350px;
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .employee-input {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .btn-modal {
+    padding: 0.6rem 1rem;
+    font-size: 14px;
+  }
 }

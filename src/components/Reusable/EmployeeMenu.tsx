@@ -2,14 +2,20 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Modal } from "../../components/Reusable/Modals";
 import { Button } from "../../components/Reusable/Button";
+import { logout } from "../../logicHandlers/userServices";
 import LogoutModal from "../../components/Reusable/LogoutModal";
 
-interface AdminMenuProps {
+interface EmployeeMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onBeforeLogout?: () => Promise<void>;
 }
 
-const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
+const EmployeeMenu: React.FC<EmployeeMenuProps> = ({
+  isOpen,
+  onClose,
+  onBeforeLogout,
+}) => {
   const history = useHistory();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -23,40 +29,38 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
     setShowLogoutConfirm(true);
   };
 
+  const handleConfirmLogout = async () => {
+    try {
+      if (onBeforeLogout) {
+        await onBeforeLogout();
+      }
+      await logout();
+      setShowLogoutConfirm(false);
+      history.replace("/login");
+    } catch (err: any) {
+      console.error("Logout failed:", err?.message || err);
+    }
+  };
+
   return (
     <>
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Admin Menu"
+        title="Menu"
         showCloseButton={false}
       >
         <div className="menu-buttons">
-          <Button className="menu-btn" onClick={() => goTo("/admin-dashboard")}>
-            DASHBOARD
+          <Button className="menu-btn" onClick={() => goTo("/pos")}>
+            POS
           </Button>
 
-          <Button className="menu-btn" onClick={() => goTo("/employee-page")}>
-            EMPLOYEE
-          </Button>
-
-          <Button className="menu-btn" onClick={() => goTo("/admin-product")}>
-            PRODUCTS
+          <Button className="menu-btn" onClick={() => goTo("/qr")}>
+            QR SCANNER
           </Button>
 
           <Button className="menu-btn" onClick={() => goTo("/status-member")}>
-            MEMBERS
-          </Button>
-
-          <Button className="menu-btn" onClick={() => goTo("/admin-membership")}>
-            MEMBERSHIP PLANS
-          </Button>
-
-          <Button
-            className="menu-btn"
-            onClick={() => console.log("Access Manager clicked")}
-          >
-            ACCESS MANAGER
+            STATUS
           </Button>
 
           <Button className="menu-btn" onClick={handleLogoutClick}>
@@ -68,8 +72,6 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
           </Button>
         </div>
       </Modal>
-
-      {/* Reusable Logout Modal */}
       <LogoutModal
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
@@ -78,4 +80,4 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default AdminMenu;
+export default EmployeeMenu;

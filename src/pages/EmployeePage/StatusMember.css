@@ -11,11 +11,11 @@
 .main-container {
   background-color: #d9d9d9;
   color: white;
-  padding: 1rem 1rem; /* Reduced from 2rem 1.5rem */
+  padding: 1rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* ✅ changed from space-between */
   gap: 0;
   width: 100%;
   max-width: 440px;
@@ -24,23 +24,14 @@
   overflow: hidden;
 }
 
-.cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem; /* Reduced from 1rem */
-  width: 100%;
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 0.5rem; /* Reduced from 1rem */
-}
-
 .top-header {
   display: flex;
   width: 100%;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem; /* Reduced from 1rem */
+  flex-shrink: 0; /* ✅ prevents header from being squished */
+  gap: 0.5rem;
 }
 
 .status-header-row {
@@ -56,11 +47,43 @@
   left: 0;
 }
 
+.status-header-row .icon-button {
+  position: absolute;
+  right: 0;
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #04354f;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.status-header-row .icon-button:hover {
+  background-color: rgba(4, 53, 79, 0.1);
+}
+
+.status-header-row .icon-button ion-icon {
+  width: 28px;
+  height: 28px;
+}
+
 .top-header h2 {
   margin-bottom: 10px;
   font-size: 30px;
   font-family: "Inter", sans-serif;
   color: #04354f;
+}
+
+/* ✅ added — was missing, causing layout miscalculation */
+.search-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .search-input::placeholder {
@@ -82,16 +105,11 @@
   outline: none;
 }
 
-.search-input::placeholder {
-  color: #04354f;
-  font-family: "Inter", sans-serif;
-}
-
 .nav-carousel {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding: 0.5rem 0; /* Reduced from 1rem 0 */
+  padding: 0.5rem 0;
   width: 100%;
 }
 
@@ -107,6 +125,26 @@
   white-space: nowrap;
 }
 
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  flex: 1;
+  min-height: 0; /* ✅ move this OUT of media query to base styles */
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-top: 0.5rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.cards-container::-webkit-scrollbar {
+  display: none;
+}
+
 .status-card {
   display: flex;
   flex-direction: row;
@@ -115,7 +153,7 @@
   background-color: #ffffff;
   width: 100%;
   height: 80px;
-  padding: 0.75rem; /* Reduced from 1rem */
+  padding: 0.75rem;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: #04354f;
@@ -127,7 +165,7 @@
 .left-info {
   display: flex;
   flex-direction: column;
-  gap: 2px; /* Reduced from 3px */
+  gap: 2px;
 }
 
 .left-info h2 {
@@ -172,10 +210,33 @@ h3 {
 }
 
 @media (max-width: 480px) {
+  .manage-member-container {
+    justify-content: flex-start;
+    padding: 0.5rem;
+    overflow: hidden;
+  }
+
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 1rem);
+    min-height: calc(100dvh - 1rem);
+    overflow: hidden;
+  }
+
+  .left-info h2 {
+    font-size: 20px;
+  }
+
+  .client-details {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .top-header {
     width: 100%;
     box-sizing: border-box;
-    align-items: stretch; /* only applies on mobile */
+    align-items: stretch;
   }
 
   .top-header h2 {
@@ -187,5 +248,13 @@ h3 {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+  }
+
+  .cards-container {
+    flex: 1;
+    overflow-y: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }

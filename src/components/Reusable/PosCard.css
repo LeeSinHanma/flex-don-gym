@@ -1,12 +1,33 @@
-/* Card Wrapper */
+/* ✅ FIXED — was expanding freely, blocking scroll */
+.pos-cards-container {
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0; /* ✅ critical */
+  overflow-y: auto; /* ✅ scroll lives here if you use this as the scroll container */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ Slim scrollbar */
+.pos-cards-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pos-cards-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pos-cards-container::-webkit-scrollbar-thumb {
+  background-color: #c5c5c5;
+  border-radius: 10px;
+}
+
+/* ✅ UNTOUCHED */
 .pos-card-item {
   width: 100%;
 }
-
-.pos-cards-container {
-  padding: 4px 0;
-}
-
 /* Main Card */
 .pos-status-card {
   display: flex;
@@ -63,6 +84,10 @@
   font-weight: normal;
   color: #04354f;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .pos-left-info p,
@@ -120,18 +145,18 @@
 
 /* Button */
 .pos-card-btn {
-  width: 130px;
-  height: 50px;
+  width: 100px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   background-color: rgba(113, 112, 112, 0.25);
   color: #04354f;
   border: none;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -164,4 +189,37 @@
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid #e5e7eb;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .pos-card-btn {
+    width: 80px;
+    height: 35px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .pos-left-info h2,
+  .pos-card-product-name {
+    font-size: 14px;
+    max-width: 150px;
+  }
+
+  .pos-left-info p,
+  .pos-card-product-price {
+    font-size: 16px;
+  }
+
+  .pos-counter-btn {
+    font-size: 16px;
+  }
+
+  .pos-counter-value {
+    font-size: 13px;
+  }
+
+  .pos-status-card {
+    padding: 10px 12px;
+  }
 }

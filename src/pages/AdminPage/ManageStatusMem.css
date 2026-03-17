@@ -222,6 +222,17 @@
 .renew-modal-content {
   display: flex;
   flex-direction: column;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.renew-modal-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
 }
 
 .renew-modal-content .form-group {
@@ -289,5 +300,41 @@
 
   .qr-member-name {
     font-size: 18px;
+  }
+
+  .renew-btn,
+  .cancel-btn {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .btn-qr {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  /* ✅ fixed — keep height constrained so cards-container can scroll */
+  .main-container {
+    height: 95vh; /* ✅ keep fixed height */
+    min-height: unset; /* ✅ remove min-height fighting against it */
+    overflow: hidden; /* ✅ scroll belongs on cards-container, not here */
+    -webkit-overflow-scrolling: unset;
+  }
+
+  .member-container {
+    flex-direction: column;
+    padding: 12px 14px;
+  }
+
+  .middle-container {
+    max-height: none;
+  }
+
+  .history-box {
+    max-height: 150px;
+  }
+
+  .status-button-container {
+    padding-bottom: 2rem;
   }
 }
