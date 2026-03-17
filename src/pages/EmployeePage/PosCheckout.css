@@ -50,3 +50,27 @@
   font-size: 16px;
   font-weight: bold;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .pos-checkout-footer {
+    height: 100px;
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .pos-checkout-footer-text {
+    font-size: 18px;
+  }
+
+  .pos-checkout-btn {
+    width: 120px;
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .pos-checkout-info {
+    gap: 0.4rem;
+  }
+}

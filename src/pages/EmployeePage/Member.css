@@ -55,13 +55,23 @@ h1 {
 .form-container {
   background-color: #efefef;
   padding: 2rem;
-  border-radius: 30px;
+  border-radius: 20px;
   width: 100%;
   max-width: 400px;
+  max-height: 800px;
   display: flex;
   flex-direction: column;
   gap: 2rem;
   box-sizing: border-box;
+  overflow-y: auto;
+
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.form-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
 }
 
 .input-username,

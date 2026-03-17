@@ -58,6 +58,16 @@
 .modal-body {
   width: 100%;
   overflow-y: auto;
+  max-height: 400px;
+  padding-right: 8px;
+
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.modal-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
 }
 
 /* Close button */

@@ -113,6 +113,17 @@
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  /* Hide scrollbar but keep functionality */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.employee-form::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
 }
 
 .form-group {
@@ -189,4 +200,58 @@
 
 .btn-modal:active {
   transform: translateY(0);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .admin-main-content {
+    padding: 0.75rem;
+  }
+
+  .admin-main-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .admin-main-content p {
+    font-size: 0.9rem;
+  }
+
+  .product-search-input {
+    height: 45px;
+    padding: 0 0.75rem;
+    font-size: 14px;
+  }
+
+  .product-search-btn {
+    width: 75px;
+    height: 45px;
+    font-size: 12px;
+  }
+
+  .bottom-container {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bottom-container .btn-submit {
+    width: 100%;
+    max-width: 350px;
+    height: 55px;
+    font-size: 18px;
+  }
+
+  .employee-input {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .btn-modal {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
 }

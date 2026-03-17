@@ -56,6 +56,31 @@
   left: 0;
 }
 
+.status-header-row .icon-button {
+  position: absolute;
+  right: 0;
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #04354f;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.status-header-row .icon-button:hover {
+  background-color: rgba(4, 53, 79, 0.1);
+}
+
+.status-header-row .icon-button ion-icon {
+  width: 28px;
+  height: 28px;
+}
+
 .top-header h2 {
   margin-bottom: 10px;
   font-size: 30px;
@@ -169,6 +194,17 @@ h3 {
 .stat .status-container h3 {
   font-size: 20px;
   color: #0084c9;
+}
+
+.cards-container {
+  /* For Chrome, Safari, and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* For IE, Edge, and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 @media (max-width: 480px) {

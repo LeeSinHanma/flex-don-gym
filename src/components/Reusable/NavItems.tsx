@@ -14,8 +14,7 @@ interface PosNavProps {
 }
 
 const defaultNavItems: NavItem[] = [
-  { label: "POS", path: "/pos", className: "nav-item-container" },
-  { label: "QR Scanner", path: "/", className: "nav-item-container" },
+  { label: "QR Scanner", path: "/qr", className: "nav-item-container" },
   {
     label: "Status",
     path: "/status-member",

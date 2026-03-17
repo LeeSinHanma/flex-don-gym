@@ -3,15 +3,14 @@ import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
-import LogoutModal from "../../components/Reusable/LogoutModal";
 import {
   startQrScanner,
   stopQrScanner,
 } from "../../logicHandlers/qrScannerModule";
 import { scanVisit } from "../../logicHandlers/visits";
-import PosNav from "../../components/Reusable/NavItems";
+import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
 import { IonIcon, IonImg } from "@ionic/react";
-import { search, logOut } from "ionicons/icons";
+import { search, menu } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
 import dondonLogo from "../../resource/dondon-logo.png";
 
@@ -40,9 +39,8 @@ const QRScannerHome: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<Member[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [showLogoutButton, setShowLogoutButton] = useState(false);
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const getMembershipLabel = (type: number) => {
@@ -118,34 +116,6 @@ const QRScannerHome: React.FC = () => {
     <div className="main-qr-container">
       <div className="main-container">
         <div className="text-container">
-          <div className="header-action-group">
-            <button
-              type="button"
-              className="icon-button logout-icon"
-              onClick={() => setShowLogoutButton((prev) => !prev)}
-              aria-label="Toggle logout button"
-            >
-              <IonIcon icon={logOut} />
-            </button>
-
-            {showLogoutButton && (
-              <div className="logout-float-panel">
-                <Button
-                  type="button"
-                  className="btn-logout"
-                  onClick={() => setShowLogoutModal(true)}
-                >
-                  Logout
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="header-title-group">
-            <IonImg src={dondonLogo} className="login-logo" />
-            <p>Scan QR code</p>
-          </div>
-
           <button
             type="button"
             className="icon-button search-icon"
@@ -154,6 +124,22 @@ const QRScannerHome: React.FC = () => {
           >
             <IonIcon icon={search} />
           </button>
+
+          <div className="header-title-group">
+            <IonImg src={dondonLogo} className="login-logo" />
+            <p>Scan QR code</p>
+          </div>
+
+          <div className="header-action-group">
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          </div>
         </div>
 
         <div className="camera-container">
@@ -170,32 +156,8 @@ const QRScannerHome: React.FC = () => {
               ADD NEW MEMBER
             </Button>
           </div>
-
-          <div className="pos-footer">
-            <PosNav
-              items={[
-                {
-                  label: "POS",
-                  path: "/pos",
-                  className: "pos-nav-item-container",
-                },
-                {
-                  label: "QR Scanner",
-                  path: "/qr",
-                  className: "qr-nav-item-container",
-                },
-                {
-                  label: "Status",
-                  path: "/status-member",
-                  className: "status-item-nav-container",
-                },
-              ]}
-            />
-          </div>
         </div>
       </div>
-
-      {/* VISIT RESULT MODAL */}
 
       <Modal
         className="modal-box"
@@ -242,12 +204,12 @@ const QRScannerHome: React.FC = () => {
             <div className="form-group">
               <div
                 className={`employee-message ${
-                  visitResult?.visit?.access_granted
+                  visitResult.visit.access_granted
                     ? "employee-message-success"
                     : "employee-message-error"
                 }`}
               >
-                {visitResult?.message || "No message available."}
+                {visitResult.message || "No message available."}
               </div>
             </div>
 
@@ -271,8 +233,6 @@ const QRScannerHome: React.FC = () => {
           </div>
         )}
       </Modal>
-
-      {/* SEARCH MEMBER MODAL */}
 
       <Modal
         className="modal-box"
@@ -437,9 +397,11 @@ const QRScannerHome: React.FC = () => {
           </div>
         </div>
       </Modal>
-      <LogoutModal
-        isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
+
+      <EmployeeMenu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+        onBeforeLogout={() => stopQrScanner()}
       />
     </div>
   );
