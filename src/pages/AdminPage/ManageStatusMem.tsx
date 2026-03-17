@@ -7,7 +7,6 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
-import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 import { getVisitsByMemberId, Visit } from "../../logicHandlers/visits";
 import {
@@ -17,8 +16,7 @@ import {
   updateMember,
 } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
-
-import QRCode from "react-qr-code";
+import QrCodeModal from "../../components/Reusable/QrCodeModal";
 
 interface RouteParams {
   memberId: string;
@@ -178,25 +176,16 @@ const ManageStatusMemPage: React.FC = () => {
         </div>
       </div>
 
-      <Modal
-        className="modal-box"
+      <QrCodeModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="DONDON'S FITNESS GYM"
-        headerImage={<IonImg src={dondonLogo} className="modal-dondon-logo" />}
-      >
-        <div className="qr-wrapper">
-          {member ? (
-            <QRCode value={member.member_id} size={250} />
-          ) : (
-            <p>Loading QR...</p>
-          )}
-        </div>
-
-        <p className="qr-member-name">
-          {member ? `${member.first_name} ${member.last_name}` : "Loading..."}
-        </p>
-      </Modal>
+        qrValue={member?.member_id}
+        memberName={member ? `${member.first_name} ${member.last_name}` : ""}
+        logoSrc={dondonLogo}
+        downloadFileName={
+          member ? `${member.first_name}-${member.last_name}-qr` : "member-qr"
+        }
+      />
 
       <Modal
         isOpen={showDeleteModal}

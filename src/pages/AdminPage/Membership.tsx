@@ -14,6 +14,11 @@ import {
   getMembershipTypes,
   MembershipTypeResponse,
 } from "../../logicHandlers/membershipCrud";
+import {
+  getGymPricing,
+  updateGymPricing,
+  GymPricing,
+} from "../../logicHandlers/gymPricing";
 import AdminMenu from "../../components/Reusable/AdminMenu";
 
 const MembershipPage: React.FC = () => {
@@ -28,16 +33,14 @@ const MembershipPage: React.FC = () => {
   const [price, setPrice] = useState(0);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [durationMonths, setDurationMonths] = useState(0);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const [gymPricing, setGymPricing] = useState<GymPricing | null>(null);
+  const [dailyRateInput, setDailyRateInput] = useState("");
   const [isEditDailyRateOpen, setIsEditDailyRateOpen] = useState(false);
   const [isConfirmDailyRateOpen, setIsConfirmDailyRateOpen] = useState(false);
-  const [dailyRateInput, setDailyRateInput] = useState("");
-
-  const membershipTypeLabel: Record<number, string> = {
-    0: "Postpaid",
-    1: "Prepaid",
-    2: "Discount",
-  };
+  const [isSavingDailyRate, setIsSavingDailyRate] = useState(false);
 
   const loadMemberships = async () => {
     try {
@@ -51,7 +54,17 @@ const MembershipPage: React.FC = () => {
     }
   };
 
+  const loadGymPricing = async () => {
+    try {
+      const data = await getGymPricing();
+      setGymPricing(data);
+    } catch (error) {
+      console.error("Failed to fetch gym pricing:", error);
+    }
+  };
+
   useEffect(() => {
+    loadGymPricing();
     loadMemberships();
   }, []);
 
@@ -99,13 +112,37 @@ const MembershipPage: React.FC = () => {
       console.log("Membership created:", res);
 
       handleCloseModal();
-      loadMemberships(); // refresh cards after add
+      loadMemberships();
     } catch (error) {
       console.error("Failed to create membership type:", error);
     }
   };
 
-  const topMembership = memberships[0];
+  const handleConfirmDailyRateUpdate = async () => {
+    try {
+      const newRate = Number(dailyRateInput);
+
+      if (dailyRateInput.trim() === "" || isNaN(newRate) || newRate < 0) {
+        alert("Please enter a valid daily rate.");
+        return;
+      }
+
+      setIsSavingDailyRate(true);
+
+      const updatedPricing = await updateGymPricing(newRate);
+      setGymPricing(updatedPricing);
+
+      setIsConfirmDailyRateOpen(false);
+      setIsEditDailyRateOpen(false);
+
+      alert("Daily rate updated successfully.");
+    } catch (error) {
+      console.error("Failed to update daily rate:", error);
+      alert("Failed to update daily rate.");
+    } finally {
+      setIsSavingDailyRate(false);
+    }
+  };
 
   return (
     <div className="admin-dashboard-container">
@@ -123,6 +160,7 @@ const MembershipPage: React.FC = () => {
             Membership <br />
             Plans
           </h1>
+
           <IonIcon
             icon={menuOutline}
             className="menu-icon"
@@ -133,10 +171,10 @@ const MembershipPage: React.FC = () => {
         <div className="membership-top-card">
           <POSCard
             productName={"Daily Rate"}
-            price={55}
+            price={gymPricing?.base_day_pass_price ?? 55}
             buttonLabel="Edit amount"
             onButtonClick={() => {
-              setDailyRateInput(String(topMembership.price ?? 55));
+              setDailyRateInput(String(gymPricing?.base_day_pass_price ?? 55));
               setIsEditDailyRateOpen(true);
             }}
           />
@@ -147,21 +185,19 @@ const MembershipPage: React.FC = () => {
             {loading ? (
               <p>Loading membership types...</p>
             ) : memberships.length > 0 ? (
-              <>
-                {memberships.map((membership) => (
-                  <POSCard
-                    key={membership.membership_id}
-                    productName={membership.name}
-                    price={membership.price}
-                    buttonLabel="Edit amount"
-                    onButtonClick={() =>
-                      history.push(
-                        `/admin-edit-membership/${membership.membership_id}`,
-                      )
-                    }
-                  />
-                ))}
-              </>
+              memberships.map((membership) => (
+                <POSCard
+                  key={membership.membership_id}
+                  productName={membership.name}
+                  price={membership.price}
+                  buttonLabel="Edit amount"
+                  onButtonClick={() =>
+                    history.push(
+                      `/admin-edit-membership/${membership.membership_id}`,
+                    )
+                  }
+                />
+              ))
             ) : (
               <p>No membership types found.</p>
             )}
@@ -258,6 +294,7 @@ const MembershipPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+
       <Modal
         className="modal-box"
         isOpen={isEditDailyRateOpen}
@@ -294,6 +331,17 @@ const MembershipPage: React.FC = () => {
               type="button"
               className="btn-modal btn-submit-modal"
               onClick={() => {
+                const newRate = Number(dailyRateInput);
+
+                if (
+                  dailyRateInput.trim() === "" ||
+                  isNaN(newRate) ||
+                  newRate < 0
+                ) {
+                  alert("Please enter a valid daily rate.");
+                  return;
+                }
+
                 setIsEditDailyRateOpen(false);
                 setIsConfirmDailyRateOpen(true);
               }}
@@ -334,24 +382,24 @@ const MembershipPage: React.FC = () => {
             <Button
               type="button"
               className="btn-modal btn-submit-modal"
-              onClick={() => {
-                console.log("New Daily Rate:", dailyRateInput);
-                setIsConfirmDailyRateOpen(false);
-              }}
+              onClick={handleConfirmDailyRateUpdate}
+              disabled={isSavingDailyRate}
             >
-              Yes
+              {isSavingDailyRate ? "Saving..." : "Yes"}
             </Button>
 
             <Button
               type="button"
               className="btn-modal"
               onClick={() => setIsConfirmDailyRateOpen(false)}
+              disabled={isSavingDailyRate}
             >
               No
             </Button>
           </div>
         </div>
       </Modal>
+
       <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
