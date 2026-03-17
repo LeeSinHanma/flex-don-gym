@@ -371,4 +371,13 @@
   .pos-nav button {
     width: 100%;
   }
+
+  .btn-add-member {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .add-member-container {
+    padding-bottom: 2rem;
+  }
 }
