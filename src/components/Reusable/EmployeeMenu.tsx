@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Modal } from "../../components/Reusable/Modals";
 import { Button } from "../../components/Reusable/Button";
 import { logout } from "../../logicHandlers/userServices";
+import LogoutModal from "../../components/Reusable/LogoutModal";
 
 interface EmployeeMenuProps {
   isOpen: boolean;
@@ -71,40 +72,10 @@ const EmployeeMenu: React.FC<EmployeeMenuProps> = ({
           </Button>
         </div>
       </Modal>
-
-      <Modal
-        className="modal-box"
+      <LogoutModal
         isOpen={showLogoutConfirm}
-        showCloseButton={false}
-        title="Confirm Logout"
         onClose={() => setShowLogoutConfirm(false)}
-      >
-        <div className="employee-form">
-          <div className="form-group" style={{ textAlign: "center" }}>
-            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-              Are you sure you want to log out?
-            </p>
-          </div>
-
-          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
-            <Button
-              type="button"
-              className="btn-modal btn-submit-modal"
-              onClick={handleConfirmLogout}
-            >
-              Yes
-            </Button>
-
-            <Button
-              type="button"
-              className="btn-modal"
-              onClick={() => setShowLogoutConfirm(false)}
-            >
-              No
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      />
     </>
   );
 };
