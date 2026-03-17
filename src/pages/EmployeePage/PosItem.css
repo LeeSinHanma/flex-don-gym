@@ -20,7 +20,7 @@
   max-width: 440px;
   border-radius: 0.375rem;
   height: 95vh;
-  overflow: hidden; /* ✅ hard block on outer container */
+  overflow: hidden;
 }
 
 /* ✅ UNTOUCHED */
@@ -38,7 +38,6 @@
   border: none;
   width: 400px;
   height: 50px;
-  color: #04354f;
 }
 
 /* ✅ UNTOUCHED */
@@ -79,18 +78,19 @@
   flex-shrink: 0;
 }
 
-/* ✅ No scroll — hidden overflow only */
+/* ✅ Added min-height: 0 so flex child can shrink and allow scroll */
 .pos-item-content {
   flex: 1;
+  min-height: 0; /* ✅ critical fix */
   width: 100%;
-  overflow: hidden; /* changed from overflow-y: auto */
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding-right: 4px;
 }
 
-/* ✅ No scroll on wrapper either */
+/* ✅ UNTOUCHED */
 .pos-item-description-wrapper {
   width: 100%;
   max-height: 120px;
@@ -99,10 +99,10 @@
   align-items: flex-start;
 }
 
-/* ✅ Shrinks font, normal weight, no scroll */
+/* ✅ UNTOUCHED */
 .pos-item-description {
-  font-size: clamp(0.55rem, 1.5vw, 0.875rem); /* shrinks more aggressively */
-  font-weight: normal; /* changed from default bold */
+  font-size: clamp(0.55rem, 1.5vw, 0.875rem);
+  font-weight: normal;
   line-height: 1.4;
   color: #333;
   width: 100%;
@@ -110,24 +110,34 @@
   overflow: hidden;
 }
 
-/* ✅ Stock/quantity label — normal weight */
+/* ✅ UNTOUCHED */
 .pos-item-stock {
   font-weight: normal;
   font-size: clamp(0.6rem, 1.5vw, 0.85rem);
 }
 
-/* ✅ Card list container */
+/* ✅ Added min-height: 0 here too */
 .pos-item-card-list {
   flex: 1;
+  min-height: 0; /* ✅ critical fix */
   width: 100%;
   overflow-y: auto;
-  display: flex;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+
   flex-direction: column;
   gap: 0.5rem;
   padding: 0 4px;
+  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 
-/* Mobile Responsiveness */
+/* ✅ Hide scrollbar for Chrome/Safari/Opera */
+.pos-item-card-list::-webkit-scrollbar {
+  display: none;
+}
+
+/* ✅ UNTOUCHED */
 @media (max-width: 480px) {
   .item-main-container {
     max-width: 100%;
@@ -143,5 +153,16 @@
 
   .pos-item-card-list {
     gap: 0.4rem;
+  }
+
+  /* Button styling for mobile */
+  .pos-card-btn {
+    width: 90px;
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .pos-counter-btn {
+    font-size: 14px;
   }
 }
