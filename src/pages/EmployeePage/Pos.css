@@ -119,9 +119,17 @@
 }
 
 .pos-card-item {
-  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pos-card-item::-webkit-scrollbar {
+  display: none;
 }
 
 .pos-cards-container {

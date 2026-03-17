@@ -1,12 +1,33 @@
-/* Card Wrapper */
+/* ✅ FIXED — was expanding freely, blocking scroll */
+.pos-cards-container {
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0; /* ✅ critical */
+  overflow-y: auto; /* ✅ scroll lives here if you use this as the scroll container */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ Slim scrollbar */
+.pos-cards-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pos-cards-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pos-cards-container::-webkit-scrollbar-thumb {
+  background-color: #c5c5c5;
+  border-radius: 10px;
+}
+
+/* ✅ UNTOUCHED */
 .pos-card-item {
   width: 100%;
 }
-
-.pos-cards-container {
-  padding: 4px 0;
-}
-
 /* Main Card */
 .pos-status-card {
   display: flex;
