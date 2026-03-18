@@ -255,7 +255,12 @@
 #qr-reader video {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* keeps aspect ratio + fits */
+  object-fit: contain;
+  transform: scaleX(1);
+  transition: transform 0.2s ease;
+}
+
+.camera-container.mirrored #qr-reader video {
   transform: scaleX(-1);
 }
 

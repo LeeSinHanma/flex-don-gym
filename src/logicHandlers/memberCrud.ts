@@ -9,7 +9,7 @@ export type Member = {
   contact_number: string;
   first_name: string;
   last_name: string;
-  membership_type: number; // 0 = Member, 1 = Casual (based on your data)
+  membership_type: number;
   membership_plan_id: number;
   membership_expiry: string | null;
   credits: number;
@@ -17,6 +17,18 @@ export type Member = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type CreateMemberPayload = {
+  email: string;
+  contact_number: string;
+  first_name: string;
+  last_name: string;
+  membership_plan_id: number;
+  credits: number;
+  registered_by: string | number;
+  payment_method: string;
+  amount_given: number;
 };
 
 // ---------- Helpers ----------
@@ -29,15 +41,9 @@ function getErrorMessage(err: unknown): string {
 }
 
 // ✅ POST /members/create
-export async function createMember(payload: {
-  email: string;
-  contact_number: string;
-  first_name: string;
-  last_name: string;
-  membership_plan_id: number;
-  credits: number;
-  registered_by: string;
-}): Promise<APIResponse> {
+export async function createMember(
+  payload: CreateMemberPayload,
+): Promise<APIResponse> {
   try {
     const res = await api.post<APIResponse>("/members/create", payload);
     return res.data;
@@ -46,7 +52,7 @@ export async function createMember(payload: {
   }
 }
 
-// ✅ GET /members/all  (returns Member[])
+// ✅ GET /members/all
 export async function getMembers(): Promise<Member[]> {
   try {
     const res = await api.get<Member[]>("/members/all");
@@ -61,7 +67,7 @@ export async function getMemberByName(name: string): Promise<Member[]> {
   try {
     const res = await api.get<Member[]>("/members/search", {
       params: {
-        name_query: name, // 👈 MUST match backend exactly
+        name_query: name,
       },
     });
 
@@ -71,10 +77,12 @@ export async function getMemberByName(name: string): Promise<Member[]> {
   }
 }
 
-// ✅ GET /members/by-id/{member_id}  (returns Member[])
+// ✅ GET /members/by-id/{member_id}
 export async function getMemberById(memberId: string): Promise<Member> {
   try {
-    const res = await api.get<Member>(`/members/by-id/${memberId}`);
+    const res = await api.get<Member>(
+      `/members/by-id/${encodeURIComponent(memberId)}`,
+    );
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
@@ -84,19 +92,27 @@ export async function getMemberById(memberId: string): Promise<Member> {
 // ✅ DELETE /members/delete/{member_id}
 export async function deleteMember(memberId: string): Promise<APIResponse> {
   try {
-    const res = await api.delete<APIResponse>(`/members/delete/${memberId}`);
+    const res = await api.delete<APIResponse>(
+      `/members/delete/${encodeURIComponent(memberId)}`,
+    );
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
   }
 }
 
-// ✅ UPDATE /members/update/{member_id}
-export async function updateMember(member_id: string, payload: any) {
-  const res = await api.put(
-    `/members/update/${encodeURIComponent(member_id)}`,
-    payload,
-  );
-
-  return res.data;
+// ✅ PUT /members/update/{member_id}
+export async function updateMember(
+  member_id: string,
+  payload: any,
+): Promise<APIResponse> {
+  try {
+    const res = await api.put<APIResponse>(
+      `/members/update/${encodeURIComponent(member_id)}`,
+      payload,
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
 }

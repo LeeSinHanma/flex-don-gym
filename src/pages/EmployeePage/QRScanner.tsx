@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
@@ -13,6 +13,8 @@ import { IonIcon, IonImg } from "@ionic/react";
 import { search, menu } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
 import dondonLogo from "../../resource/dondon-logo.png";
+import scanSound from "../../resource/scanSound.mp3";
+import scanError from "../../resource/scanError.mp3";
 
 type ScanVisitResult = {
   visit: {
@@ -42,6 +44,28 @@ const QRScannerHome: React.FC = () => {
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [isMirrored, setIsMirrored] = useState(false);
+  const scanAudio = useRef<HTMLAudioElement | null>(null);
+  const errorAudio = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    scanAudio.current = new Audio(scanSound);
+    errorAudio.current = new Audio(scanError);
+  }, []);
+
+  const playSuccessSound = () => {
+    if (scanAudio.current) {
+      scanAudio.current.currentTime = 0;
+      scanAudio.current.play().catch(() => {});
+    }
+  };
+
+  const playErrorSound = () => {
+    if (errorAudio.current) {
+      errorAudio.current.currentTime = 0;
+      errorAudio.current.play().catch(() => {});
+    }
+  };
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
@@ -64,20 +88,27 @@ const QRScannerHome: React.FC = () => {
         direction: "inbound",
       });
 
+      if (result.visit.access_granted) {
+        playSuccessSound();
+      } else {
+        playErrorSound();
+      }
+
       setVisitResult(result);
       setShowModal(true);
     } catch (err: any) {
       console.error("Failed to scan visit:", err?.message || err);
+      playErrorSound();
     }
   }, []);
 
   const restartScanner = useCallback(async () => {
     await stopQrScanner();
-    await startQrScanner("member", handleDecoded);
+    await startQrScanner("qr-reader", handleDecoded);
   }, [handleDecoded]);
 
   useEffect(() => {
-    startQrScanner("member", handleDecoded);
+    startQrScanner("qr-reader", handleDecoded);
 
     return () => {
       stopQrScanner();
@@ -112,6 +143,19 @@ const QRScannerHome: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [searchText, showSearchModal]);
 
+  const lastTap = useRef(0);
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      setIsMirrored((prev) => !prev);
+    }
+
+    lastTap.current = now;
+  };
+
   return (
     <div className="main-qr-container">
       <div className="main-container">
@@ -142,7 +186,10 @@ const QRScannerHome: React.FC = () => {
           </div>
         </div>
 
-        <div className="camera-container">
+        <div
+          className={`camera-container ${isMirrored ? "mirrored" : ""}`}
+          onClick={handleDoubleTap}
+        >
           <div id="qr-reader" />
         </div>
 
@@ -378,6 +425,7 @@ const QRScannerHome: React.FC = () => {
                     "Failed to scan selected member:",
                     err?.message || err,
                   );
+                  playErrorSound();
                 }
               }}
             >
