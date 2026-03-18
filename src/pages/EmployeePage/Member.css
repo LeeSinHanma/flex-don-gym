@@ -1,5 +1,6 @@
 .member-menu-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #d1d5db; /* Gray-300 equivalent */
   display: flex;
   flex-direction: column;
@@ -260,4 +261,12 @@ input:focus {
   color: #b91c1c;
   text-align: center;
   margin: 0;
+}
+
+@media (max-width: 480px) {
+  .qr-wrapper {
+    width: min(88vw, 280px);
+    border-width: 2px;
+    border-radius: 8px;
+  }
 }

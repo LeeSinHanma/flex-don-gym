@@ -19,6 +19,7 @@
   width: 100%;
   max-width: 440px;
   height: 95vh;
+  height: 95dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -231,7 +232,9 @@
 @media (max-width: 480px) {
   .admin-dashboard-container .main-container {
     height: 100vh;
+    height: 100dvh;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
   }
