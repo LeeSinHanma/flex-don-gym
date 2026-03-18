@@ -44,6 +44,7 @@ const QRScannerHome: React.FC = () => {
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [isMirrored, setIsMirrored] = useState(false);
   const scanAudio = useRef<HTMLAudioElement | null>(null);
   const errorAudio = useRef<HTMLAudioElement | null>(null);
 
@@ -142,6 +143,19 @@ const QRScannerHome: React.FC = () => {
     return () => clearTimeout(timeout);
   }, [searchText, showSearchModal]);
 
+  const lastTap = useRef(0);
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      setIsMirrored((prev) => !prev);
+    }
+
+    lastTap.current = now;
+  };
+
   return (
     <div className="main-qr-container">
       <div className="main-container">
@@ -172,7 +186,10 @@ const QRScannerHome: React.FC = () => {
           </div>
         </div>
 
-        <div className="camera-container">
+        <div
+          className={`camera-container ${isMirrored ? "mirrored" : ""}`}
+          onClick={handleDoubleTap}
+        >
           <div id="qr-reader" />
         </div>
 

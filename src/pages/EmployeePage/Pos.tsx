@@ -36,7 +36,7 @@ const PosPage: React.FC = () => {
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const scanAudio = useRef<HTMLAudioElement | null>(null);
   const errorAudio = useRef<HTMLAudioElement | null>(null);
-
+  const [isMirrored, setIsMirrored] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
@@ -44,7 +44,7 @@ const PosPage: React.FC = () => {
     "success" | "error" | "warning" | "info"
   >("info");
 
-    const playSuccessSound = () => {
+  const playSuccessSound = () => {
     if (scanAudio.current) {
       scanAudio.current.currentTime = 0;
       scanAudio.current.play().catch(() => {});
@@ -207,6 +207,19 @@ const PosPage: React.FC = () => {
     0,
   );
 
+  const lastTap = useRef(0);
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      setIsMirrored((prev) => !prev);
+    }
+
+    lastTap.current = now;
+  };
+
   return (
     <div className="pos-main-container">
       <div className="pos-container">
@@ -233,7 +246,10 @@ const PosPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="barcode">
+        <div
+          className={`barcode ${isMirrored ? "mirrored" : ""}`}
+          onClick={handleDoubleTap}
+        >
           <div id="qr-reader" style={{ width: "100%" }}></div>
         </div>
 
