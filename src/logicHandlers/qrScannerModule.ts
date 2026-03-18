@@ -1,48 +1,36 @@
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
-let qr: Html5Qrcode | null = null;
-let isStarting = false;
-let isHandlingScan = false;
+let qrScanner: Html5Qrcode | null = null;
+let isStartingQr = false;
+let isHandlingQrScan = false;
 
-export type ScanMode = "member" | "product";
-
-const FORMATS: Record<ScanMode, Html5QrcodeSupportedFormats[]> = {
-  member: [Html5QrcodeSupportedFormats.QR_CODE],
-  product: [
-    Html5QrcodeSupportedFormats.CODE_128,
-    Html5QrcodeSupportedFormats.CODE_39,
-    Html5QrcodeSupportedFormats.EAN_13,
-    Html5QrcodeSupportedFormats.EAN_8,
-    Html5QrcodeSupportedFormats.UPC_A,
-    Html5QrcodeSupportedFormats.UPC_E,
-  ],
-};
+const QR_FORMATS: Html5QrcodeSupportedFormats[] = [
+  Html5QrcodeSupportedFormats.QR_CODE,
+];
 
 export async function startQrScanner(
-  mode: ScanMode,
+  elementId: string,
   onScan: (decodedText: string) => void | Promise<void>,
   onError?: (err: string) => void,
   stopAfterScan: boolean = false,
 ) {
-  if (qr || isStarting) return;
-  isStarting = true;
+  if (qrScanner || isStartingQr) return;
+  isStartingQr = true;
 
   try {
-    const elementId = "qr-reader";
-
-    qr = new Html5Qrcode(elementId, {
+    qrScanner = new Html5Qrcode(elementId, {
       verbose: false,
-      formatsToSupport: FORMATS[mode],
+      formatsToSupport: QR_FORMATS,
     });
 
-    isHandlingScan = false;
+    isHandlingQrScan = false;
 
-    await qr.start(
+    await qrScanner.start(
       { facingMode: "environment" },
       { fps: 10, qrbox: { width: 250, height: 250 } },
       async (decodedText) => {
-        if (isHandlingScan) return;
-        isHandlingScan = true;
+        if (isHandlingQrScan) return;
+        isHandlingQrScan = true;
 
         try {
           await Promise.resolve(onScan(decodedText));
@@ -53,7 +41,7 @@ export async function startQrScanner(
             await stopQrScanner();
           } else {
             setTimeout(() => {
-              isHandlingScan = false;
+              isHandlingQrScan = false;
             }, 1500);
           }
         }
@@ -64,23 +52,23 @@ export async function startQrScanner(
     );
   } catch (e: any) {
     onError?.(e?.message ?? String(e));
-    qr = null;
+    qrScanner = null;
   } finally {
-    isStarting = false;
+    isStartingQr = false;
   }
 }
 
 export async function stopQrScanner() {
-  if (!qr) return;
+  if (!qrScanner) return;
 
   try {
-    await qr.stop();
+    await qrScanner.stop();
   } catch {}
 
   try {
-    await qr.clear();
+    await qrScanner.clear();
   } catch {}
 
-  qr = null;
-  isHandlingScan = false;
+  qrScanner = null;
+  isHandlingQrScan = false;
 }
