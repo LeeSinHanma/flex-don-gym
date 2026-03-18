@@ -86,10 +86,10 @@ const EmployeeMenu: React.FC<EmployeeMenuProps> = ({
             </p>
           </div>
 
-          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+          <div className="modal-actions">
             <Button
               type="button"
-              className="btn-modal btn-submit-modal"
+              className="modal-action-btn modal-action-btn-primary"
               onClick={handleConfirmLogout}
             >
               Yes
@@ -97,7 +97,7 @@ const EmployeeMenu: React.FC<EmployeeMenuProps> = ({
 
             <Button
               type="button"
-              className="btn-modal"
+              className="modal-action-btn modal-action-btn-danger"
               onClick={() => setShowLogoutConfirm(false)}
             >
               No

@@ -84,102 +84,105 @@ const ManageStatusMemPage: React.FC = () => {
           </BackButton>
           <h2>Manage Member</h2>
         </div>
-        <div className="member-container member-container-member">
-          <div className="member-info">
-            <h2 className="member-name">
-              <div>
-                {member
-                  ? `${member.first_name} ${member.last_name}`
-                  : "Loading..."}
+        <div className="status-content-scroll">
+          <div className="member-container member-container-member">
+            <div className="member-info">
+              <h2 className="member-name">
+                <div>
+                  {member
+                    ? `${member.first_name} ${member.last_name}`
+                    : "Loading..."}
+                </div>
+              </h2>
+
+              <div className="member-details">
+                <h4 className="member-type">
+                  <strong>Contact Number:</strong>{" "}
+                  {member?.contact_number || "Loading..."}
+                </h4>
+
+                <h4 className="member-type">
+                  <strong>Membership Type:</strong>{" "}
+                  {membershipName || "Loading..."}
+                </h4>
+
+                <h4 className="member-type">
+                  <strong>Credits:</strong> {member?.credits ?? 0}
+                </h4>
+
+                <h4 className="member-duration">
+                  <strong>End of Membership:</strong>{" "}
+                  {member?.membership_expiry
+                    ? formatDateDash(member.membership_expiry)
+                    : "No Expiry"}
+                </h4>
               </div>
-            </h2>
-
-            <div className="member-details">
-              <h4 className="member-type">
-                <strong>Contact Number:</strong>{" "}
-                {member?.contact_number || "Loading..."}
-              </h4>
-
-              <h4 className="member-type">
-                <strong>Membership Type:</strong>{" "}
-                {membershipName || "Loading..."}
-              </h4>
-
-              <h4 className="member-type">
-                <strong>Credits:</strong> {member?.credits ?? 0}
-              </h4>
-
-              <h4 className="member-duration">
-                <strong>End of Membership:</strong>{" "}
-                {member?.membership_expiry
-                  ? formatDateDash(member.membership_expiry)
-                  : "No Expiry"}
-              </h4>
             </div>
           </div>
-        </div>
-        <div className="middle-container">
-          <div className="history-box">
-            <p className="history-info">History:</p>
+          <div className="middle-container">
+            <div className="history-box">
+              <p className="history-info">History:</p>
 
-            {visits.length === 0 ? (
-              <p>No visit history found.</p>
-            ) : (
-              visits.map((visit) => (
-                <div key={visit.visit_id} className="history-item">
-                  <p>
-                    <strong>{visit.direction}</strong> - {formatDateTime(visit.created_at)}
-                  </p>
-                  <p>
-                    Access: {visit.access_granted ? "Granted" : "Denied"}
-                  </p>
-                  {!visit.access_granted && visit.denial_reason && (
-                    <p>Reason: {visit.denial_reason}</p>
-                  )}
-                  {visit.amount_paid > 0 && <p>Amount Paid: ₱{visit.amount_paid}</p>}
-                </div>
-              ))
-            )}
+              {visits.length === 0 ? (
+                <p>No visit history found.</p>
+              ) : (
+                visits.map((visit) => (
+                  <div key={visit.visit_id} className="history-item">
+                    <p>
+                      <strong>{visit.direction}</strong> -{" "}
+                      {formatDateTime(visit.created_at)}
+                    </p>
+                    <p>Access: {visit.access_granted ? "Granted" : "Denied"}</p>
+                    {!visit.access_granted && visit.denial_reason && (
+                      <p>Reason: {visit.denial_reason}</p>
+                    )}
+                    {visit.amount_paid > 0 && (
+                      <p>Amount Paid: ₱{visit.amount_paid}</p>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <Button
+              className="btn-qr"
+              type="button"
+              onClick={() => setShowModal(true)}
+            >
+              Show QR Code
+            </Button>
           </div>
 
-          <Button
-            className="btn-qr"
-            type="button"
-            onClick={() => setShowModal(true)}
-          >
-            Show QR Code
-          </Button>
-        </div>
-
-        <div className="status-button-container">
-          <div className="status-button">
-            <Button
-              type="button"
-              className="renew-btn"
-              onClick={() => history.push(`/members/edit/${memberId}`)}
-            >
-              Edit
-            </Button>
-            <Button
-              type="button"
-              className="renew-btn"
-              onClick={() => setShowRenewModal(true)}
-            >
-              Renew
-            </Button>
-            <Button
-              type="button"
-              className="cancel-btn"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              Delete
-            </Button>
+          <div className="status-button-container">
+            <div className="status-button">
+              <Button
+                type="button"
+                className="renew-btn"
+                onClick={() => history.push(`/members/edit/${memberId}`)}
+              >
+                Edit
+              </Button>
+              <Button
+                type="button"
+                className="renew-btn"
+                onClick={() => setShowRenewModal(true)}
+              >
+                Renew
+              </Button>
+              <Button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setShowDeleteModal(true)}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       <Modal
-        className="modal-box"
+        className="modal-box qr-modal"
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         title="DONDON'S FITNESS GYM"

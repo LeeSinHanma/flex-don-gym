@@ -318,7 +318,7 @@ const MemberMenu: React.FC = () => {
         </Modal>
 
         <Modal
-          className="modal-box"
+          className="modal-box qr-modal"
           isOpen={showQrModal}
           showCloseButton={false}
           onClose={() => setShowQrModal(false)}
@@ -337,13 +337,10 @@ const MemberMenu: React.FC = () => {
                 {acceptedData.firstName} {acceptedData.lastName}
               </p>
 
-              <div
-                className="form-actions"
-                style={{ display: "flex", gap: 10, marginTop: 15 }}
-              >
+              <div className="modal-actions">
                 <Button
                   type="button"
-                  className="btn-modal btn-submit-modal"
+                  className="modal-action-btn modal-action-btn-primary"
                   onClick={() => setShowQrModal(false)}
                 >
                   Close

@@ -1,5 +1,6 @@
 .member-menu-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #d1d5db; /* Gray-300 equivalent */
   display: flex;
   flex-direction: column;
@@ -126,9 +127,23 @@ input:focus {
 }
 
 .qr-wrapper {
-  margin-top: 10px;
   display: flex;
+  align-items: center;
   justify-content: center;
+  padding: clamp(8px, 2.5vw, 12px);
+  border: 3px solid #0084c9;
+  border-radius: 10px;
+  margin: 0 auto;
+  width: min(82vw, 320px);
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+}
+
+.qr-wrapper svg {
+  width: 100%;
+  height: 100%;
+  max-width: 260px;
+  max-height: 260px;
 }
 
 .qr-value-text {
@@ -153,4 +168,12 @@ input:focus {
   color: #b91c1c;
   text-align: center;
   margin: 0;
+}
+
+@media (max-width: 480px) {
+  .qr-wrapper {
+    width: min(88vw, 280px);
+    border-width: 2px;
+    border-radius: 8px;
+  }
 }
