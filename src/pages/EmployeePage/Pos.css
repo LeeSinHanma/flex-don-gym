@@ -63,16 +63,31 @@
 .btn-checkout {
   width: 160px;
   height: 50px;
-  background-color: #af2828;
+  background-color: #af0a0a;
 }
 
 .barcode {
   width: 100%;
-  max-width: 400px;
-  height: 130px;
+  height: 220px;
   background-color: #71707040;
   border-radius: 25px;
-  margin: 0 auto;
+  overflow: hidden; /* IMPORTANT */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#qr-reader {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* video inside scanner */
+#qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover; /* fills nicely */
+  border-radius: 25px;
 }
 
 .shopping-info {

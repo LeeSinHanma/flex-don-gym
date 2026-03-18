@@ -1,8 +1,11 @@
 import React, { useRef } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
+import * as htmlToImage from "html-to-image";
+import QRCode from "react-qr-code";
 import { Modal } from "./Modals";
 import { Button } from "./Button";
-import QRCode from "react-qr-code";
-import * as htmlToImage from "html-to-image";
 
 type QrCodeModalProps = {
   isOpen: boolean;
@@ -29,21 +32,46 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
     if (!qrCardRef.current || !qrValue) return;
 
     try {
-      const dataUrl = await htmlToImage.toPng(qrCardRef.current, {
+      const node = qrCardRef.current;
+
+      const dataUrl = await htmlToImage.toPng(node, {
         cacheBust: true,
         pixelRatio: 3,
         backgroundColor: "#ffffff",
         canvasWidth: 360,
-        canvasHeight: qrCardRef.current.offsetHeight,
+        canvasHeight: node.offsetHeight,
       });
 
-      const link = document.createElement("a");
-      link.download = `${downloadFileName}.png`;
-      link.href = dataUrl;
-      link.click();
+      const fileName = `${downloadFileName}.png`;
+      const platform = Capacitor.getPlatform();
+
+      // Web browser download
+      if (platform === "web") {
+        const link = document.createElement("a");
+        link.download = fileName;
+        link.href = dataUrl;
+        link.click();
+        return;
+      }
+
+      // Android / iOS installed app
+      const base64Data = dataUrl.split(",")[1];
+
+      const savedFile = await Filesystem.writeFile({
+        path: fileName,
+        data: base64Data,
+        directory: Directory.Cache,
+      });
+
+      await Share.share({
+        title: "QR Code",
+        text: memberName ? `${memberName} QR Code` : "QR Code",
+        url: savedFile.uri,
+        dialogTitle: "Save or share QR Code",
+      });
     } catch (error) {
-      console.error("Failed to download QR image:", error);
-      alert("Failed to download QR image.");
+      console.error("Failed to export QR image:", error);
+      alert("Failed to save QR image.");
     }
   };
 

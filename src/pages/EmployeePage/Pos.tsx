@@ -6,11 +6,14 @@ import { IonIcon } from "@ionic/react";
 import { filter, menu } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
+import scanSound from "../../resource/scanSound.mp3";
+import scanError from "../../resource/scanError.mp3";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 import {
-  startQrScanner,
-  stopQrScanner,
-} from "../../logicHandlers/qrScannerModule";
+  startBarcodeScanner,
+  stopBarcodeScanner,
+} from "../../logicHandlers/barcodeScannerModule";
 import {
   getInventoryItemById,
   InventoryItem,
@@ -31,6 +34,45 @@ const PosPage: React.FC = () => {
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
+  const scanAudio = useRef<HTMLAudioElement | null>(null);
+  const errorAudio = useRef<HTMLAudioElement | null>(null);
+
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
+    const playSuccessSound = () => {
+    if (scanAudio.current) {
+      scanAudio.current.currentTime = 0;
+      scanAudio.current.play().catch(() => {});
+    }
+  };
+
+  const playErrorSound = () => {
+    if (errorAudio.current) {
+      errorAudio.current.currentTime = 0;
+      errorAudio.current.play().catch(() => {});
+    }
+  };
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
+
+  useEffect(() => {
+    scanAudio.current = new Audio(scanSound);
+    errorAudio.current = new Audio(scanError);
+  }, []);
 
   useEffect(() => {
     if (location.state?.cartItems) {
@@ -50,12 +92,42 @@ const PosPage: React.FC = () => {
 
         const item = await getInventoryItemById(itemId);
 
+        if (!item) {
+          playErrorSound();
+          openStatusModal(
+            "Item Not Found",
+            "The scanned barcode does not match any product.",
+            "error",
+          );
+          return;
+        }
+
+        if (item.quantity <= 0) {
+          playErrorSound();
+          openStatusModal(
+            "Out of Stock",
+            `${item.item_name} is currently out of stock.`,
+            "warning",
+          );
+          return;
+        }
+
+        let didAddItem = false;
+        let reachedMaxStock = false;
+
         setCartItems((prev) => {
           const existingItem = prev.find(
             (cartItem) => cartItem.item_id === item.item_id,
           );
 
           if (existingItem) {
+            if (existingItem.cartQuantity >= item.quantity) {
+              reachedMaxStock = true;
+              return prev;
+            }
+
+            didAddItem = true;
+
             return prev.map((cartItem) =>
               cartItem.item_id === item.item_id
                 ? {
@@ -69,16 +141,38 @@ const PosPage: React.FC = () => {
             );
           }
 
+          didAddItem = true;
+
           return [
             ...prev,
             {
               ...item,
-              cartQuantity: item.quantity > 0 ? 1 : 0,
+              cartQuantity: 1,
             },
           ];
         });
+
+        if (reachedMaxStock) {
+          playErrorSound();
+          openStatusModal(
+            "Stock Limit Reached",
+            `You already added the maximum available quantity for ${item.item_name}.`,
+            "warning",
+          );
+          return;
+        }
+
+        if (didAddItem) {
+          playSuccessSound();
+        }
       } catch (error) {
         console.error("Scan handling error:", error);
+        playErrorSound();
+        openStatusModal(
+          "Item Not Found",
+          "The scanned barcode does not match any product.",
+          "error",
+        );
       } finally {
         setTimeout(() => {
           isProcessingScan.current = false;
@@ -86,10 +180,10 @@ const PosPage: React.FC = () => {
       }
     };
 
-    startQrScanner("product", handleScan);
+    startBarcodeScanner("qr-reader", handleScan);
 
     return () => {
-      stopQrScanner();
+      stopBarcodeScanner();
     };
   }, []);
 
@@ -191,7 +285,15 @@ const PosPage: React.FC = () => {
       <EmployeeMenu
         isOpen={showEmployeeMenu}
         onClose={() => setShowEmployeeMenu(false)}
-        onBeforeLogout={() => stopQrScanner()}
+        onBeforeLogout={() => stopBarcodeScanner()}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+        onClose={() => setShowStatusModal(false)}
       />
     </div>
   );
