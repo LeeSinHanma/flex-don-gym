@@ -1,0 +1,60 @@
+.receipt-modal {
+  color: #04354f;
+}
+
+.receipt-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #04354f;
+  font-size: 0.95rem;
+}
+
+.receipt-divider {
+  height: 1px;
+  background-color: #d1d5db;
+  margin: 0.25rem 0;
+}
+
+.receipt-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.receipt-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  color: #04354f;
+}
+
+.receipt-item-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.receipt-item-price {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.receipt-change {
+  font-weight: 700;
+}
+
+.receipt-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
