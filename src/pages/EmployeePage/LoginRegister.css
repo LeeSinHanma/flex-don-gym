@@ -1,6 +1,7 @@
 /* Centered container for the entire component */
 .login-register-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #d1d5db; /* Gray-300 equivalent */
   display: flex;
   flex-direction: column;

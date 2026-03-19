@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import { Button } from "../../components/Reusable/Button";
@@ -8,6 +8,10 @@ import POSCard from "../../components/Reusable/PosCard";
 import "./PosItem.css";
 import "./PosCheckout.css";
 import { InventoryItem } from "../../logicHandlers/itemInvCrud";
+import { createSale } from "../../logicHandlers/salesHandler";
+import ReceiptModal from "../../components/Reusable/ReceiptModal";
+import TransacModal from "../../components/Reusable/TransacModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 type CartItem = InventoryItem & {
   cartQuantity: number;
@@ -25,28 +29,88 @@ const PosCheckout: React.FC = () => {
   const cartItems = location.state?.cartItems ?? [];
   const totalAmount = location.state?.totalAmount ?? 0;
 
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [receiptSoldBy, setReceiptSoldBy] = useState("");
+  const [receiptPaymentMethod, setReceiptPaymentMethod] = useState<
+    "cash" | "gcash"
+  >("cash");
+  const [receiptAmountGiven, setReceiptAmountGiven] = useState(0);
+  const [showTransacModal, setShowTransacModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"cash" | "gcash">("cash");
+  const [amountGiven, setAmountGiven] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
+
   const handlePlaceOrder = async () => {
     try {
       if (cartItems.length === 0) {
-        console.log("No items in cart");
+        openStatusModal("Empty Cart", "There are no items in the cart.", "info");
         return;
       }
 
-      const orderPayload = {
+      if (paymentMethod === "cash" && Number(amountGiven) < totalAmount) {
+        setShowTransacModal(false);
+
+        openStatusModal(
+          "Insufficient Amount",
+          "The cash amount given is less than the total amount.",
+          "warning"
+        );
+        return;
+      }
+
+      const storedUser = localStorage.getItem("user");
+      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
+      const soldBy =
+        parsedUser?.username ||
+        parsedUser?.name ||
+        parsedUser?.email ||
+        "unknown";
+
+      const finalAmountGiven =
+        paymentMethod === "gcash" ? totalAmount : Number(amountGiven);
+
+      const salePayload = {
+        sold_by: soldBy,
+        payment_method: paymentMethod,
+        amount_given: finalAmountGiven,
         items: cartItems.map((item) => ({
           item_id: item.item_id,
+          item_name: item.item_name,
           quantity: item.cartQuantity,
-          price: item.price,
+          unit_price: item.price,
         })),
-        total_amount: totalAmount,
       };
 
-      console.log("Order to submit:", orderPayload);
+      await createSale(salePayload);
 
-      // later:
-      // await createOrder(orderPayload);
+      // close transaction modal
+      setShowTransacModal(false);
 
-      history.push("/pos");
+      // save values for receipt modal
+      setReceiptSoldBy(soldBy);
+      setReceiptPaymentMethod(paymentMethod);
+      setReceiptAmountGiven(finalAmountGiven);
+
+      // open receipt
+      setShowReceiptModal(true);
     } catch (error) {
       console.error("Checkout failed:", error);
     }
@@ -88,12 +152,45 @@ const PosCheckout: React.FC = () => {
           <Button
             className="btn-checkout"
             type="button"
-            onClick={handlePlaceOrder}
+            onClick={() => setShowTransacModal(true)}
           >
             Place order
           </Button>
         </div>
       </div>
+
+      <ReceiptModal
+        isOpen={showReceiptModal}
+        onClose={() => setShowReceiptModal(false)}
+        onDone={() => {
+          setShowReceiptModal(false);
+          history.push("/pos");
+        }}
+        soldBy={receiptSoldBy}
+        paymentMethod={receiptPaymentMethod}
+        amountGiven={receiptAmountGiven}
+        totalAmount={totalAmount}
+        cartItems={cartItems}
+      />
+
+      <TransacModal
+        isOpen={showTransacModal}
+        onClose={() => setShowTransacModal(false)}
+        onCheckout={handlePlaceOrder}
+        totalAmount={totalAmount}
+        paymentMethod={paymentMethod}
+        setPaymentMethod={setPaymentMethod}
+        amountGiven={amountGiven}
+        setAmountGiven={setAmountGiven}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
     </div>
   );
 };

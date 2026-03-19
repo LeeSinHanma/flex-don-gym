@@ -19,6 +19,7 @@
   width: 100%;
   max-width: 440px;
   height: 95vh;
+  height: 95dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -58,6 +59,114 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.access-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin-top: 8px;
+}
+
+.access-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: #04354f;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+}
+
+.access-toggle input {
+  display: none;
+}
+
+.access-slider {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  background-color: #d1d5db;
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.access-slider::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.access-toggle input:checked + .access-slider {
+  background-color: #04354f;
+}
+
+.access-toggle input:checked + .access-slider::before {
+  transform: translateX(20px);
+}
+
+.access-text {
+  user-select: none;
+}
+
+.access-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #04354f;
+  cursor: pointer;
+}
+
+/* Hide default checkbox */
+.access-item input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Custom box */
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #04354f;
+  border-radius: 4px;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Checked style */
+.access-item input:checked + .checkmark {
+  background-color: #04354f;
+}
+
+/* Check icon */
+.access-item input:checked + .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Hover effect */
+.access-item:hover .checkmark {
+  border-color: #065a82;
 }
 
 .product-search-input {
@@ -231,7 +340,9 @@
 @media (max-width: 480px) {
   .admin-dashboard-container .main-container {
     height: 100vh;
+    height: 100dvh;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
   }

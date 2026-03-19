@@ -1,5 +1,6 @@
 .pos-main-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #d1d5db;
   display: flex;
   flex-direction: column;
@@ -20,6 +21,7 @@
   max-width: 440px;
   border-radius: 0.375rem;
   height: 95vh;
+  height: 95dvh;
   overflow: hidden;
 }
 
@@ -63,16 +65,38 @@
 .btn-checkout {
   width: 160px;
   height: 50px;
-  background-color: #af2828;
+  background-color: #af0a0a;
 }
 
 .barcode {
   width: 100%;
-  max-width: 400px;
-  height: 130px;
+  height: 220px;
   background-color: #71707040;
   border-radius: 25px;
-  margin: 0 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#qr-reader {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#qr-reader video,
+#qr-reader canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 25px;
+  transform: scaleX(1);
+  transition: transform 0.2s ease;
+}
+
+.barcode.mirrored #qr-reader video,
+.barcode.mirrored #qr-reader canvas {
+  transform: scaleX(-1);
 }
 
 .shopping-info {
@@ -196,6 +220,7 @@
     max-width: 100%;
     padding: 1rem;
     height: 100vh;
+    height: 100dvh;
   }
 
   .pos-main-container {

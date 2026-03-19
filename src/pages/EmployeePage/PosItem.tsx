@@ -77,9 +77,11 @@ const PosItemPage: React.FC = () => {
     });
   };
 
-  const filteredItems = items.filter((item) =>
-    item.item_name.toLowerCase().includes(searchText.toLowerCase()),
-  );
+  const filteredItems = items.filter(
+    (item) =>
+      item.quantity > 0 &&
+      item.item_name.toLowerCase().includes(searchText.toLowerCase())
+  );  
 
   return (
     <div className="pos-item-container">

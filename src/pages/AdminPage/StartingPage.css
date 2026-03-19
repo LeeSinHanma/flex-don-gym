@@ -1,6 +1,7 @@
 /* Centered container for the entire component */
 .admin-login-container {
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #d1d5db;
   display: flex;
   flex-direction: column;
@@ -23,6 +24,7 @@
   max-width: 440px;
   border-radius: 0.375rem;
   height: 95vh;
+  height: 95dvh;
   overflow: hidden;
 }
 

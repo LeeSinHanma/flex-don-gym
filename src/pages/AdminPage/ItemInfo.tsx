@@ -12,6 +12,8 @@ import {
   updateInventoryItem,
 } from "../../logicHandlers/itemInvCrud";
 import { Modal } from "../../components/Reusable/Modals";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 type LocationState = {
   item?: InventoryItem;
@@ -32,6 +34,17 @@ const ItemInfoPage: React.FC = () => {
   const [price, setPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(0);
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmType, setConfirmType] = useState<"save" | "delete" | null>(null);
+
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
   useEffect(() => {
     if (!passedItem) return;
 
@@ -41,16 +54,27 @@ const ItemInfoPage: React.FC = () => {
     setQuantity(Number(passedItem.quantity ?? 0));
   }, [passedItem]);
 
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
+
   const handleDelete = async () => {
     if (!passedItem?.item_id) return;
 
     try {
       await deleteInventoryItem(passedItem.item_id);
-      setShowDeleteModal(false);
-      history.push("/admin-product");
+      setShouldRedirect(true);
+      openStatusModal("Deleted", "Product deleted successfully.", "success");
     } catch (e: any) {
       console.error(e);
-      alert(e?.message || "Delete failed");
+      openStatusModal("Delete Failed", e?.message || "Delete failed", "error");
     }
   };
 
@@ -67,13 +91,28 @@ const ItemInfoPage: React.FC = () => {
         quantity,
       });
 
-      setShowSaveModal(true);
+      setShouldRedirect(true);
+      openStatusModal("Saved", "Product updated successfully.", "success");
     } catch (e: any) {
       console.error(e);
-      alert(e?.message || "Update failed");
+      openStatusModal("Update Failed", e?.message || "Update failed", "error");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleConfirmAction = async () => {
+    setShowConfirmModal(false);
+
+    if (confirmType === "save") {
+      await handleSave();
+    }
+
+    if (confirmType === "delete") {
+      await handleDelete();
+    }
+
+    setConfirmType(null);
   };
 
   return (
@@ -136,7 +175,7 @@ const ItemInfoPage: React.FC = () => {
               placeholder="Quantity"
               type="number"
               value={quantity}
-              onChange={(e: any) => setQuantity(Number(e.target.value))}
+              readOnly
             />
           </div>
         </div>
@@ -155,7 +194,10 @@ const ItemInfoPage: React.FC = () => {
               type="button"
               className="cancel-btn"
               disabled={!passedItem}
-              onClick={() => setShowDeleteModal(true)}
+              onClick={() => {
+                setConfirmType("delete");
+                setShowConfirmModal(true);
+              }}
             >
               Delete
             </Button>
@@ -164,7 +206,10 @@ const ItemInfoPage: React.FC = () => {
               type="button"
               className="renew-btn"
               disabled={!passedItem || isSaving}
-              onClick={handleSave}
+              onClick={() => {
+                setConfirmType("save");
+                setShowConfirmModal(true);
+              }}
             >
               {isSaving ? "Saving..." : "Save"}
             </Button>
@@ -223,6 +268,38 @@ const ItemInfoPage: React.FC = () => {
           </Button>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title={confirmType === "delete" ? "Confirm Delete" : "Confirm Save"}
+        message={
+          confirmType === "delete"
+            ? "Are you sure you want to delete this product?"
+            : "Are you sure you want to save these changes?"
+        }
+        confirmText={confirmType === "delete" ? "Delete" : "Save"}
+        cancelText="Cancel"
+        onCancel={() => {
+          setShowConfirmModal(false);
+          setConfirmType(null);
+        }}
+        onConfirm={handleConfirmAction}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
+
+          if (shouldRedirect) {
+            setShouldRedirect(false);
+            history.push("/admin-product");
+          }
+        }}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
     </div>
   );
 };

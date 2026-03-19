@@ -28,15 +28,9 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
         Are you sure you want to logout?
       </p>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "15px",
-        }}
-      >
+      <div className="modal-actions">
         <Button
-          className="btn-confirm"
+          className="modal-action-btn modal-action-btn-primary"
           onClick={() => {
             handleLogout();
           }}
@@ -44,7 +38,10 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
           Yes
         </Button>
 
-        <Button className="btn-cancel" onClick={onClose}>
+        <Button
+          className="modal-action-btn modal-action-btn-danger"
+          onClick={onClose}
+        >
           Cancel
         </Button>
       </div>
