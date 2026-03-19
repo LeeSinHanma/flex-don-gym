@@ -52,13 +52,6 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
             MEMBERSHIP PLANS
           </Button>
 
-          <Button
-            className="menu-btn"
-            onClick={() => console.log("Access Manager clicked")}
-          >
-            ACCESS MANAGER
-          </Button>
-
           <Button className="menu-btn" onClick={handleLogoutClick}>
             LOGOUT
           </Button>
@@ -68,8 +61,6 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
           </Button>
         </div>
       </Modal>
-
-      {/* Reusable Logout Modal */}
       <LogoutModal
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}

@@ -27,10 +27,28 @@ const EmployeeMenu: React.FC = () => {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<number>(1);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [access, setAccess] = useState<string[]>([]);
+
+  const accessOptions = [
+    "Employee Edit",
+    "Products Edit",
+    "Members Page",
+    "Membership Plan",
+    "POS",
+    "QR Scanner",
+  ];
 
   useEffect(() => {
     loadUsers();
   }, []);
+
+  const handleAccessChange = (value: string) => {
+    setAccess((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
+  };
 
   const loadUsers = async () => {
     try {
@@ -76,15 +94,39 @@ const EmployeeMenu: React.FC = () => {
     setFirstName("");
     setLastName("");
     setRole(1);
+    setAccess([]);
   };
 
   const handleSubmit = async () => {
     try {
-      await createUser(username, email, password, firstName, lastName, role);
+      if (!username || !email || !password || !firstName || !lastName) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      if (role === 1 && access.length === 0) {
+        alert("Please select at least one access.");
+        return;
+      }
+
+      const finalAccess = role === 0 ? accessOptions : access;
+
+      await createUser(
+        username,
+        email,
+        password,
+        firstName,
+        lastName,
+        role,
+        //finalAccess
+      );
+
       await loadUsers();
       handleCloseModal();
-    } catch (error) {
+      alert("Employee created successfully.");
+    } catch (error: any) {
       console.error("Failed to create user:", error);
+      alert(error.message || "Failed to create user.");
     }
   };
 
@@ -235,6 +277,24 @@ const EmployeeMenu: React.FC = () => {
             </select>
           </div>
 
+          <div className="form-group">
+            <label>Access</label>
+
+            <div className="access-group">
+              {accessOptions.map((item) => (
+                <label key={item} className="access-toggle">
+                  <input
+                    type="checkbox"
+                    checked={access.includes(item)}
+                    onChange={() => handleAccessChange(item)}
+                  />
+                  <span className="access-slider"></span>
+                  <span className="access-text">{item}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
           <div className="form-actions">
             <Button
               className="btn-modal btn-submit-modal"
@@ -245,6 +305,7 @@ const EmployeeMenu: React.FC = () => {
           </div>
         </div>
       </Modal>
+
       <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );

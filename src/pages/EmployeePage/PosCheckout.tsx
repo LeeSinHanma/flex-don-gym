@@ -11,6 +11,7 @@ import { InventoryItem } from "../../logicHandlers/itemInvCrud";
 import { createSale } from "../../logicHandlers/salesHandler";
 import ReceiptModal from "../../components/Reusable/ReceiptModal";
 import TransacModal from "../../components/Reusable/TransacModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 type CartItem = InventoryItem & {
   cartQuantity: number;
@@ -38,16 +39,39 @@ const PosCheckout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "gcash">("cash");
   const [amountGiven, setAmountGiven] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
 
   const handlePlaceOrder = async () => {
     try {
       if (cartItems.length === 0) {
-        console.log("No items in cart");
+        openStatusModal("Empty Cart", "There are no items in the cart.", "info");
         return;
       }
 
       if (paymentMethod === "cash" && Number(amountGiven) < totalAmount) {
-        console.log("Insufficient cash amount");
+        setShowTransacModal(false);
+
+        openStatusModal(
+          "Insufficient Amount",
+          "The cash amount given is less than the total amount.",
+          "warning"
+        );
         return;
       }
 
@@ -158,6 +182,14 @@ const PosCheckout: React.FC = () => {
         setPaymentMethod={setPaymentMethod}
         amountGiven={amountGiven}
         setAmountGiven={setAmountGiven}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
       />
     </div>
   );

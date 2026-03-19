@@ -286,12 +286,21 @@ const PosPage: React.FC = () => {
           <Button
             className="btn-checkout"
             type="button"
-            onClick={() =>
+            onClick={() => {
+              if (!cartItems || cartItems.length === 0) {
+                openStatusModal(
+                  "Empty Cart",
+                  "You cannot proceed to checkout because your cart is empty.",
+                  "warning"
+                );
+                return;
+              }
+
               history.push("/pos-checkout", {
                 cartItems,
                 totalAmount,
-              })
-            }
+              });
+            }}
           >
             Checkout
           </Button>
