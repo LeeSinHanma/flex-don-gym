@@ -5,7 +5,9 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import "./ManageStatusMem.css";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 import { getUserById, updateUser } from "../../logicHandlers/userCrud";
 
@@ -21,6 +23,7 @@ interface User {
   last_name: string;
   is_active: boolean;
   role: number | string;
+  access_list?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -32,8 +35,19 @@ const EmployeeEdit: React.FC = () => {
   const [employee, setEmployee] = useState<User | null>(null);
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmType, setConfirmType] = useState<"update" | "delete" | null>(
+    null
+  );
+
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
 
   const [editUsername, setEditUsername] = useState("");
   const [editEmail, setEditEmail] = useState("");
@@ -41,6 +55,28 @@ const EmployeeEdit: React.FC = () => {
   const [editLastName, setEditLastName] = useState("");
   const [editRole, setEditRole] = useState<number>(1);
   const [editIsActive, setEditIsActive] = useState(true);
+  const [editAccess, setEditAccess] = useState<string[]>([]);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  const accessOptions = [
+    "Employee Edit",
+    "Products Edit",
+    "Members Page",
+    "Membership Plan",
+    "POS",
+    "QR Scanner",
+  ];
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
 
   const getRoleName = (role: number | string) => {
     switch (role) {
@@ -55,13 +91,21 @@ const EmployeeEdit: React.FC = () => {
     }
   };
 
+  const handleEditAccessChange = (value: string) => {
+    setEditAccess((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
+  };
+
   useEffect(() => {
     const loadEmployee = async () => {
       try {
         const data = await getUserById(userId);
         setEmployee(data);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to load employee:", error);
       }
     };
 
@@ -76,6 +120,7 @@ const EmployeeEdit: React.FC = () => {
       setEditLastName(employee.last_name);
       setEditRole(Number(employee.role));
       setEditIsActive(employee.is_active);
+      setEditAccess(employee.access_list || []);
     }
   }, [employee]);
 
@@ -83,6 +128,8 @@ const EmployeeEdit: React.FC = () => {
     if (!employee) return;
 
     try {
+      const finalAccess = editRole === 0 ? accessOptions : editAccess;
+
       const updatedUser = await updateUser(employee.id, {
         username: editUsername,
         email: editEmail,
@@ -90,13 +137,25 @@ const EmployeeEdit: React.FC = () => {
         last_name: editLastName,
         role: editRole,
         is_active: editIsActive,
+        // access_list: finalAccess,
       });
 
       setEmployee(updatedUser);
+      // setEditAccess(updatedUser.access_list || finalAccess);
       setShowUpdateModal(false);
+
+      openStatusModal(
+        "Update Successful",
+        "Employee details were updated successfully.",
+        "success"
+      );
     } catch (error) {
-      console.error(error);
-      alert("Update failed");
+      console.error("Failed to update employee:", error);
+      openStatusModal(
+        "Update Failed",
+        "Failed to update employee.",
+        "error"
+      );
     }
   };
 
@@ -105,12 +164,36 @@ const EmployeeEdit: React.FC = () => {
 
     try {
       console.log("Deleting user with ID:", employee.id);
-      setShowDeleteModal(false);
-      setShowSuccessModal(true);
+
+      setShouldRedirect(true);
+
+      openStatusModal(
+        "Delete Successful",
+        "Employee was deleted successfully.",
+        "success"
+      );
     } catch (error) {
-      console.error(error);
-      alert("Delete failed");
+      console.error("Failed to delete employee:", error);
+      openStatusModal(
+        "Delete Failed",
+        "Failed to delete employee.",
+        "error"
+      );
     }
+  };
+
+  const handleConfirmAction = async () => {
+    setShowConfirmModal(false);
+
+    if (confirmType === "update") {
+      await handleUpdate();
+    }
+
+    if (confirmType === "delete") {
+      await handleDelete();
+    }
+
+    setConfirmType(null);
   };
 
   return (
@@ -165,7 +248,10 @@ const EmployeeEdit: React.FC = () => {
             <Button
               type="button"
               className="cancel-btn"
-              onClick={() => setShowDeleteModal(true)}
+              onClick={() => {
+                setConfirmType("delete");
+                setShowConfirmModal(true);
+              }}
             >
               Delete
             </Button>
@@ -241,11 +327,33 @@ const EmployeeEdit: React.FC = () => {
             </select>
           </div>
 
+          <div className="form-group">
+            <label>Access</label>
+
+            <div className="access-group">
+              {accessOptions.map((item) => (
+                <label key={item} className="access-toggle">
+                  <input
+                    type="checkbox"
+                    checked={editAccess.includes(item)}
+                    onChange={() => handleEditAccessChange(item)}
+                  />
+                  <span className="access-slider"></span>
+                  <span className="access-text">{item}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
           <div className="form-actions" style={{ display: "flex", gap: 10 }}>
             <Button
               type="button"
               className="btn-modal btn-submit-modal"
-              onClick={handleUpdate}
+              onClick={() => {
+                setShowUpdateModal(false);
+                setConfirmType("update");
+                setShowConfirmModal(true);
+              }}
             >
               Update
             </Button>
@@ -253,7 +361,14 @@ const EmployeeEdit: React.FC = () => {
             <Button
               type="button"
               className="cancel-btn"
-              onClick={() => setShowUpdateModal(false)}
+              onClick={() => {
+                setShowUpdateModal(false);
+                openStatusModal(
+                  "Update Cancelled",
+                  "Employee update was cancelled.",
+                  "info"
+                );
+              }}
             >
               Cancel
             </Button>
@@ -261,56 +376,54 @@ const EmployeeEdit: React.FC = () => {
         </div>
       </Modal>
 
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        title="Confirm Delete"
-        showCloseButton={false}
-        className="confirm-modal"
-      >
-        <p>Are you sure you want to delete this employee?</p>
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title={confirmType === "update" ? "Confirm Update" : "Confirm Delete"}
+        message={
+          confirmType === "update"
+            ? "Are you sure you want to update this employee?"
+            : "Are you sure you want to delete this employee?"
+        }
+        confirmText={confirmType === "update" ? "Update" : "Delete"}
+        cancelText="Cancel"
+        onCancel={() => {
+          setShowConfirmModal(false);
 
-        <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
-          <Button
-            type="button"
-            className="renew-btn"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            Cancel
-          </Button>
+          if (confirmType === "update") {
+            openStatusModal(
+              "Update Cancelled",
+              "Employee update was cancelled.",
+              "info"
+            );
+          }
 
-          <Button type="button" className="cancel-btn" onClick={handleDelete}>
-            Confirm Delete
-          </Button>
-        </div>
-      </Modal>
+          if (confirmType === "delete") {
+            openStatusModal(
+              "Delete Cancelled",
+              "Employee deletion was cancelled.",
+              "info"
+            );
+          }
 
-      <Modal
-        isOpen={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          history.push("/employee");
+          setConfirmType(null);
         }}
-        showCloseButton={false}
-        title="Employee Deleted"
-      >
-        <p style={{ textAlign: "center" }}>
-          The employee has been successfully deleted.
-        </p>
+        onConfirm={handleConfirmAction}
+      />
 
-        <div className="success-actions">
-          <Button
-            type="button"
-            className="renew-btn"
-            onClick={() => {
-              setShowSuccessModal(false);
-              history.push("/employee");
-            }}
-          >
-            OK
-          </Button>
-        </div>
-      </Modal>
+      <StatusModal
+      isOpen={showStatusModal}
+      onClose={() => {
+        setShowStatusModal(false);
+
+        if (shouldRedirect) {
+          setShouldRedirect(false);
+          history.push("/employee-page");
+        }
+      }}
+      title={statusTitle}
+      message={statusMessage}
+      type={statusType}
+    />
     </div>
   );
 };

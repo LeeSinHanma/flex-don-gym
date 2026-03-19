@@ -9,6 +9,7 @@ export interface User {
   last_name: string;
   is_active: boolean;
   role: number;
+  //access_list: string[];
   created_at: string;
   updated_at: string;
 }
@@ -20,6 +21,7 @@ export type UpdateUserInput = {
   last_name: string;
   role: number;
   is_active: boolean;
+  //access_list?: string[];
 };
 
 export type APIResponse = any;
@@ -27,7 +29,6 @@ export type APIResponse = any;
 // ---------- Helpers ----------
 function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
-    // FastAPI often uses { detail: "..." }
     const detail = (err.response?.data as any)?.detail;
     return detail || err.message || "Request failed";
   }
@@ -37,7 +38,7 @@ function getErrorMessage(err: unknown): string {
 // ✅ POST /users/login?username=...&password=...
 export async function loginUser(
   username: string,
-  password: string,
+  password: string
 ): Promise<APIResponse> {
   try {
     const res = await api.post<APIResponse>("/users/login", null, {
@@ -69,14 +70,15 @@ export async function getUsers(): Promise<User[]> {
   }
 }
 
-// ✅ POST /users/create ... creation of user(cashier/staffs)
+// ✅ POST /users/create ... creation of user (cashier/staffs)
 export async function createUser(
   username: string,
   email: string,
   password: string,
   firstName: string,
   lastName: string,
-  role: number,
+  role: number
+  //,accessList: string[]
 ): Promise<APIResponse> {
   try {
     const res = await api.post<APIResponse>("/users/create", {
@@ -86,6 +88,7 @@ export async function createUser(
       first_name: firstName,
       last_name: lastName,
       role,
+      //access_list: accessList,
     });
 
     return res.data;
@@ -98,7 +101,7 @@ export async function createUser(
 export async function getUserType(username: string): Promise<number> {
   try {
     const res = await api.get<APIResponse>(
-      `/users/by-username/${encodeURIComponent(username)}`,
+      `/users/by-username/${encodeURIComponent(username)}`
     );
 
     return res.data.role;

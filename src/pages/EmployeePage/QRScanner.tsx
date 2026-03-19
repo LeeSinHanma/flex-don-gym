@@ -13,6 +13,7 @@ import { IonIcon, IonImg } from "@ionic/react";
 import { search, menu } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
 import dondonLogo from "../../resource/dondon-logo.png";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import scanSound from "../../resource/scanSound.mp3";
 import scanError from "../../resource/scanError.mp3";
 
@@ -375,76 +376,54 @@ const QRScannerHome: React.FC = () => {
         </div>
       </Modal>
 
-      <Modal
-        className="modal-box"
+      <ConfirmModal
         isOpen={showConfirmModal}
-        showCloseButton={false}
         title="Confirm Admission"
-        onClose={() => {
+        message={
+          selectedMember
+            ? `Admit ${selectedMember.first_name} ${selectedMember.last_name}?`
+            : "Admit this member?"
+        }
+        confirmText="Admit"
+        cancelText="Cancel"
+        onCancel={() => {
           setShowConfirmModal(false);
           setSelectedMember(null);
         }}
-      >
-        <div className="employee-form">
-          <div className="form-group" style={{ textAlign: "center" }}>
-            <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-              Admit this Member?
-            </p>
+        onConfirm={async () => {
+          if (!selectedMember) return;
 
-            {selectedMember && (
-              <p style={{ marginTop: "10px", color: "#666", fontSize: "25px" }}>
-                {selectedMember.first_name} {selectedMember.last_name}
-              </p>
-            )}
-          </div>
+          try {
+            const result = await scanVisit({
+              member_id: selectedMember.member_id,
+              direction: "inbound",
+            });
 
-          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
-            <Button
-              type="button"
-              className="btn-modal btn-submit-modal"
-              onClick={async () => {
-                if (!selectedMember) return;
+            setShowConfirmModal(false);
+            setShowSearchModal(false);
+            setSelectedMember(null);
+            setSearchText("");
+            setSearchResults([]);
+            setIsSearching(false);
 
-                try {
-                  const result = await scanVisit({
-                    member_id: selectedMember.member_id,
-                    direction: "inbound",
-                  });
+            setVisitResult(result);
+            setShowModal(true);
 
-                  setShowConfirmModal(false);
-                  setShowSearchModal(false);
-                  setSelectedMember(null);
-                  setSearchText("");
-                  setSearchResults([]);
-                  setIsSearching(false);
-
-                  setVisitResult(result);
-                  setShowModal(true);
-                } catch (err: any) {
-                  console.error(
-                    "Failed to scan selected member:",
-                    err?.message || err,
-                  );
-                  playErrorSound();
-                }
-              }}
-            >
-              Yes
-            </Button>
-
-            <Button
-              type="button"
-              className="btn-modal"
-              onClick={() => {
-                setShowConfirmModal(false);
-                setSelectedMember(null);
-              }}
-            >
-              No
-            </Button>
-          </div>
-        </div>
-      </Modal>
+            // 🔊 optional sounds (same behavior as scanner)
+            if (result.visit.access_granted) {
+              playSuccessSound();
+            } else {
+              playErrorSound();
+            }
+          } catch (err: any) {
+            console.error(
+              "Failed to scan selected member:",
+              err?.message || err
+            );
+            playErrorSound();
+          }
+        }}
+      />
 
       <EmployeeMenu
         isOpen={showEmployeeMenu}
