@@ -1,0 +1,32 @@
+.barcode-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.barcode-modal-reader {
+  width: 100%;
+  min-height: 260px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.barcode-scan-text {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #1f3b64;
+}
+
+.barcode-scan-error {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: red;
+}
+
+.barcode-modal-actions {
+  display: flex;
+  justify-content: center;
+}

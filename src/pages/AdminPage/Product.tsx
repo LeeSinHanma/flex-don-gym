@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
@@ -9,13 +9,14 @@ import POSCard from "../../components/Reusable/PosCard";
 import AdminMenu from "../../components/Reusable/AdminMenu";
 import "./AdminDashboard.css";
 import "./Product.css";
-
+import BarcodeScanModal from "../../components/Reusable/BarcodeScanModal";
 import {
   createInventoryItem,
   getInventoryItems,
   InventoryItem,
   CreateInventoryItem,
-} from "../../logicHandlers/itemInvCrud"; // ✅ make sure this is the correct path
+} from "../../logicHandlers/itemInvCrud";
+import { stopBarcodeScanner } from "../../logicHandlers/barcodeScannerModule";
 
 const ProductPage: React.FC = () => {
   const history = useHistory();
@@ -40,6 +41,35 @@ const ProductPage: React.FC = () => {
 
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
+  const [scanTarget, setScanTarget] = useState<"itemId" | "search">("itemId");
+  const [sortType, setSortType] = useState<
+    "default" | "name-asc" | "name-desc" | "price-asc" | "price-desc"
+  >("default");
+
+  const [stockFilter, setStockFilter] = useState<
+    "all" | "in-stock" | "out-of-stock"
+  >("all");
+
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+    useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowSortDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const loadItems = async () => {
     try {
@@ -58,24 +88,52 @@ const ProductPage: React.FC = () => {
   }, []);
 
   const filteredItems = useMemo(() => {
-    const q = searchValue.trim().toLowerCase();
-    if (!q) return items;
+    let result = [...items];
 
-    return items.filter((it) => {
-      const name = (it.item_name ?? "").toLowerCase();
-      const desc = (it.description ?? "").toLowerCase();
-      const id = (it.item_id ?? "").toLowerCase();
-      return name.includes(q) || desc.includes(q) || id.includes(q);
-    });
-  }, [items, searchValue]);
+    const q = searchValue.trim().toLowerCase();
+
+    // 🔍 search
+    if (q) {
+      result = result.filter((it) => {
+        const name = (it.item_name ?? "").toLowerCase();
+        const desc = (it.description ?? "").toLowerCase();
+        const id = (it.item_id ?? "").toLowerCase();
+        return name.includes(q) || desc.includes(q) || id.includes(q);
+      });
+    }
+
+    // 📦 stock filter
+    if (stockFilter === "in-stock") {
+      result = result.filter((it) => it.quantity > 0);
+    } else if (stockFilter === "out-of-stock") {
+      result = result.filter((it) => it.quantity === 0);
+    }
+
+    // 🔽 sorting
+    switch (sortType) {
+      case "name-asc":
+        result.sort((a, b) => a.item_name.localeCompare(b.item_name));
+        break;
+      case "name-desc":
+        result.sort((a, b) => b.item_name.localeCompare(a.item_name));
+        break;
+      case "price-asc":
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        result.sort((a, b) => b.price - a.price);
+        break;
+    }
+
+    return result;
+  }, [items, searchValue, sortType, stockFilter]);
 
   const openAddProductModal = () => {
     setIsModalOpen(true);
     setErrorMessage("");
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closeModal = async  () => {
     setItemId("");
     setItemName("");
     setDescription("");
@@ -83,6 +141,9 @@ const ProductPage: React.FC = () => {
     setQuantity(0);
     setAddedBy("");
     setErrorMessage("");
+    await stopBarcodeScanner();
+    setIsScanModalOpen(false);
+    setIsModalOpen(false);
   };
 
   const handleMenuClick = () => {
@@ -150,23 +211,112 @@ const ProductPage: React.FC = () => {
 
         <div className="admin-main-content">
           <div className="product-search-row">
-            <input
-              className="product-search-input"
-              type="text"
-              placeholder="Search by name / id / description"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
+          <input
+            className="product-search-input"
+            type="text"
+            placeholder="Search by name / id / description"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+
+          {/* Scan */}
+          <button
+            type="button"
+            className="product-search-btn"
+            onClick={() => {
+              setScanTarget("search");
+              setIsScanModalOpen(true);
+            }}
+          >
+            Scan
+          </button>
+
+          {/* Sort / Filter Dropdown */}
+          <div className="sort-dropdown-wrapper" ref={dropdownRef}>
             <button
-              type="button"
               className="product-search-btn"
-              onClick={() => {
-                // optional: keep, but filtering already happens as you type
-              }}
+              onClick={() => setShowSortDropdown((prev) => !prev)}
             >
-              Scan
+              Filter
             </button>
+
+            {showSortDropdown && (
+              <div className="sort-dropdown">
+                <p className="dropdown-label">Sort</p>
+
+                <button onClick={() => setSortType("default")}>Default</button>
+                <button
+                  className={sortType === "name-asc" ? "active" : ""}
+                  onClick={() => {
+                    setSortType("name-asc");
+                    setShowSortDropdown(false);
+                  }}
+                >
+                  Name A-Z
+                </button>
+                <button
+                  className={sortType === "name-desc" ? "active" : ""}
+                  onClick={() => {
+                    setSortType("name-desc");
+                    setShowSortDropdown(false);
+                  }}
+                >
+                  Name Z-A
+                </button>
+                <button
+                    className={sortType === "price-asc" ? "active" : ""}
+                    onClick={() => {
+                      setSortType("price-asc");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                  Price Low → High
+                </button>
+                <button
+                className={sortType === "price-desc" ? "active" : ""}
+                onClick={() => {
+                  setSortType("price-desc");
+                  setShowSortDropdown(false);
+                }}
+                >
+                  Price High → Low
+                </button>
+
+                <hr />
+
+                <p className="dropdown-label">Stock</p>
+
+                <button
+                  className={stockFilter === "all" ? "active" : ""}
+                  onClick={() => {
+                    setStockFilter("all");
+                    setShowSortDropdown(false);
+                  }}
+                  >
+                  All
+                </button>
+                <button
+                  className={stockFilter === "in-stock" ? "active" : ""}
+                  onClick={() => {
+                    setStockFilter("in-stock");
+                    setShowSortDropdown(false);
+                  }}
+                  >
+                  In Stock
+                </button>
+                <button
+                  className={stockFilter === "out-of-stock" ? "active" : ""}
+                  onClick={() => {
+                    setStockFilter("out-of-stock");
+                    setShowSortDropdown(false);
+                  }}
+                >
+                  Out of Stock
+                </button>
+              </div>
+            )}
           </div>
+        </div>
 
           <div className="product-card-wrapper">
             {isLoading && <p style={{ textAlign: "center" }}>Loading...</p>}
@@ -212,7 +362,7 @@ const ProductPage: React.FC = () => {
         onClose={closeModal}
         title="Add New Product"
         showCloseButton={false}
-        className="confirm-modal"
+        className="confirm-modals"
       >
         <div className="employee-form">
           {errorMessage && (
@@ -222,7 +372,21 @@ const ProductPage: React.FC = () => {
           )}
 
           <div className="form-group">
-            <label>Item ID *</label>
+            <div className="label-with-action">
+              <label>Item ID *</label>
+
+              <button
+                type="button"
+                className="scan-btn"
+                onClick={() => {
+                  setScanTarget("itemId");
+                  setIsScanModalOpen(true);
+                }}
+              >
+                Scan
+              </button>
+            </div>
+
             <input
               className="employee-input"
               placeholder="e.g. ITEM-001"
@@ -301,6 +465,18 @@ const ProductPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+      <BarcodeScanModal
+        isOpen={isScanModalOpen}
+        onClose={() => setIsScanModalOpen(false)}
+        onScanned={(value) => {
+          if (scanTarget === "itemId") {
+            setItemId(value);
+          } else if (scanTarget === "search") {
+            setSearchValue(value);
+          }
+        }}
+        title="Scan Item Barcode"
+      />
       <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
