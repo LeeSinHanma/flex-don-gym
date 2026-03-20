@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
@@ -52,6 +51,11 @@ const ManageStatusMemPage: React.FC = () => {
     return `${mm}-${dd}-${yyyy}`;
   };
 
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString();
+  };
+
   const openStatusModal = (
     title: string,
     message: string,
@@ -61,11 +65,6 @@ const ManageStatusMemPage: React.FC = () => {
     setStatusMessage(message);
     setStatusType(type);
     setShowStatusModal(true);
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
   };
 
   useEffect(() => {
@@ -132,6 +131,7 @@ const ManageStatusMemPage: React.FC = () => {
       openStatusModal("Update Failed", "Failed to update member.", "error");
     }
   };
+
   return (
     <div className="manage-member-container">
       <div className="main-container">
@@ -144,6 +144,7 @@ const ManageStatusMemPage: React.FC = () => {
           </BackButton>
           <h2>Manage Member</h2>
         </div>
+
         <div className="status-content-scroll">
           <div className="member-container member-container-member">
             <div className="member-info">
@@ -179,40 +180,31 @@ const ManageStatusMemPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="middle-container">
-          <div className="history-box">
-            <p className="history-info">History:</p>
 
-            {visits.length === 0 ? (
-              <p>No visit history found.</p>
-            ) : (
-              visits.map((visit) => (
-                <div key={visit.visit_id} className="history-item">
-                  <p>
-                    <strong>{visit.direction}</strong> -{" "}
-                    {formatDateTime(visit.created_at)}
-                  </p>
-                  <p>Access: {visit.access_granted ? "Granted" : "Denied"}</p>
-                  {!visit.access_granted && visit.denial_reason && (
-                    <p>Reason: {visit.denial_reason}</p>
-                  )}
-                  {visit.amount_paid > 0 && (
-                    <p>Amount Paid: ₱{visit.amount_paid}</p>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
+          <div className="middle-container">
+            <div className="history-box">
+              <p className="history-info">History:</p>
 
-          <Button
-            className="btn-qr"
-            type="button"
-            onClick={() => setShowModal(true)}
-          >
-            Show QR Code
-          </Button>
-        </div>
+              {visits.length === 0 ? (
+                <p>No visit history found.</p>
+              ) : (
+                visits.map((visit) => (
+                  <div key={visit.visit_id} className="history-item">
+                    <p>
+                      <strong>{visit.direction}</strong> -{" "}
+                      {formatDateTime(visit.created_at)}
+                    </p>
+                    <p>Access: {visit.access_granted ? "Granted" : "Denied"}</p>
+                    {!visit.access_granted && visit.denial_reason && (
+                      <p>Reason: {visit.denial_reason}</p>
+                    )}
+                    {visit.amount_paid > 0 && (
+                      <p>Amount Paid: ₱{visit.amount_paid}</p>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
 
             <Button
               className="btn-qr"
@@ -285,7 +277,11 @@ const ManageStatusMemPage: React.FC = () => {
             );
           } catch (error) {
             console.error(error);
-            alert("Delete failed");
+            openStatusModal(
+              "Delete Failed",
+              "Failed to delete member.",
+              "error",
+            );
           }
         }}
       />
