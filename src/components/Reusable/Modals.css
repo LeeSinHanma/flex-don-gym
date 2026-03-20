@@ -20,6 +20,7 @@
   max-width: 90vw;
   height: auto;
   max-height: 90vh;
+  max-height: 90dvh;
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
@@ -57,6 +58,44 @@
 /* Body */
 .modal-body {
   width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.modal-action-btn {
+  width: 125px;
+  height: 60px;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+}
+
+.modal-action-btn-primary {
+  background-color: #04354f;
+  color: #ffffff;
+}
+
+.modal-action-btn-danger {
+  background-color: #af2828;
+  color: #ffffff;
+}
+
+.modal-action-btn-neutral {
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+.modal-content.qr-modal {
+  width: min(92vw, 420px);
 }
 
 /* Close button */
