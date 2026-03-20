@@ -261,7 +261,27 @@ const QRScannerHome: React.FC = () => {
               </div>
             </div>
 
-            <div className="form-actions" style={{ marginTop: "16px" }}>
+            <div
+              className="form-actions"
+              style={{ marginTop: "16px", display: "flex", gap: "10px" }}
+            >
+              {!visitResult.visit.access_granted &&
+                visitResult.visit.denial_reason === "No remaining credits" && (
+                  <Button
+                    type="button"
+                    className="renew-btn"
+                    onClick={() => {
+                      console.log("Add Cash payment", {
+                        member_id: visitResult.visit.member_id,
+                        name: visitResult.member_name,
+                        reason: visitResult.visit.denial_reason,
+                      });
+                    }}
+                  >
+                    Pay Via Cash
+                  </Button>
+                )}
+
               <Button
                 type="button"
                 className="btn-modal btn-submit-modal"
@@ -418,7 +438,7 @@ const QRScannerHome: React.FC = () => {
           } catch (err: any) {
             console.error(
               "Failed to scan selected member:",
-              err?.message || err
+              err?.message || err,
             );
             playErrorSound();
           }

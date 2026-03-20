@@ -16,7 +16,7 @@
 
 /* Main modal container */
 .modal-content {
-  width: 450px;
+  width: 400px;
   max-width: 90vw;
   height: auto;
   max-height: 90vh;
@@ -80,4 +80,8 @@
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.add-credit-modal {
+  width: 300px;
 }

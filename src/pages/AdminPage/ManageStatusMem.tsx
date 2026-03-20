@@ -7,6 +7,7 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import dondonLogo from "../../resource/dondon-logo.png";
 import { getVisitsByMemberId, Visit } from "../../logicHandlers/visits";
 import {
@@ -17,6 +18,7 @@ import {
 } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 import QrCodeModal from "../../components/Reusable/QrCodeModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 interface RouteParams {
   memberId: string;
@@ -29,11 +31,18 @@ const ManageStatusMemPage: React.FC = () => {
   const [member, setMember] = useState<Member | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [membershipName, setMembershipName] = useState("");
   const [showRenewModal, setShowRenewModal] = useState(false);
   const [addCredits, setAddCredits] = useState("");
   const [visits, setVisits] = useState<Visit[]>([]);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [showRenewConfirmModal, setShowRenewConfirmModal] = useState(false);
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -41,6 +50,17 @@ const ManageStatusMemPage: React.FC = () => {
     const dd = String(date.getDate()).padStart(2, "0");
     const yyyy = date.getFullYear();
     return `${mm}-${dd}-${yyyy}`;
+  };
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
   };
 
   const formatDateTime = (dateString: string) => {
@@ -70,6 +90,48 @@ const ManageStatusMemPage: React.FC = () => {
 
     loadMember();
   }, [memberId]);
+
+  const handleRenewMember = async () => {
+    if (!member) return;
+
+    try {
+      const creditsToAdd = Number(addCredits);
+
+      if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
+        openStatusModal(
+          "Invalid Input",
+          "Please enter a valid credit amount.",
+          "warning",
+        );
+        return;
+      }
+
+      const payload = {
+        first_name: member.first_name,
+        last_name: member.last_name,
+        email: member.email,
+        contact_number: member.contact_number,
+        membership_plan_id: member.membership_plan_id,
+        membership_expiry: member.membership_expiry,
+        credits: (member.credits ?? 0) + creditsToAdd,
+      };
+
+      const updated = await updateMember(member.member_id, payload);
+
+      setMember(updated);
+      setAddCredits("");
+      setShowRenewModal(false);
+
+      openStatusModal(
+        "Credits Updated",
+        `${creditsToAdd} credits added successfully.`,
+        "success",
+      );
+    } catch (error) {
+      console.error(error);
+      openStatusModal("Update Failed", "Failed to update member.", "error");
+    }
+  };
   return (
     <div className="manage-member-container">
       <div className="main-container">
@@ -126,15 +188,16 @@ const ManageStatusMemPage: React.FC = () => {
               visits.map((visit) => (
                 <div key={visit.visit_id} className="history-item">
                   <p>
-                    <strong>{visit.direction}</strong> - {formatDateTime(visit.created_at)}
+                    <strong>{visit.direction}</strong> -{" "}
+                    {formatDateTime(visit.created_at)}
                   </p>
-                  <p>
-                    Access: {visit.access_granted ? "Granted" : "Denied"}
-                  </p>
+                  <p>Access: {visit.access_granted ? "Granted" : "Denied"}</p>
                   {!visit.access_granted && visit.denial_reason && (
                     <p>Reason: {visit.denial_reason}</p>
                   )}
-                  {visit.amount_paid > 0 && <p>Amount Paid: ₱{visit.amount_paid}</p>}
+                  {visit.amount_paid > 0 && (
+                    <p>Amount Paid: ₱{visit.amount_paid}</p>
+                  )}
                 </div>
               ))
             )}
@@ -187,79 +250,70 @@ const ManageStatusMemPage: React.FC = () => {
         }
       />
 
-      <Modal
+      <ConfirmModal
         isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
         title="Confirm Delete"
-        showCloseButton={false}
-        className="confirm-modal"
-      >
-        <p>Are you sure you want to delete this member?</p>
+        message={`Are you sure you want to delete "${
+          member ? `${member.first_name} ${member.last_name}` : "this member"
+        }"?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={async () => {
+          if (!member) return;
 
-        <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
-          <Button
-            type="button"
-            className="renew-btn"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="button"
-            className="cancel-btn"
-            onClick={async () => {
-              if (!member) return;
-
-              try {
-                await deleteMember(member.member_id);
-
-                setShowDeleteModal(false); // close confirm
-                setShowSuccessModal(true); // open success modal
-              } catch (error) {
-                console.error(error);
-                alert("Delete failed");
-              }
-            }}
-          >
-            Confirm Delete
-          </Button>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          history.push("/status-member");
+          try {
+            await deleteMember(member.member_id);
+            setShowDeleteModal(false);
+            setShouldRedirect(true);
+            openStatusModal(
+              "Member Deleted",
+              "The member has been successfully deleted.",
+              "success",
+            );
+          } catch (error) {
+            console.error(error);
+            alert("Delete failed");
+          }
         }}
-        showCloseButton={false}
-        title="Member Deleted"
-      >
-        <p style={{ textAlign: "center" }}>
-          The member has been successfully deleted.
-        </p>
+      />
 
-        <div className="success-actions">
-          <Button
-            type="button"
-            className="renew-btn"
-            onClick={() => {
-              setShowSuccessModal(false);
-              history.push("/status-member");
-            }}
-          >
-            OK
-          </Button>
-        </div>
-      </Modal>
+      <ConfirmModal
+        isOpen={showRenewConfirmModal}
+        title="Confirm Credit Update"
+        message={`Add ${addCredits || 0} credits to ${
+          member ? `${member.first_name} ${member.last_name}` : "this member"
+        }?`}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        onCancel={() => setShowRenewConfirmModal(false)}
+        onConfirm={async () => {
+          setShowRenewConfirmModal(false);
+          await handleRenewMember();
+        }}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
+
+          if (shouldRedirect) {
+            setShouldRedirect(false);
+            history.push("/status-member");
+          }
+        }}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
 
       <Modal
         isOpen={showRenewModal}
         onClose={() => setShowRenewModal(false)}
         title="Add Credit / Duration"
         showCloseButton={false}
-        className="confirm-modal"
+        className="add-credit-modal"
       >
         <div className="renew-modal-content">
           <div className="form-group">
@@ -277,37 +331,7 @@ const ManageStatusMemPage: React.FC = () => {
             <Button
               type="button"
               className="renew-btn"
-              onClick={async () => {
-                if (!member) return;
-
-                try {
-                  const creditsToAdd = Number(addCredits);
-
-                  if (isNaN(creditsToAdd) || creditsToAdd <= 0) {
-                    alert("Please enter a valid credit amount.");
-                    return;
-                  }
-
-                  const payload = {
-                    first_name: member.first_name,
-                    last_name: member.last_name,
-                    email: member.email,
-                    contact_number: member.contact_number,
-                    membership_plan_id: member.membership_plan_id,
-                    membership_expiry: member.membership_expiry,
-                    credits: (member.credits ?? 0) + creditsToAdd,
-                  };
-
-                  const updated = await updateMember(member.member_id, payload);
-
-                  setMember(updated);
-                  setAddCredits("");
-                  setShowRenewModal(false);
-                } catch (error) {
-                  console.error(error);
-                  alert("Failed to update member.");
-                }
-              }}
+              onClick={() => setShowRenewConfirmModal(true)}
             >
               Confirm
             </Button>
@@ -317,6 +341,7 @@ const ManageStatusMemPage: React.FC = () => {
               className="cancel-btn"
               onClick={() => {
                 setShowRenewModal(false);
+                setShowRenewConfirmModal(false);
                 setAddCredits("");
               }}
             >

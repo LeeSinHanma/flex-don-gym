@@ -6,6 +6,8 @@ import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import StatusModal from "../../components/Reusable/StatusModal";
+import NumberInput from "../../components/Reusable/NumberInput";
 import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
@@ -30,9 +32,9 @@ const MembershipPage: React.FC = () => {
 
   const [name, setName] = useState("");
   const [type, setType] = useState(0);
-  const [price, setPrice] = useState(0);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [durationMonths, setDurationMonths] = useState(0);
+  const [price, setPrice] = useState("0");
+  const [discountAmount, setDiscountAmount] = useState("0");
+  const [durationMonths, setDurationMonths] = useState("0");
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -41,6 +43,24 @@ const MembershipPage: React.FC = () => {
   const [isEditDailyRateOpen, setIsEditDailyRateOpen] = useState(false);
   const [isConfirmDailyRateOpen, setIsConfirmDailyRateOpen] = useState(false);
   const [isSavingDailyRate, setIsSavingDailyRate] = useState(false);
+
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
 
   const loadMemberships = async () => {
     try {
@@ -76,9 +96,9 @@ const MembershipPage: React.FC = () => {
     setIsModalOpen(false);
     setName("");
     setType(0);
-    setPrice(0);
-    setDiscountAmount(0);
-    setDurationMonths(0);
+    setPrice("0");
+    setDiscountAmount("0");
+    setDurationMonths("0");
   };
 
   const handleMenuClick = () => {
@@ -91,30 +111,50 @@ const MembershipPage: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      const numericPrice = price === "" ? 0 : Number(price);
+      const numericDiscount =
+        discountAmount === "" ? 0 : Number(discountAmount);
+      const numericDuration =
+        durationMonths === "" ? 0 : Number(durationMonths);
+
       if (
         !name.trim() ||
-        price < 0 ||
-        discountAmount < 0 ||
-        durationMonths < 0
+        numericPrice < 0 ||
+        numericDiscount < 0 ||
+        numericDuration < 0
       ) {
-        alert("Please fill out all required fields properly.");
+        openStatusModal(
+          "Invalid Input",
+          "Please fill out all required fields properly.",
+          "warning",
+        );
         return;
       }
 
       const res = await createMembershipType({
-        name,
+        name: name.trim(),
         type,
-        price,
-        discount_amount: discountAmount,
-        duration_months: durationMonths,
+        price: numericPrice,
+        discount_amount: numericDiscount,
+        duration_months: numericDuration,
       });
 
       console.log("Membership created:", res);
 
       handleCloseModal();
       loadMemberships();
+      openStatusModal(
+        "Success",
+        "Membership type added successfully.",
+        "success",
+      );
     } catch (error) {
       console.error("Failed to create membership type:", error);
+      openStatusModal(
+        "Create Failed",
+        "Failed to create membership type.",
+        "error",
+      );
     }
   };
 
@@ -123,7 +163,11 @@ const MembershipPage: React.FC = () => {
       const newRate = Number(dailyRateInput);
 
       if (dailyRateInput.trim() === "" || isNaN(newRate) || newRate < 0) {
-        alert("Please enter a valid daily rate.");
+        openStatusModal(
+          "Invalid Input",
+          "Please enter a valid daily rate.",
+          "warning",
+        );
         return;
       }
 
@@ -135,10 +179,14 @@ const MembershipPage: React.FC = () => {
       setIsConfirmDailyRateOpen(false);
       setIsEditDailyRateOpen(false);
 
-      alert("Daily rate updated successfully.");
+      openStatusModal(
+        "Daily Rate Updated",
+        `Daily rate was updated to ₱${newRate.toFixed(2)}.`,
+        "success",
+      );
     } catch (error) {
       console.error("Failed to update daily rate:", error);
-      alert("Failed to update daily rate.");
+      openStatusModal("Update Failed", "Failed to update daily rate.", "error");
     } finally {
       setIsSavingDailyRate(false);
     }
@@ -250,37 +298,38 @@ const MembershipPage: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="membership-price">Price</label>
-            <UsernameInput
-              id="membership-price"
+            <NumberInput
               className="employee-input"
               placeholder="Enter price"
-              type="number"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={setPrice}
+              allowDecimal
+              prefix="₱"
+              formatWithCommas
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="membership-discount">Discount Amount</label>
-            <UsernameInput
-              id="membership-discount"
+            <NumberInput
               className="employee-input"
               placeholder="Enter discount amount"
-              type="number"
               value={discountAmount}
-              onChange={(e) => setDiscountAmount(Number(e.target.value))}
+              onChange={setDiscountAmount}
+              allowDecimal
+              prefix="₱"
+              formatWithCommas
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="membership-duration">Duration Months</label>
-            <UsernameInput
-              id="membership-duration"
+            <NumberInput
               className="employee-input"
               placeholder="Enter duration in months"
-              type="number"
               value={durationMonths}
-              onChange={(e) => setDurationMonths(Number(e.target.value))}
+              onChange={setDurationMonths}
+              formatWithCommas
             />
           </div>
 
@@ -307,22 +356,14 @@ const MembershipPage: React.FC = () => {
             <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
               Enter new Daily Rate
             </p>
-
-            <input
-              type="number"
+            <NumberInput
               value={dailyRateInput}
-              onChange={(e) => setDailyRateInput(e.target.value)}
+              onChange={setDailyRateInput}
               placeholder="Enter daily rate"
-              style={{
-                marginTop: "15px",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #ccc",
-                fontSize: "16px",
-                width: "100%",
-                color: "#333",
-                boxSizing: "border-box",
-              }}
+              allowDecimal
+              prefix="₱"
+              formatWithCommas
+              className="employee-input"
             />
           </div>
 
@@ -338,7 +379,11 @@ const MembershipPage: React.FC = () => {
                   isNaN(newRate) ||
                   newRate < 0
                 ) {
-                  alert("Please enter a valid daily rate.");
+                  openStatusModal(
+                    "Invalid Input",
+                    "Please enter a valid daily rate.",
+                    "warning",
+                  );
                   return;
                 }
 
@@ -372,9 +417,15 @@ const MembershipPage: React.FC = () => {
             <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
               Update Daily Rate?
             </p>
-
             <p style={{ marginTop: "10px", color: "#666", fontSize: "25px" }}>
-              ₱{dailyRateInput}
+              ₱
+              {(dailyRateInput === ""
+                ? 0
+                : Number(dailyRateInput)
+              ).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </div>
 
@@ -399,6 +450,14 @@ const MembershipPage: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
 
       <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>

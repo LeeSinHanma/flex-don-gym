@@ -17,6 +17,9 @@ import {
   CreateInventoryItem,
 } from "../../logicHandlers/itemInvCrud";
 import { stopBarcodeScanner } from "../../logicHandlers/barcodeScannerModule";
+import StatusModal from "../../components/Reusable/StatusModal";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
+import NumberInput from "../../components/Reusable/NumberInput";
 
 const ProductPage: React.FC = () => {
   const history = useHistory();
@@ -34,8 +37,8 @@ const ProductPage: React.FC = () => {
   const [itemId, setItemId] = useState("");
   const [itemName, setItemName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState<number>(0);
-  const [quantity, setQuantity] = useState<number>(0);
+  const [price, setPrice] = useState<string>("0");
+  const [quantity, setQuantity] = useState<string>("0");
   const [addedBy, setAddedBy] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -51,10 +54,32 @@ const ProductPage: React.FC = () => {
     "all" | "in-stock" | "out-of-stock"
   >("all");
 
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-    useEffect(() => {
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        setAddedBy(parsedUser.username || "");
+      } catch (e) {
+        console.error("Failed to parse user from localStorage");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -70,6 +95,17 @@ const ProductPage: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
 
   const loadItems = async () => {
     try {
@@ -133,17 +169,27 @@ const ProductPage: React.FC = () => {
     setErrorMessage("");
   };
 
-  const closeModal = async  () => {
+  const closeModal = async () => {
     setItemId("");
     setItemName("");
     setDescription("");
-    setPrice(0);
-    setQuantity(0);
-    setAddedBy("");
+    setPrice("0");
+    setQuantity("0");
     setErrorMessage("");
     await stopBarcodeScanner();
     setIsScanModalOpen(false);
     setIsModalOpen(false);
+
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        setAddedBy(parsedUser.username || "");
+      } catch (e) {
+        console.error("Failed to parse user from localStorage");
+        setAddedBy("");
+      }
+    }
   };
 
   const handleMenuClick = () => {
@@ -154,13 +200,16 @@ const ProductPage: React.FC = () => {
     setIsMenuOpen(false);
   };
 
-
   const handleCreateProduct = async () => {
     if (!itemId.trim() || !itemName.trim() || !addedBy.trim()) {
       setErrorMessage("Item ID, Item Name, and Added By are required.");
       return;
     }
-    if (price < 0 || quantity < 0) {
+
+    const numericPrice = price === "" ? 0 : Number(price);
+    const numericQuantity = quantity === "" ? 0 : Number(quantity);
+
+    if (numericPrice < 0 || numericQuantity < 0) {
       setErrorMessage("Price and Quantity cannot be negative.");
       return;
     }
@@ -169,8 +218,8 @@ const ProductPage: React.FC = () => {
       item_id: itemId.trim(),
       item_name: itemName.trim(),
       description: description.trim(),
-      price: Number(price),
-      quantity: Number(quantity),
+      price: numericPrice,
+      quantity: numericQuantity,
       added_by: addedBy.trim(),
     };
 
@@ -179,11 +228,20 @@ const ProductPage: React.FC = () => {
       setErrorMessage("");
 
       await createInventoryItem(payload);
+      await loadItems();
+      await closeModal();
 
-      closeModal();
-      await loadItems(); // ✅ refresh list so new product appears
+      openStatusModal(
+        "Product Added",
+        `"${itemName}" was added successfully.`,
+        "success",
+      );
     } catch (e: any) {
-      setErrorMessage(e?.message || "Create product failed");
+      openStatusModal(
+        "Create Failed",
+        e?.message || "Create product failed",
+        "error",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -211,112 +269,114 @@ const ProductPage: React.FC = () => {
 
         <div className="admin-main-content">
           <div className="product-search-row">
-          <input
-            className="product-search-input"
-            type="text"
-            placeholder="Search by name / id / description"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
+            <input
+              className="product-search-input"
+              type="text"
+              placeholder="Search by name / id / description"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
 
-          {/* Scan */}
-          <button
-            type="button"
-            className="product-search-btn"
-            onClick={() => {
-              setScanTarget("search");
-              setIsScanModalOpen(true);
-            }}
-          >
-            Scan
-          </button>
-
-          {/* Sort / Filter Dropdown */}
-          <div className="sort-dropdown-wrapper" ref={dropdownRef}>
+            {/* Scan */}
             <button
+              type="button"
               className="product-search-btn"
-              onClick={() => setShowSortDropdown((prev) => !prev)}
+              onClick={() => {
+                setScanTarget("search");
+                setIsScanModalOpen(true);
+              }}
             >
-              Filter
+              Scan
             </button>
 
-            {showSortDropdown && (
-              <div className="sort-dropdown">
-                <p className="dropdown-label">Sort</p>
+            {/* Sort / Filter Dropdown */}
+            <div className="sort-dropdown-wrapper" ref={dropdownRef}>
+              <button
+                className="product-search-btn"
+                onClick={() => setShowSortDropdown((prev) => !prev)}
+              >
+                Filter
+              </button>
 
-                <button onClick={() => setSortType("default")}>Default</button>
-                <button
-                  className={sortType === "name-asc" ? "active" : ""}
-                  onClick={() => {
-                    setSortType("name-asc");
-                    setShowSortDropdown(false);
-                  }}
-                >
-                  Name A-Z
-                </button>
-                <button
-                  className={sortType === "name-desc" ? "active" : ""}
-                  onClick={() => {
-                    setSortType("name-desc");
-                    setShowSortDropdown(false);
-                  }}
-                >
-                  Name Z-A
-                </button>
-                <button
+              {showSortDropdown && (
+                <div className="sort-dropdown">
+                  <p className="dropdown-label">Sort</p>
+
+                  <button onClick={() => setSortType("default")}>
+                    Default
+                  </button>
+                  <button
+                    className={sortType === "name-asc" ? "active" : ""}
+                    onClick={() => {
+                      setSortType("name-asc");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                    Name A-Z
+                  </button>
+                  <button
+                    className={sortType === "name-desc" ? "active" : ""}
+                    onClick={() => {
+                      setSortType("name-desc");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                    Name Z-A
+                  </button>
+                  <button
                     className={sortType === "price-asc" ? "active" : ""}
                     onClick={() => {
                       setSortType("price-asc");
                       setShowSortDropdown(false);
                     }}
                   >
-                  Price Low → High
-                </button>
-                <button
-                className={sortType === "price-desc" ? "active" : ""}
-                onClick={() => {
-                  setSortType("price-desc");
-                  setShowSortDropdown(false);
-                }}
-                >
-                  Price High → Low
-                </button>
-
-                <hr />
-
-                <p className="dropdown-label">Stock</p>
-
-                <button
-                  className={stockFilter === "all" ? "active" : ""}
-                  onClick={() => {
-                    setStockFilter("all");
-                    setShowSortDropdown(false);
-                  }}
+                    Price Low → High
+                  </button>
+                  <button
+                    className={sortType === "price-desc" ? "active" : ""}
+                    onClick={() => {
+                      setSortType("price-desc");
+                      setShowSortDropdown(false);
+                    }}
                   >
-                  All
-                </button>
-                <button
-                  className={stockFilter === "in-stock" ? "active" : ""}
-                  onClick={() => {
-                    setStockFilter("in-stock");
-                    setShowSortDropdown(false);
-                  }}
+                    Price High → Low
+                  </button>
+
+                  <hr />
+
+                  <p className="dropdown-label">Stock</p>
+
+                  <button
+                    className={stockFilter === "all" ? "active" : ""}
+                    onClick={() => {
+                      setStockFilter("all");
+                      setShowSortDropdown(false);
+                    }}
                   >
-                  In Stock
-                </button>
-                <button
-                  className={stockFilter === "out-of-stock" ? "active" : ""}
-                  onClick={() => {
-                    setStockFilter("out-of-stock");
-                    setShowSortDropdown(false);
-                  }}
-                >
-                  Out of Stock
-                </button>
-              </div>
-            )}
+                    All
+                  </button>
+                  <button
+                    className={stockFilter === "in-stock" ? "active" : ""}
+                    onClick={() => {
+                      setStockFilter("in-stock");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                    In Stock
+                  </button>
+                  <button
+                    className={stockFilter === "out-of-stock" ? "active" : ""}
+                    onClick={() => {
+                      setStockFilter("out-of-stock");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                    Out of Stock
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
           <div className="product-card-wrapper">
             {isLoading && <p style={{ textAlign: "center" }}>Loading...</p>}
@@ -417,31 +477,25 @@ const ProductPage: React.FC = () => {
 
           <div className="form-group">
             <label>Price</label>
-            <input
+            <NumberInput
               className="employee-input"
-              type="number"
+              placeholder="Enter price"
               value={price}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={setPrice}
+              allowDecimal
+              prefix="₱"
+              formatWithCommas
             />
           </div>
 
           <div className="form-group">
             <label>Quantity</label>
-            <input
+            <NumberInput
               className="employee-input"
-              type="number"
+              placeholder="Enter quantity"
               value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Added By *</label>
-            <input
-              className="employee-input"
-              placeholder="e.g. admin"
-              value={addedBy}
-              onChange={(e) => setAddedBy(e.target.value)}
+              onChange={setQuantity}
+              formatWithCommas
             />
           </div>
 
@@ -457,7 +511,7 @@ const ProductPage: React.FC = () => {
             <Button
               type="button"
               className="btn-modal btn-submit-modal"
-              onClick={handleCreateProduct}
+              onClick={() => setShowConfirmModal(true)}
               disabled={isSaving}
             >
               {isSaving ? "Saving..." : "Confirm"}
@@ -476,6 +530,35 @@ const ProductPage: React.FC = () => {
           }
         }}
         title="Scan Item Barcode"
+      />
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Confirm Product Creation"
+        message={`Are you sure you want to create "${
+          itemName || "this product"
+        }"?
+
+        Price: ₱${(price === "" ? 0 : Number(price)).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+        Quantity: ${(quantity === "" ? 0 : Number(quantity)).toLocaleString()}`}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={async () => {
+          setShowConfirmModal(false);
+          await handleCreateProduct();
+        }}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
       />
       <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>

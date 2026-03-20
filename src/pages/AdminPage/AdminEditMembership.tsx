@@ -5,7 +5,8 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
-import { Modal } from "../../components/Reusable/Modals";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
+import NumberInput from "../../components/Reusable/NumberInput";
 import LoadingScreen from "../LoadingScreen";
 import "./AdminDashboard.css";
 import "./Product.css";
@@ -16,6 +17,7 @@ import {
   MembershipTypeResponse,
   deleteMembershipType,
 } from "../../logicHandlers/membershipCrud";
+import StatusModal from "../../components/Reusable/StatusModal";
 
 interface RouteParams {
   membershipId: string;
@@ -24,22 +26,40 @@ interface RouteParams {
 const AdminEditMembership: React.FC = () => {
   const history = useHistory();
   const { membershipId } = useParams<RouteParams>();
-
-  const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [name, setName] = useState("");
   const [type, setType] = useState<number>(0);
-  const [price, setPrice] = useState<number>(0);
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [durationMonths, setDurationMonths] = useState<number>(0);
+  const [price, setPrice] = useState<string>("0");
+  const [discountAmount, setDiscountAmount] = useState<string>("0");
+  const [durationMonths, setDurationMonths] = useState<string>("0");
+
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+  const [shouldGoBack, setShouldGoBack] = useState(false);
+  const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
 
   const membershipTypeLabel: Record<number, string> = {
     0: "Postpaid",
     1: "Prepaid",
     2: "Discount",
+  };
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
   };
 
   const [acceptedData, setAcceptedData] = useState<{
@@ -67,9 +87,9 @@ const AdminEditMembership: React.FC = () => {
 
         setName(selectedMembership.name ?? "");
         setType(selectedMembership.type ?? 0);
-        setPrice(selectedMembership.price ?? 0);
-        setDiscountAmount(selectedMembership.discount_amount ?? 0);
-        setDurationMonths(selectedMembership.duration_months ?? 0);
+        setPrice(String(selectedMembership.price ?? 0));
+        setDiscountAmount(String(selectedMembership.discount_amount ?? 0));
+        setDurationMonths(String(selectedMembership.duration_months ?? 0));
       } catch (err) {
         console.error(err);
         alert("Failed to load membership");
@@ -85,12 +105,24 @@ const AdminEditMembership: React.FC = () => {
     const trimmedName = name.trim();
 
     if (!trimmedName) {
-      alert("Membership name is required.");
+      openStatusModal(
+        "Missing Name",
+        "Membership name is required.",
+        "warning",
+      );
       return;
     }
 
-    if (price < 0 || discountAmount < 0 || durationMonths < 0) {
-      alert("Numeric fields cannot be negative.");
+    const numericPrice = price === "" ? 0 : Number(price);
+    const numericDiscount = discountAmount === "" ? 0 : Number(discountAmount);
+    const numericDuration = durationMonths === "" ? 0 : Number(durationMonths);
+
+    if (numericPrice < 0 || numericDiscount < 0 || numericDuration < 0) {
+      openStatusModal(
+        "Invalid Input",
+        "Numeric fields cannot be negative.",
+        "warning",
+      );
       return;
     }
 
@@ -99,23 +131,32 @@ const AdminEditMembership: React.FC = () => {
       await updateMembershipType(Number(membershipId), {
         name: trimmedName,
         type,
-        price,
-        discount_amount: discountAmount,
-        duration_months: durationMonths,
+        price: numericPrice,
+        discount_amount: numericDiscount,
+        duration_months: numericDuration,
       });
 
       setAcceptedData({
         name: trimmedName,
         type,
-        price,
-        discountAmount,
-        durationMonths,
+        price: numericPrice,
+        discountAmount: numericDiscount,
+        durationMonths: numericDuration,
       });
 
-      setShowModal(true);
+      setShouldGoBack(true);
+      openStatusModal(
+        "Membership Updated",
+        `"${trimmedName}" was updated successfully.`,
+        "success",
+      );
     } catch (err: any) {
       console.log("API ERROR:", err?.message);
-      alert(err?.message || "Failed to update membership");
+      openStatusModal(
+        "Update Failed",
+        err?.message || "Failed to update membership",
+        "error",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -182,34 +223,38 @@ const AdminEditMembership: React.FC = () => {
 
             <div className="form-group">
               <label>Price:</label>
-              <UsernameInput
+              <NumberInput
                 className="input-username"
                 placeholder="Price"
-                type="number"
                 value={price}
-                onChange={(e: any) => setPrice(Number(e.target.value))}
+                onChange={setPrice}
+                allowDecimal
+                prefix="₱"
+                formatWithCommas
               />
             </div>
 
             <div className="form-group">
               <label>Discount Amount:</label>
-              <UsernameInput
+              <NumberInput
                 className="input-username"
                 placeholder="Discount amount"
-                type="number"
                 value={discountAmount}
-                onChange={(e: any) => setDiscountAmount(Number(e.target.value))}
+                onChange={setDiscountAmount}
+                allowDecimal
+                prefix="₱"
+                formatWithCommas
               />
             </div>
 
             <div className="form-group">
               <label>Duration in Months:</label>
-              <UsernameInput
+              <NumberInput
                 className="input-username"
                 placeholder="Duration months"
-                type="number"
                 value={durationMonths}
-                onChange={(e: any) => setDurationMonths(Number(e.target.value))}
+                onChange={setDurationMonths}
+                formatWithCommas
               />
             </div>
           </div>
@@ -223,79 +268,59 @@ const AdminEditMembership: React.FC = () => {
               Delete
             </Button>
 
-            <Button className="btn-submit" type="button" onClick={handleUpdate}>
+            <Button
+              className="btn-submit"
+              type="button"
+              onClick={() => setShowSaveConfirmModal(true)}
+            >
               Save
             </Button>
           </div>
         </div>
 
-        <Modal
-          className="modal-box"
-          isOpen={showModal}
-          onClose={() => {
-            setShowModal(false);
-            setAcceptedData(null);
-            history.goBack();
-          }}
-          title="Membership Updated"
-        >
-          {acceptedData ? (
-            <div className="accepted-details">
-              <p>
-                <b>Name:</b> {acceptedData.name}
-              </p>
-              <p>
-                <b>Type:</b>{" "}
-                {membershipTypeLabel[acceptedData.type] || "Unknown"} (
-                {acceptedData.type})
-              </p>
-              <p>
-                <b>Price:</b> {acceptedData.price}
-              </p>
-              <p>
-                <b>Discount Amount:</b> {acceptedData.discountAmount}
-              </p>
-              <p>
-                <b>Duration Months:</b> {acceptedData.durationMonths}
-              </p>
-            </div>
-          ) : (
-            <p>Updated.</p>
-          )}
-        </Modal>
-        <Modal
+        <ConfirmModal
           isOpen={showDeleteModal}
-          onClose={() => {
+          title="Confirm Delete"
+          message={`Are you sure you want to delete "${
+            name.trim() || "this membership"
+          }"?`}
+          confirmText={isDeleting ? "Deleting..." : "Delete"}
+          cancelText="Cancel"
+          onCancel={() => {
             if (!isDeleting) setShowDeleteModal(false);
           }}
-          title="Confirm Delete"
-          showCloseButton={false}
-          className="confirm-modal"
-        >
-          <p style={{ textAlign: "center" }}>
-            Are you sure you want to delete this item?
-          </p>
+          onConfirm={handleDelete}
+        />
 
-          <div className="success-actions">
-            <Button
-              type="button"
-              className="renew-btn"
-              onClick={() => setShowDeleteModal(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
+        <ConfirmModal
+          isOpen={showSaveConfirmModal}
+          title="Confirm Save"
+          message={`Are you sure you want to save changes to "${
+            name.trim() || "this membership"
+          }"?`}
+          confirmText="Save"
+          cancelText="Cancel"
+          onCancel={() => setShowSaveConfirmModal(false)}
+          onConfirm={async () => {
+            setShowSaveConfirmModal(false);
+            await handleUpdate();
+          }}
+        />
 
-            <Button
-              type="button"
-              className="cancel-btn"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Confirm Delete"}
-            </Button>
-          </div>
-        </Modal>
+        <StatusModal
+          isOpen={showStatusModal}
+          onClose={() => {
+            setShowStatusModal(false);
+
+            if (shouldGoBack) {
+              setShouldGoBack(false);
+              history.goBack();
+            }
+          }}
+          title={statusTitle}
+          message={statusMessage}
+          type={statusType}
+        />
       </div>
     </>
   );
