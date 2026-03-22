@@ -3,6 +3,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
@@ -43,6 +44,11 @@ const MembershipPage: React.FC = () => {
   const [isEditDailyRateOpen, setIsEditDailyRateOpen] = useState(false);
   const [isConfirmDailyRateOpen, setIsConfirmDailyRateOpen] = useState(false);
   const [isSavingDailyRate, setIsSavingDailyRate] = useState(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmType, setConfirmType] = useState<"save" | "delete" | null>(
+    null,
+  );
 
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
