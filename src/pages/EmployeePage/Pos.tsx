@@ -5,7 +5,7 @@ import "./Pos.css";
 import { IonIcon } from "@ionic/react";
 import { filter, menu } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
-import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
+import Menu from "../../components/Reusable/Menu";
 import scanSound from "../../resource/scanSound.mp3";
 import scanError from "../../resource/scanError.mp3";
 import StatusModal from "../../components/Reusable/StatusModal";
@@ -307,7 +307,7 @@ const PosPage: React.FC = () => {
         </div>
       </div>
 
-      <EmployeeMenu
+      <Menu
         isOpen={showEmployeeMenu}
         onClose={() => setShowEmployeeMenu(false)}
         onBeforeLogout={() => stopBarcodeScanner()}

@@ -6,7 +6,7 @@ import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
-import AdminMenu from "../../components/Reusable/AdminMenu";
+import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
 import "./Product.css";
 import BarcodeScanModal from "../../components/Reusable/BarcodeScanModal";
@@ -20,6 +20,7 @@ import { stopBarcodeScanner } from "../../logicHandlers/barcodeScannerModule";
 import StatusModal from "../../components/Reusable/StatusModal";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import NumberInput from "../../components/Reusable/NumberInput";
+import { getCurrentUser } from "../../logicHandlers/userServices";
 
 const ProductPage: React.FC = () => {
   const history = useHistory();
@@ -67,11 +68,10 @@ const ProductPage: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
+    const parsedUser = getCurrentUser();
 
-    if (user) {
+    if (parsedUser) {
       try {
-        const parsedUser = JSON.parse(user);
         setAddedBy(parsedUser.username || "");
       } catch (e) {
         console.error("Failed to parse user from localStorage");
@@ -180,10 +180,9 @@ const ProductPage: React.FC = () => {
     setIsScanModalOpen(false);
     setIsModalOpen(false);
 
-    const user = localStorage.getItem("user");
-    if (user) {
+    const parsedUser = getCurrentUser();
+    if (parsedUser) {
       try {
-        const parsedUser = JSON.parse(user);
         setAddedBy(parsedUser.username || "");
       } catch (e) {
         console.error("Failed to parse user from localStorage");
@@ -560,7 +559,7 @@ const ProductPage: React.FC = () => {
         message={statusMessage}
         type={statusType}
       />
-      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+      <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };

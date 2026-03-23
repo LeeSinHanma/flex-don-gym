@@ -4,6 +4,7 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory, useLocation } from "react-router-dom";
 import { arrowBackOutline } from "ionicons/icons";
 import "./AdminDashboard.css";
+import "./ItemInfo.css";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import {

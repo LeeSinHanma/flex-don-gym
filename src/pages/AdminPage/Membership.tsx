@@ -3,6 +3,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
@@ -21,7 +22,7 @@ import {
   updateGymPricing,
   GymPricing,
 } from "../../logicHandlers/gymPricing";
-import AdminMenu from "../../components/Reusable/AdminMenu";
+import Menu from "../../components/Reusable/Menu";
 
 const MembershipPage: React.FC = () => {
   const history = useHistory();
@@ -43,6 +44,11 @@ const MembershipPage: React.FC = () => {
   const [isEditDailyRateOpen, setIsEditDailyRateOpen] = useState(false);
   const [isConfirmDailyRateOpen, setIsConfirmDailyRateOpen] = useState(false);
   const [isSavingDailyRate, setIsSavingDailyRate] = useState(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmType, setConfirmType] = useState<"save" | "delete" | null>(
+    null,
+  );
 
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
@@ -459,7 +465,7 @@ const MembershipPage: React.FC = () => {
         type={statusType}
       />
 
-      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+      <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };

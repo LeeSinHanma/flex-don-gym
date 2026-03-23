@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 import LogoutModal from "../../components/Reusable/LogoutModal";
+import { getCurrentUser, logout } from "../../logicHandlers/userServices";
 
 const StartingPageAdmin: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,7 +16,7 @@ const StartingPageAdmin: React.FC = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogout = () => {
-    localStorage.clear();
+    logout();
     history.replace("/");
   };
 
@@ -34,12 +35,11 @@ const StartingPageAdmin: React.FC = () => {
   };
 
   useEffect(() => {
-    const user = localStorage.getItem("user");
+    const parsedUser = getCurrentUser();
 
-    if (!user) {
+    if (!parsedUser) {
       history.push("/");
     } else {
-      const parsedUser = JSON.parse(user);
       setLoggedUser(parsedUser.username);
     }
   }, [history]);

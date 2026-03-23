@@ -16,6 +16,7 @@ import {
 } from "../../logicHandlers/membershipCrud";
 import LoadingScreen from "../LoadingScreen";
 import QRCode from "react-qr-code";
+import { getCurrentUser } from "../../logicHandlers/userServices";
 import "./Member.css";
 
 const MemberMenu: React.FC = () => {
@@ -122,7 +123,7 @@ const MemberMenu: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const user = getCurrentUser() || {};
 
       const response = await createMember({
         email: trimmedEmail,
@@ -131,7 +132,7 @@ const MemberMenu: React.FC = () => {
         last_name: trimmedLastName,
         membership_plan_id: membershipType,
         credits: credits === "" ? 0 : credits,
-        registered_by: String(user.user_id),
+        registered_by: String(user.userID || user.user_id || "unknown"),
         payment_method: paymentMethod,
         amount_given: Number(amountGiven),
       });

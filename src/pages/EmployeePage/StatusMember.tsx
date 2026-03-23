@@ -7,7 +7,7 @@ import { IonIcon } from "@ionic/react";
 import { arrowBack, menu } from "ionicons/icons";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
-import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
+import Menu from "../../components/Reusable/Menu";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
@@ -168,7 +168,7 @@ const StatusMemberPage: React.FC = () => {
         </div>
       </div>
 
-      <EmployeeMenu
+      <Menu
         isOpen={showEmployeeMenu}
         onClose={() => setShowEmployeeMenu(false)}
       />

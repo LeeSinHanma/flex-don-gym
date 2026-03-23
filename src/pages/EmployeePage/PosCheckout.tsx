@@ -12,6 +12,7 @@ import { createSale } from "../../logicHandlers/salesHandler";
 import ReceiptModal from "../../components/Reusable/ReceiptModal";
 import TransacModal from "../../components/Reusable/TransacModal";
 import StatusModal from "../../components/Reusable/StatusModal";
+import { getCurrentUser } from "../../logicHandlers/userServices";
 
 type CartItem = InventoryItem & {
   cartQuantity: number;
@@ -75,8 +76,7 @@ const PosCheckout: React.FC = () => {
         return;
       }
 
-      const storedUser = localStorage.getItem("user");
-      const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+      const parsedUser = getCurrentUser();
 
       const soldBy =
         parsedUser?.username ||
