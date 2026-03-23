@@ -2,6 +2,7 @@ import React from "react";
 import { Modal } from "./Modals";
 import { Button } from "./Button";
 import { useHistory } from "react-router-dom";
+import { logout } from "../../logicHandlers/userServices";
 
 interface LogoutModalProps {
   isOpen: boolean;
@@ -12,7 +13,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ isOpen, onClose }) => {
   const history = useHistory();
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    logout();
     history.replace("/");
   };
 

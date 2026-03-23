@@ -1,22 +1,45 @@
 import api from "../api/axios";
 import axios from "axios";
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_active: boolean;
+  role: number;
+  access_list: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export type UpdateUserInput = {
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: number;
+  is_active: boolean;
+  //access_list?: string[];
+};
+
 export type APIResponse = any;
 
 // ---------- Helpers ----------
 function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
-    // FastAPI often uses { detail: "..." }
     const detail = (err.response?.data as any)?.detail;
     return detail || err.message || "Request failed";
   }
   return "Unknown error";
 }
 
-// ---------- Services ----------
-
 // ✅ POST /users/login?username=...&password=...
-export async function loginUser(username: string, password: string): Promise<APIResponse> {
+export async function loginUser(
+  username: string,
+  password: string
+): Promise<APIResponse> {
   try {
     const res = await api.post<APIResponse>("/users/login", null, {
       params: { username, password },
@@ -27,22 +50,47 @@ export async function loginUser(username: string, password: string): Promise<API
   }
 }
 
-// ✅ POST /users/create ... creation of user(cashier/staffs)
-export async function createUser(username: string, email: string,password: string, firstName: string, lastName: string, role: number): Promise<APIResponse> {
+// ✅ GET /users/by-id/{user_id} ... get user by id
+export async function getUserById(userId: string): Promise<User> {
   try {
-    const res = await api.post<APIResponse>("/users/create", null, {
-      params: { username, email, password, firstName, lastName, role},
-    });
+    const res = await api.get<User>(`/users/by-id/${userId}`);
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
   }
 }
 
-// ✅ GET /members/by-id/{member_id} ... get member info by member id (QR scanning)
-export async function getMemberByID(memberID: string | number): Promise<APIResponse> {
+// ✅ GET /users/all ... get all users
+export async function getUsers(): Promise<User[]> {
   try {
-    const res = await api.get<APIResponse>(`/members/by-id/${encodeURIComponent(String(memberID))}`);
+    const res = await api.get<User[]>("/users/all");
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+// ✅ POST /users/create ... creation of user (cashier/staffs)
+export async function createUser(
+  username: string,
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+  role: number,
+  accessList: string[]
+): Promise<APIResponse> {
+  try {
+    const res = await api.post<APIResponse>("/users/create", {
+      username,
+      email,
+      password,
+      first_name: firstName,
+      last_name: lastName,
+      role,
+      access_list: accessList,
+    });
+
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
@@ -62,6 +110,33 @@ export async function getUserType(username: string): Promise<number> {
   }
 }
 
+// ✅ PUT /users/update/{user_id}
+export async function updateUser(
+  userId: string,
+  data: UpdateUserInput
+): Promise<User> {
+  try {
+    const res = await api.put<User>(`/users/update/${userId}`, data);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+export async function getUserByUsername(username: string): Promise<User> {
+  try {
+    const res = await api.get<User>(
+      `/users/by-username/${encodeURIComponent(username)}`
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error("Failed to get user details");
+  }
+}
+
+export const setCurrentUser = (userData: any) => {
+  localStorage.setItem("user", JSON.stringify(userData));
+};
 
 export const getCurrentUser = () => {
   const user = localStorage.getItem("user");

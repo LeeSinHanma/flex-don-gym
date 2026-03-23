@@ -22,7 +22,7 @@ import {
   updateGymPricing,
   GymPricing,
 } from "../../logicHandlers/gymPricing";
-import AdminMenu from "../../components/Reusable/AdminMenu";
+import Menu from "../../components/Reusable/Menu";
 
 const MembershipPage: React.FC = () => {
   const history = useHistory();
@@ -465,7 +465,7 @@ const MembershipPage: React.FC = () => {
         type={statusType}
       />
 
-      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+      <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };

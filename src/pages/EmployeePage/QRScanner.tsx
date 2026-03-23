@@ -8,7 +8,7 @@ import {
   stopQrScanner,
 } from "../../logicHandlers/qrScannerModule";
 import { scanVisit } from "../../logicHandlers/visits";
-import EmployeeMenu from "../../components/Reusable/EmployeeMenu";
+import Menu from "../../components/Reusable/Menu";
 import { IonIcon, IonImg } from "@ionic/react";
 import { search, menu } from "ionicons/icons";
 import { getMemberByName, Member } from "../../logicHandlers/memberCrud";
@@ -445,7 +445,7 @@ const QRScannerHome: React.FC = () => {
         }}
       />
 
-      <EmployeeMenu
+      <Menu
         isOpen={showEmployeeMenu}
         onClose={() => setShowEmployeeMenu(false)}
         onBeforeLogout={() => stopQrScanner()}

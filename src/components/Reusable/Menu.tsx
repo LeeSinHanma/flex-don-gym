@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { Modal } from "../../components/Reusable/Modals";
-import { Button } from "../../components/Reusable/Button";
-import LogoutModal from "../../components/Reusable/LogoutModal";
+import { Modal } from "./Modals";
+import { Button } from "./Button";
+import LogoutModal from "./LogoutModal";
 
-interface AdminMenuProps {
+interface MenuProps {
   isOpen: boolean;
   onClose: () => void;
+  onBeforeLogout?: () => Promise<void>;
 }
 
-const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
+const Menu: React.FC<MenuProps> = ({
+  isOpen,
+  onClose,
+  onBeforeLogout,
+}) => {
   const history = useHistory();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -28,7 +33,7 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title="Admin Menu"
+        title="Menu"
         showCloseButton={false}
       >
         <div className="menu-buttons">
@@ -44,12 +49,20 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
             PRODUCTS
           </Button>
 
-          <Button className="menu-btn" onClick={() => goTo("/status-member")}>
-            MEMBERS
-          </Button>
-
           <Button className="menu-btn" onClick={() => goTo("/admin-membership")}>
             MEMBERSHIP PLANS
+          </Button>
+
+          <Button className="menu-btn" onClick={() => goTo("/pos")}>
+            POS
+          </Button>
+
+          <Button className="menu-btn" onClick={() => goTo("/qr")}>
+            QR SCANNER
+          </Button>
+
+          <Button className="menu-btn" onClick={() => goTo("/status-member")}>
+            STATUS / MEMBERS
           </Button>
 
           <Button className="menu-btn" onClick={handleLogoutClick}>
@@ -69,4 +82,4 @@ const AdminMenu: React.FC<AdminMenuProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default AdminMenu;
+export default Menu;

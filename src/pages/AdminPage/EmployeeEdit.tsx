@@ -9,7 +9,7 @@ import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import "./ManageStatusMem.css";
 import StatusModal from "../../components/Reusable/StatusModal";
 
-import { getUserById, updateUser } from "../../logicHandlers/userCrud";
+import { getUserById, updateUser } from "../../logicHandlers/userServices";
 
 interface RouteParams {
   userId: string;

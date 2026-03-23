@@ -5,7 +5,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
-import { loginUser } from "../../logicHandlers/userCrud";
+import { loginUser } from "../../logicHandlers/userServices";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 
