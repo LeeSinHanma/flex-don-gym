@@ -4,7 +4,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
-import { getUserType, loginUser } from "../../logicHandlers/userCrud";
+import { getUserByUsername, loginUser, setCurrentUser, getCurrentUser } from "../../logicHandlers/userServices";
 import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 
@@ -22,15 +22,13 @@ const LoginRegister: React.FC = () => {
 
   // ✅ Detect internet changes
   useEffect(() => {
-    const user = localStorage.getItem("user");
+    const parsed = getCurrentUser();
 
-    if (user) {
-      const parsed = JSON.parse(user);
-
+    if (parsed) {
       console.log("User already logged in:", parsed); // ✅
 
-      if (parsed.userType === 0) history.push("/admin-dashboard");
-      else if (parsed.userType === 1) history.push("/qr");
+      if (parsed.role === 0) history.push("/admin-dashboard");
+      else if (parsed.role === 1) history.push("/qr");
     }
 
     const onOnline = () => setIsOnline(true);
@@ -61,22 +59,26 @@ const LoginRegister: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const user = await loginUser(username, password);
-      const userType = await getUserType(username);
+      const userRes = await loginUser(username, password);
+      const fullUser = await getUserByUsername(username);
 
       const loggedUser = {
-        username,
-        userType,
+        userID: fullUser.id,
+        username: fullUser.username,
+        firstName: fullUser.first_name,
+        lastName: fullUser.last_name,
+        role: fullUser.role,
+        accessList: fullUser.access_list || [],
       };
 
       // ✅ Save logged in user
-      localStorage.setItem("user", JSON.stringify(loggedUser));
+      setCurrentUser(loggedUser);
 
       // ✅ Console log here
       console.log("Logged in user:", loggedUser);
 
-      if (userType === 0) history.push("/admin-dashboard");
-      else if (userType === 1) history.push("/qr");
+      if (fullUser.role === 0) history.push("/admin-dashboard");
+      else if (fullUser.role === 1) history.push("/qr");
       else setErrorMessage("Unknown user type");
     } catch (error: any) {
       // ✅ show better message if it's likely internet issue

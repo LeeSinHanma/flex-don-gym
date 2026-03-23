@@ -7,11 +7,11 @@ import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
-import AdminMenu from "../../components/Reusable/AdminMenu";
+import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
 import "./Employee.css";
 
-import { createUser, getUsers, User } from "../../logicHandlers/userCrud";
+import { createUser, getUsers, getCurrentUser, User } from "../../logicHandlers/userServices";
 
 const EmployeeMenu: React.FC = () => {
   const history = useHistory();
@@ -30,12 +30,13 @@ const EmployeeMenu: React.FC = () => {
   const [access, setAccess] = useState<string[]>([]);
 
   const accessOptions = [
-    "Employee Edit",
-    "Products Edit",
-    "Members Page",
-    "Membership Plan",
-    "POS",
-    "QR Scanner",
+    { label: "Dashboard", value: "dashboard" },
+    { label: "Employee Edit", value: "employees" },
+    { label: "Products Edit", value: "products" },
+    { label: "Membership Plan", value: "membership-plans" },
+    { label: "QR Scanner", value: "qr-scanner" },
+    { label: "POS", value: "pos" },
+    { label: "Members Page", value: "status" },
   ];
 
   useEffect(() => {
@@ -69,10 +70,18 @@ const EmployeeMenu: React.FC = () => {
 
   const filteredUsers = useMemo(() => {
     const term = search.toLowerCase().trim();
+    const currentUser = getCurrentUser();
 
-    if (!term) return users;
+    let result = users;
 
-    return users.filter((u) => {
+    // Hide the logged-in user's own account
+    if (currentUser?.userID) {
+      result = result.filter((u) => u.id !== currentUser.userID);
+    }
+
+    if (!term) return result;
+
+    return result.filter((u) => {
       const fullName = `${u.first_name} ${u.last_name}`.toLowerCase();
       return (
         fullName.includes(term) ||
@@ -109,7 +118,7 @@ const EmployeeMenu: React.FC = () => {
         return;
       }
 
-      const finalAccess = role === 0 ? accessOptions : access;
+      const finalAccess = role === 0 ? accessOptions.map(opt => opt.value) : access;
 
       await createUser(
         username,
@@ -118,7 +127,7 @@ const EmployeeMenu: React.FC = () => {
         firstName,
         lastName,
         role,
-        //finalAccess
+        finalAccess
       );
 
       await loadUsers();
@@ -282,14 +291,14 @@ const EmployeeMenu: React.FC = () => {
 
             <div className="access-group">
               {accessOptions.map((item) => (
-                <label key={item} className="access-toggle">
+                <label key={item.value} className="access-toggle">
                   <input
                     type="checkbox"
-                    checked={access.includes(item)}
-                    onChange={() => handleAccessChange(item)}
+                    checked={access.includes(item.value)}
+                    onChange={() => handleAccessChange(item.value)}
                   />
                   <span className="access-slider"></span>
-                  <span className="access-text">{item}</span>
+                  <span className="access-text">{item.label}</span>
                 </label>
               ))}
             </div>
@@ -306,7 +315,7 @@ const EmployeeMenu: React.FC = () => {
         </div>
       </Modal>
 
-      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+      <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };
