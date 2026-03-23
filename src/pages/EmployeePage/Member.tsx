@@ -264,7 +264,9 @@ const MemberMenu: React.FC = () => {
                 <Button
                   type="button"
                   className={`payment-btn ${
-                    paymentMethod === "cash" ? "payment-active" : "payment-inactive"
+                    paymentMethod === "cash"
+                      ? "payment-active"
+                      : "payment-inactive"
                   }`}
                   onClick={() => setPaymentMethod("cash")}
                 >
@@ -274,7 +276,9 @@ const MemberMenu: React.FC = () => {
                 <Button
                   type="button"
                   className={`payment-btn ${
-                    paymentMethod === "gcash" ? "payment-active" : "payment-inactive"
+                    paymentMethod === "gcash"
+                      ? "payment-active"
+                      : "payment-inactive"
                   }`}
                   onClick={() => setPaymentMethod("gcash")}
                 >
