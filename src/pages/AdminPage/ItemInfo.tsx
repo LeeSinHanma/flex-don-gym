@@ -4,6 +4,7 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory, useLocation } from "react-router-dom";
 import { arrowBackOutline } from "ionicons/icons";
 import "./AdminDashboard.css";
+import "./ItemInfo.css";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import {
@@ -14,6 +15,7 @@ import {
 import { Modal } from "../../components/Reusable/Modals";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import StatusModal from "../../components/Reusable/StatusModal";
+import NumberInput from "../../components/Reusable/NumberInput";
 
 type LocationState = {
   item?: InventoryItem;
@@ -22,20 +24,19 @@ type LocationState = {
 const ItemInfoPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<LocationState>();
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showSaveModal, setShowSaveModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const passedItem = location.state?.item;
 
   const [itemName, setItemName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState<number>(0);
-  const [quantity, setQuantity] = useState<number>(0);
+  const [price, setPrice] = useState<string>("0");
+  const [quantity, setQuantity] = useState<string>("0");
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmType, setConfirmType] = useState<"save" | "delete" | null>(null);
+  const [confirmType, setConfirmType] = useState<"save" | "delete" | null>(
+    null,
+  );
 
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
@@ -50,14 +51,14 @@ const ItemInfoPage: React.FC = () => {
 
     setItemName(passedItem.item_name ?? "");
     setDescription(passedItem.description ?? "");
-    setPrice(Number(passedItem.price ?? 0));
-    setQuantity(Number(passedItem.quantity ?? 0));
+    setPrice(String(passedItem.price ?? 0));
+    setQuantity(String(passedItem.quantity ?? 0));
   }, [passedItem]);
 
   const openStatusModal = (
     title: string,
     message: string,
-    type: "success" | "error" | "warning" | "info" = "info"
+    type: "success" | "error" | "warning" | "info" = "info",
   ) => {
     setStatusTitle(title);
     setStatusMessage(message);
@@ -87,8 +88,8 @@ const ItemInfoPage: React.FC = () => {
       await updateInventoryItem(passedItem.item_id, {
         item_name: itemName.trim(),
         description: description.trim(),
-        price,
-        quantity,
+        price: price === "" ? 0 : Number(price),
+        quantity: quantity === "" ? 0 : Number(quantity),
       });
 
       setShouldRedirect(true);
@@ -159,37 +160,31 @@ const ItemInfoPage: React.FC = () => {
 
           <div className="form-group">
             <label>Price:</label>
-            <UsernameInput
+            <NumberInput
               className="input-username"
               placeholder="Price"
-              type="number"
               value={price}
-              onChange={(e: any) => setPrice(Number(e.target.value))}
+              onChange={setPrice}
+              allowDecimal
+              prefix="₱"
+              formatWithCommas
             />
           </div>
 
           <div className="form-group">
             <label>Stock:</label>
-            <UsernameInput
+            <NumberInput
               className="input-username"
               placeholder="Quantity"
-              type="number"
               value={quantity}
-              readOnly
+              onChange={setQuantity}
+              formatWithCommas
             />
           </div>
         </div>
 
         <div className="status-button-container">
           <div className="status-button">
-            <Button
-              type="button"
-              className="renew-btn"
-              onClick={() => history.push("/admin-product")}
-            >
-              Cancel
-            </Button>
-
             <Button
               type="button"
               className="cancel-btn"
@@ -216,58 +211,6 @@ const ItemInfoPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        title="Confirm Delete"
-        showCloseButton={false}
-        className="confirm-modal"
-      >
-        <p style={{ textAlign: "center" }}>
-          Are you sure you want to delete this product?
-        </p>
-
-        <div className="success-actions">
-          <Button
-            type="button"
-            className="renew-btn"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            Cancel
-          </Button>
-
-          <Button type="button" className="cancel-btn" onClick={handleDelete}>
-            Confirm Delete
-          </Button>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={showSaveModal}
-        onClose={() => {
-          setShowSaveModal(false);
-          history.push("/admin-product");
-        }}
-        title="Success"
-        showCloseButton={false}
-        className="confirm-modal"
-      >
-        <p style={{ textAlign: "center" }}>Product updated successfully.</p>
-
-        <div className="success-actions">
-          <Button
-            type="button"
-            className="cancel-btn"
-            onClick={() => {
-              setShowSaveModal(false);
-              history.push("/admin-product");
-            }}
-          >
-            OK
-          </Button>
-        </div>
-      </Modal>
 
       <ConfirmModal
         isOpen={showConfirmModal}

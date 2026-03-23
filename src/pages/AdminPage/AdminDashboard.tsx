@@ -3,7 +3,7 @@ import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { BackButton } from "../../components/Reusable/BackButton";
-import AdminMenu from "../../components/Reusable/AdminMenu";
+import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
 
 const AdminDashboard: React.FC = () => {
@@ -44,7 +44,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      <AdminMenu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+      <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
     </div>
   );
 };
