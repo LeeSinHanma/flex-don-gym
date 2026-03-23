@@ -9,7 +9,7 @@ import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import "./ManageStatusMem.css";
 import StatusModal from "../../components/Reusable/StatusModal";
 
-import { getUserById, updateUser } from "../../logicHandlers/userServices";
+import { getUserById, updateUser, deleteUser } from "../../logicHandlers/userServices";
 
 interface RouteParams {
   userId: string;
@@ -59,12 +59,13 @@ const EmployeeEdit: React.FC = () => {
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   const accessOptions = [
-    "Employee Edit",
-    "Products Edit",
-    "Members Page",
-    "Membership Plan",
-    "POS",
-    "QR Scanner",
+    { label: "Dashboard", value: "dashboard" },
+    { label: "Employee Edit", value: "employees" },
+    { label: "Products Edit", value: "products" },
+    { label: "Membership Plan", value: "membership-plans" },
+    { label: "QR Scanner", value: "qr-scanner" },
+    { label: "POS", value: "pos" },
+    { label: "Members Page", value: "status" },
   ];
 
   const openStatusModal = (
@@ -128,7 +129,7 @@ const EmployeeEdit: React.FC = () => {
     if (!employee) return;
 
     try {
-      const finalAccess = editRole === 0 ? accessOptions : editAccess;
+      const finalAccess = editRole === 0 ? accessOptions.map(opt => opt.value) : editAccess;
 
       const updatedUser = await updateUser(employee.id, {
         username: editUsername,
@@ -137,11 +138,11 @@ const EmployeeEdit: React.FC = () => {
         last_name: editLastName,
         role: editRole,
         is_active: editIsActive,
-        // access_list: finalAccess,
+        access_list: finalAccess,
       });
 
       setEmployee(updatedUser);
-      // setEditAccess(updatedUser.access_list || finalAccess);
+      setEditAccess(updatedUser.access_list || finalAccess);
       setShowUpdateModal(false);
 
       openStatusModal(
@@ -164,6 +165,8 @@ const EmployeeEdit: React.FC = () => {
 
     try {
       console.log("Deleting user with ID:", employee.id);
+
+      await deleteUser(employee.id);
 
       setShouldRedirect(true);
 
@@ -332,14 +335,14 @@ const EmployeeEdit: React.FC = () => {
 
             <div className="access-group">
               {accessOptions.map((item) => (
-                <label key={item} className="access-toggle">
+                <label key={item.value} className="access-toggle">
                   <input
                     type="checkbox"
-                    checked={editAccess.includes(item)}
-                    onChange={() => handleEditAccessChange(item)}
+                    checked={editAccess.includes(item.value)}
+                    onChange={() => handleEditAccessChange(item.value)}
                   />
                   <span className="access-slider"></span>
-                  <span className="access-text">{item}</span>
+                  <span className="access-text">{item.label}</span>
                 </label>
               ))}
             </div>

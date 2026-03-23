@@ -21,7 +21,7 @@ export type UpdateUserInput = {
   last_name: string;
   role: number;
   is_active: boolean;
-  //access_list?: string[];
+  access_list?: string[];
 };
 
 export type APIResponse = any;
@@ -118,6 +118,14 @@ export async function updateUser(
   try {
     const res = await api.put<User>(`/users/update/${userId}`, data);
     return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  try {
+    await api.delete(`/users/delete/${userId}`);
   } catch (err) {
     throw new Error(getErrorMessage(err));
   }

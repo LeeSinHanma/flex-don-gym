@@ -11,7 +11,7 @@ import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
 import "./Employee.css";
 
-import { createUser, getUsers, User } from "../../logicHandlers/userServices";
+import { createUser, getUsers, getCurrentUser, User } from "../../logicHandlers/userServices";
 
 const EmployeeMenu: React.FC = () => {
   const history = useHistory();
@@ -70,10 +70,18 @@ const EmployeeMenu: React.FC = () => {
 
   const filteredUsers = useMemo(() => {
     const term = search.toLowerCase().trim();
+    const currentUser = getCurrentUser();
 
-    if (!term) return users;
+    let result = users;
 
-    return users.filter((u) => {
+    // Hide the logged-in user's own account
+    if (currentUser?.userID) {
+      result = result.filter((u) => u.id !== currentUser.userID);
+    }
+
+    if (!term) return result;
+
+    return result.filter((u) => {
       const fullName = `${u.first_name} ${u.last_name}`.toLowerCase();
       return (
         fullName.includes(term) ||

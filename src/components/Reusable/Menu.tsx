@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Modal } from "./Modals";
 import { Button } from "./Button";
 import LogoutModal from "./LogoutModal";
+import { getCurrentUser } from "../../logicHandlers/userServices";
 
 interface MenuProps {
   isOpen: boolean;
@@ -17,6 +18,14 @@ const Menu: React.FC<MenuProps> = ({
 }) => {
   const history = useHistory();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const user = getCurrentUser();
+  const isAdmin = user?.role === 0 || user?.userType === 0;
+  const accessList: string[] = user?.accessList || [];
+
+  const hasAccess = (key: string) => {
+    return isAdmin || accessList.includes(key);
+  };
 
   const goTo = (path: string) => {
     onClose();
@@ -37,33 +46,47 @@ const Menu: React.FC<MenuProps> = ({
         showCloseButton={false}
       >
         <div className="menu-buttons">
-          <Button className="menu-btn" onClick={() => goTo("/admin-dashboard")}>
-            DASHBOARD
-          </Button>
+          {hasAccess("dashboard") && (
+            <Button className="menu-btn" onClick={() => goTo("/admin-dashboard")}>
+              DASHBOARD
+            </Button>
+          )}
 
-          <Button className="menu-btn" onClick={() => goTo("/employee-page")}>
-            EMPLOYEE
-          </Button>
+          {hasAccess("employees") && (
+            <Button className="menu-btn" onClick={() => goTo("/employee-page")}>
+              EMPLOYEE
+            </Button>
+          )}
 
-          <Button className="menu-btn" onClick={() => goTo("/admin-product")}>
-            PRODUCTS
-          </Button>
+          {hasAccess("products") && (
+            <Button className="menu-btn" onClick={() => goTo("/admin-product")}>
+              PRODUCTS
+            </Button>
+          )}
 
-          <Button className="menu-btn" onClick={() => goTo("/admin-membership")}>
-            MEMBERSHIP PLANS
-          </Button>
+          {hasAccess("membership-plans") && (
+            <Button className="menu-btn" onClick={() => goTo("/admin-membership")}>
+              MEMBERSHIP PLANS
+            </Button>
+          )}
 
-          <Button className="menu-btn" onClick={() => goTo("/pos")}>
-            POS
-          </Button>
+          {hasAccess("pos") && (
+            <Button className="menu-btn" onClick={() => goTo("/pos")}>
+              POS
+            </Button>
+          )}
 
-          <Button className="menu-btn" onClick={() => goTo("/qr")}>
-            QR SCANNER
-          </Button>
+          {hasAccess("qr-scanner") && (
+            <Button className="menu-btn" onClick={() => goTo("/qr")}>
+              QR SCANNER
+            </Button>
+          )}
 
-          <Button className="menu-btn" onClick={() => goTo("/status-member")}>
-            STATUS / MEMBERS
-          </Button>
+          {hasAccess("status") && (
+            <Button className="menu-btn" onClick={() => goTo("/status-member")}>
+              STATUS / MEMBERS
+            </Button>
+          )}
 
           <Button className="menu-btn" onClick={handleLogoutClick}>
             LOGOUT
