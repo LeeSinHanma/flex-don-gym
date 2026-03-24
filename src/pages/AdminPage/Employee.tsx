@@ -8,6 +8,8 @@ import { useHistory } from "react-router-dom";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import Menu from "../../components/Reusable/Menu";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 import "./AdminDashboard.css";
 import "./Employee.css";
 
@@ -27,8 +29,17 @@ const EmployeeMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<number>(1);
+  const [isActive, setIsActive] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [access, setAccess] = useState<string[]>([]);
+
+  // Modals state
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<"success" | "error" | "warning" | "info">("info");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const accessOptions = [
     { label: "Dashboard", value: "dashboard" },
@@ -51,6 +62,12 @@ const EmployeeMenu: React.FC = () => {
         : [...prev, value]
     );
   };
+
+  useEffect(() => {
+    if (role === 0) {
+      setAccess(accessOptions.map((opt) => opt.value));
+    }
+  }, [role]);
 
   const loadUsers = async () => {
     try {
@@ -107,23 +124,39 @@ const EmployeeMenu: React.FC = () => {
     setFirstName("");
     setLastName("");
     setRole(1);
+    setIsActive(true);
     setAccess([]);
   };
 
-  const handleSubmit = async () => {
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
+
+  const handleSubmit = () => {
+    if (!username || !email || !password || !firstName || !lastName) {
+      openStatusModal("Missing Fields", "Please fill in all fields.", "warning");
+      return;
+    }
+
+    if (role === 1 && access.length === 0) {
+      openStatusModal("Missing Access", "Please select at least one access.", "warning");
+      return;
+    }
+
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmCreate = async () => {
+    setShowConfirmModal(false);
+    setIsSubmitting(true);
     try {
-      if (!username || !email || !password || !firstName || !lastName) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      if (role === 1 && access.length === 0) {
-        alert("Please select at least one access.");
-        return;
-      }
-
-      const finalAccess = role === 0 ? accessOptions.map(opt => opt.value) : access;
-
       await createUser(
         username,
         email,
@@ -131,15 +164,18 @@ const EmployeeMenu: React.FC = () => {
         firstName,
         lastName,
         role,
-        finalAccess
+        access,
+        isActive
       );
 
       await loadUsers();
       handleCloseModal();
-      alert("Employee created successfully.");
+      openStatusModal("Success", "Employee created successfully.", "success");
     } catch (error: any) {
       console.error("Failed to create user:", error);
-      alert(error.message || "Failed to create user.");
+      openStatusModal("Error", error.message || "Failed to create user.", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -309,6 +345,19 @@ const EmployeeMenu: React.FC = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              className="employee-input"
+              value={isActive ? "true" : "false"}
+              onChange={(e) => setIsActive(e.target.value === "true")}
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+
+          <div className="form-group">
             <label>Access</label>
 
             <div className="access-group">
@@ -338,6 +387,25 @@ const EmployeeMenu: React.FC = () => {
       </Modal>
 
       <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Confirm Creation"
+        message={`Are you sure you want to create employee ${firstName} ${lastName}?`}
+        confirmText="Create"
+        cancelText="Cancel"
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmCreate}
+        loading={isSubmitting}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
     </div>
   );
 };
