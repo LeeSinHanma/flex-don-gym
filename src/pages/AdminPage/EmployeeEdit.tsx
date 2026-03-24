@@ -2,31 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
-import ConfirmModal from "../../components/Reusable/ConfirmModal";
-import "./ManageStatusMem.css";
 import StatusModal from "../../components/Reusable/StatusModal";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
+import { UsernameInput } from "../../components/Reusable/Username";
+import "./ManageStatusMem.css";
 
-import { getUserById, updateUser, deleteUser } from "../../logicHandlers/userServices";
+import { getUserById, updateUser, deleteUser, User } from "../../logicHandlers/userServices";
 
 interface RouteParams {
   userId: string;
 }
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  is_active: boolean;
-  role: number | string;
-  access_list?: string[];
-  created_at: string;
-  updated_at: string;
-}
+
 
 const EmployeeEdit: React.FC = () => {
   const history = useHistory();
@@ -57,6 +47,8 @@ const EmployeeEdit: React.FC = () => {
   const [editIsActive, setEditIsActive] = useState(true);
   const [editAccess, setEditAccess] = useState<string[]>([]);
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const accessOptions = [
     { label: "Dashboard", value: "dashboard" },
@@ -101,12 +93,21 @@ const EmployeeEdit: React.FC = () => {
   };
 
   useEffect(() => {
+    if (editRole === 0) {
+      setEditAccess(accessOptions.map((opt) => opt.value));
+    }
+  }, [editRole]);
+
+  useEffect(() => {
     const loadEmployee = async () => {
       try {
+        setLoading(true);
         const data = await getUserById(userId);
         setEmployee(data);
       } catch (error) {
         console.error("Failed to load employee:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -128,9 +129,8 @@ const EmployeeEdit: React.FC = () => {
   const handleUpdate = async () => {
     if (!employee) return;
 
+    setIsSubmitting(true);
     try {
-      const finalAccess = editRole === 0 ? accessOptions.map(opt => opt.value) : editAccess;
-
       const updatedUser = await updateUser(employee.id, {
         username: editUsername,
         email: editEmail,
@@ -138,11 +138,11 @@ const EmployeeEdit: React.FC = () => {
         last_name: editLastName,
         role: editRole,
         is_active: editIsActive,
-        access_list: finalAccess,
+        access_list: editAccess,
       });
 
       setEmployee(updatedUser);
-      setEditAccess(updatedUser.access_list || finalAccess);
+      setEditAccess(updatedUser.access_list || editAccess);
       setShowUpdateModal(false);
 
       openStatusModal(
@@ -157,12 +157,15 @@ const EmployeeEdit: React.FC = () => {
         "Failed to update employee.",
         "error"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
     if (!employee) return;
 
+    setIsSubmitting(true);
     try {
       console.log("Deleting user with ID:", employee.id);
 
@@ -182,6 +185,8 @@ const EmployeeEdit: React.FC = () => {
         "Failed to delete employee.",
         "error"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -215,25 +220,33 @@ const EmployeeEdit: React.FC = () => {
         <div className="member-container member-container-employee">
           <div className="member-info">
             <h2 className="member-name">
-              {employee
-                ? `${employee.first_name} ${employee.last_name}`
-                : "Loading..."}
+              {loading ? (
+                <IonSkeletonText animated style={{ width: "150px" }} />
+              ) : (
+                `${employee?.first_name} ${employee?.last_name}`
+              )}
             </h2>
 
             <div className="member-details member-details-employee">
-              <h4>
-                <strong>Name:</strong>{" "}
-                {employee
-                  ? `${employee.first_name} ${employee.last_name}`
-                  : "Loading..."}
-              </h4>
-              <h4>
-                <strong>Username:</strong> {employee?.username || "Loading..."}
-              </h4>
-              <h4>
-                <strong>Role:</strong>{" "}
-                {employee ? getRoleName(employee.role) : "Loading..."}
-              </h4>
+              {loading ? (
+                <>
+                  <h4><IonSkeletonText animated style={{ width: "60%" }} /></h4>
+                  <h4><IonSkeletonText animated style={{ width: "50%" }} /></h4>
+                  <h4><IonSkeletonText animated style={{ width: "40%" }} /></h4>
+                </>
+              ) : (
+                <>
+                  <h4>
+                    <strong>Name:</strong> {employee?.first_name} {employee?.last_name}
+                  </h4>
+                  <h4>
+                    <strong>Username:</strong> {employee?.username}
+                  </h4>
+                  <h4>
+                    <strong>Role:</strong> {employee ? getRoleName(employee.role) : ""}
+                  </h4>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -272,7 +285,7 @@ const EmployeeEdit: React.FC = () => {
         <div className="employee-form">
           <div className="form-group">
             <label>Username</label>
-            <input
+            <UsernameInput
               className="employee-input"
               value={editUsername}
               onChange={(e) => setEditUsername(e.target.value)}
@@ -281,16 +294,17 @@ const EmployeeEdit: React.FC = () => {
 
           <div className="form-group">
             <label>Email</label>
-            <input
+            <UsernameInput
               className="employee-input"
               value={editEmail}
+              type="email"
               onChange={(e) => setEditEmail(e.target.value)}
             />
           </div>
 
           <div className="form-group">
             <label>First Name</label>
-            <input
+            <UsernameInput
               className="employee-input"
               value={editFirstName}
               onChange={(e) => setEditFirstName(e.target.value)}
@@ -299,7 +313,7 @@ const EmployeeEdit: React.FC = () => {
 
           <div className="form-group">
             <label>Last Name</label>
-            <input
+            <UsernameInput
               className="employee-input"
               value={editLastName}
               onChange={(e) => setEditLastName(e.target.value)}
@@ -411,22 +425,23 @@ const EmployeeEdit: React.FC = () => {
           setConfirmType(null);
         }}
         onConfirm={handleConfirmAction}
+        loading={isSubmitting}
       />
 
       <StatusModal
-      isOpen={showStatusModal}
-      onClose={() => {
-        setShowStatusModal(false);
+        isOpen={showStatusModal}
+        onClose={() => {
+          setShowStatusModal(false);
 
-        if (shouldRedirect) {
-          setShouldRedirect(false);
-          history.push("/employee-page");
-        }
-      }}
-      title={statusTitle}
-      message={statusMessage}
-      type={statusType}
-    />
+          if (shouldRedirect) {
+            setShouldRedirect(false);
+            history.push("/employee-page");
+          }
+        }}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
     </div>
   );
 };
