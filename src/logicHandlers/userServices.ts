@@ -81,7 +81,7 @@ export async function createUser(
   accessList: string[]
 ): Promise<APIResponse> {
   try {
-    const res = await api.post<APIResponse>("/users/create", {
+    const payload = {
       username,
       email,
       password,
@@ -89,7 +89,9 @@ export async function createUser(
       last_name: lastName,
       role,
       access_list: accessList,
-    });
+    };
+    console.log("📤 POST /users/create payload:", JSON.stringify(payload, null, 2));
+    const res = await api.post<APIResponse>("/users/create", payload);
 
     return res.data;
   } catch (err) {

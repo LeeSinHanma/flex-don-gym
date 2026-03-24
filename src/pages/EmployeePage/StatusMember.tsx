@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import "./StatusMember.css";
 import PosNav from "../../components/Reusable/NavItems";
 import { BackButton } from "../../components/Reusable/BackButton";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBack, menu } from "ionicons/icons";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
@@ -14,6 +14,7 @@ const StatusMemberPage: React.FC = () => {
 
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [membershipNames, setMembershipNames] = useState<
     Record<number, string>
   >({});
@@ -41,6 +42,7 @@ const StatusMemberPage: React.FC = () => {
   useEffect(() => {
     const load = async () => {
       try {
+        setLoading(true);
         const data = await getMembers();
         setAllMembers(data);
 
@@ -62,6 +64,8 @@ const StatusMemberPage: React.FC = () => {
         setMembershipNames(map);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -131,40 +135,63 @@ const StatusMemberPage: React.FC = () => {
         </div>
 
         <div className="cards-container">
-          {filteredMembers.length === 0 && (
-            <p style={{ textAlign: "center" }}>No members found.</p>
-          )}
-
-          {filteredMembers.map((m) => (
-            <div
-              key={m.member_id}
-              className="status-card"
-              onClick={() => history.push(`/manage-status/${m.member_id}`)}
-            >
-              <div className="status-info">
-                <div className="left-info">
-                  <h2 className="client-name">
-                    {m.first_name} {m.last_name}
-                  </h2>
-                  <div className="client-details">
-                    <p className="client-type">
-                      {m.membership_plan_id !== null &&
-                      membershipNames[m.membership_plan_id]
-                        ? membershipNames[m.membership_plan_id]
-                        : "No Plan"}
-                    </p>
-                    <p className="client-duration">
-                      {formatDateDash(m.membership_expiry)}
-                    </p>
+          {loading ? (
+            [1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <div key={i} className="status-card">
+                <div className="status-info">
+                  <div className="left-info">
+                    <h2 className="client-name">
+                      <IonSkeletonText animated style={{ width: "150px", display: "block" }} />
+                    </h2>
+                    <div className="client-details">
+                      <p className="client-type">
+                        <IonSkeletonText animated style={{ width: "100px", display: "block" }} />
+                      </p>
+                      <p className="client-duration">
+                        <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                      </p>
+                    </div>
                   </div>
                 </div>
+                <div className="client-status">
+                  <IonSkeletonText animated style={{ width: "50px", display: "block" }} />
+                </div>
               </div>
+            ))
+          ) : filteredMembers.length === 0 ? (
+            <p style={{ textAlign: "center" }}>No members found.</p>
+          ) : (
+            filteredMembers.map((m) => (
+              <div
+                key={m.member_id}
+                className="status-card"
+                onClick={() => history.push(`/manage-status/${m.member_id}`)}
+              >
+                <div className="status-info">
+                  <div className="left-info">
+                    <h2 className="client-name">
+                      {m.first_name} {m.last_name}
+                    </h2>
+                    <div className="client-details">
+                      <p className="client-type">
+                        {m.membership_plan_id !== null &&
+                        membershipNames[m.membership_plan_id]
+                          ? membershipNames[m.membership_plan_id]
+                          : "No Plan"}
+                      </p>
+                      <p className="client-duration">
+                        {formatDateDash(m.membership_expiry)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="client-status">
-                {m.is_active ? "active" : "inactive"}
+                <div className="client-status">
+                  {m.is_active ? "active" : "inactive"}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 

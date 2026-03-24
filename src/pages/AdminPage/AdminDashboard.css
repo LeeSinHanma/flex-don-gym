@@ -413,3 +413,9 @@
 .menu-btn-close:hover {
   background-color: #4b5563;
 }
+
+/* Skeleton loading shimmer – blue tint */
+ion-skeleton-text {
+  --background: rgba(59, 130, 246, 0.25);
+  --background-rgb: 59, 130, 246;
+}

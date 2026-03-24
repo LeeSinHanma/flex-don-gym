@@ -5,7 +5,7 @@ import { Modal } from "../../components/Reusable/Modals";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
@@ -19,6 +19,7 @@ const EmployeeMenu: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -53,10 +54,13 @@ const EmployeeMenu: React.FC = () => {
 
   const loadUsers = async () => {
     try {
+      setLoading(true);
       const data = await getUsers();
       setUsers(data);
     } catch (error) {
       console.error("Failed to load users:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -170,33 +174,51 @@ const EmployeeMenu: React.FC = () => {
         </div>
 
         <div className="cards-container">
-          {filteredUsers.length === 0 && (
-            <p style={{ textAlign: "center" }}>No users found.</p>
-          )}
-
-          {filteredUsers.map((u) => (
-            <div
-              key={u.id}
-              className="status-card"
-              onClick={() => history.push(`/employee/edit/${u.id}`)}
-            >
-              <div className="status-info">
-                <div className="left-info">
-                  <h2 className="client-name">
-                    {u.first_name} {u.last_name}
-                  </h2>
-
-                  <div className="client-details">
-                    <p className="client-type">{u.username}</p>
+          {loading ? (
+            [1, 2, 3].map((i) => (
+              <div key={i} className="status-card">
+                <div className="status-info">
+                  <div className="left-info">
+                    <h2 className="client-name">
+                      <IonSkeletonText animated style={{ width: "60%" }} />
+                    </h2>
+                    <div className="client-details">
+                      <p className="client-type">
+                        <IonSkeletonText animated style={{ width: "40%" }} />
+                      </p>
+                    </div>
                   </div>
                 </div>
+                <div className="client-status">
+                  <IonSkeletonText animated style={{ width: "50px" }} />
+                </div>
               </div>
-
-              <div className="client-status">
-                {u.role === 0 ? "Admin" : "Employee"}
+            ))
+          ) : filteredUsers.length === 0 ? (
+            <p style={{ textAlign: "center" }}>No users found.</p>
+          ) : (
+            filteredUsers.map((u) => (
+              <div
+                key={u.id}
+                className="status-card"
+                onClick={() => history.push(`/employee/edit/${u.id}`)}
+              >
+                <div className="status-info">
+                  <div className="left-info">
+                    <h2 className="client-name">
+                      {u.first_name} {u.last_name}
+                    </h2>
+                    <div className="client-details">
+                      <p className="client-type">{u.username}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="client-status">
+                  {u.role === 0 ? "Admin" : "Employee"}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="bottom-container">
