@@ -1,6 +1,9 @@
+import { Capacitor } from "@capacitor/core";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
+import { sqliteService } from "./localdb/sqliteService";
+import { useEffect } from "react";
 
 import "./App.css";
 
@@ -57,6 +60,25 @@ import GetStarted from "./pages/EmployeePage/GetStarted";
 setupIonicReact();
 
 const App: React.FC = () => {
+
+  useEffect(() => {
+    const initDb = async () => {
+      if (Capacitor.getPlatform() === "web") {
+        console.log("Skipping SQLite init on web");
+        return;
+      }
+
+      try {
+        await sqliteService.init();
+        console.log("✅ SQLite initialized");
+      } catch (err) {
+        console.error("❌ SQLite init failed:", err);
+      }
+    };
+
+    initDb();
+  }, []);
+
   return (
     <IonApp>
       <IonReactRouter>
@@ -87,8 +109,8 @@ const App: React.FC = () => {
             <PrivateRoute exact path="/employee-page" requiredAccess="employees" component={EmployeeMenu} />
             <PrivateRoute exact path="/admin-product" requiredAccess="products" component={ProductPage} />
             <PrivateRoute exact path="/admin-membership" requiredAccess="membership-plans" component={MembershipPage} />
-            <PrivateRoute path="/manage-status/:memberId" requiredAccess="status" component={ManageStatusMemPage}/>
-            <PrivateRoute path="/admin-edit-membership/:membershipId" requiredAccess="membership-plans" component={AdminEditMembership}/>
+            <PrivateRoute path="/manage-status/:memberId" requiredAccess="status" component={ManageStatusMemPage} />
+            <PrivateRoute path="/admin-edit-membership/:membershipId" requiredAccess="membership-plans" component={AdminEditMembership} />
             <PrivateRoute path="/employee/edit/:userId" requiredAccess="employees" component={EmployeeEdit} exact />
             <PrivateRoute path="/members/edit/:memberId" requiredAccess="status" component={EditMemberPage} />
             <PrivateRoute exact path="/admin-dashboard" requiredAccess="dashboard" component={AdminDashboard} />
