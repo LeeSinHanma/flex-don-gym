@@ -1,40 +1,46 @@
 export const CREATE_TABLES_SQL = `
 CREATE TABLE IF NOT EXISTS members (
-  id TEXT PRIMARY KEY NOT NULL,
-  qr_code TEXT UNIQUE,
+  member_id TEXT PRIMARY KEY NOT NULL,
+  email TEXT,
+  contact_number TEXT,
   first_name TEXT,
   last_name TEXT,
-  full_name TEXT,
-  membership_type_id TEXT,
-  membership_status TEXT,
-  start_date TEXT,
-  end_date TEXT,
+  membership_type INTEGER,
+  membership_plan_id INTEGER,
+  membership_expiry TEXT,
+  credits REAL,
+  registered_by TEXT,
   is_active INTEGER DEFAULT 1,
+  created_at TEXT,
   updated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS membership_types (
-  id TEXT PRIMARY KEY NOT NULL,
+  membership_id INTEGER PRIMARY KEY NOT NULL,
   name TEXT,
-  duration_days INTEGER,
+  type INTEGER,
   price REAL,
-  description TEXT,
+  discount_amount REAL,
+  duration_months INTEGER,
+  created_at TEXT,
   updated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS inventory_items (
-  id TEXT PRIMARY KEY NOT NULL,
+  item_id TEXT PRIMARY KEY NOT NULL,
   item_name TEXT,
   description TEXT,
   price REAL,
   quantity INTEGER,
-  is_active INTEGER DEFAULT 1,
+  added_by TEXT,
+  created_at TEXT,
   updated_at TEXT
 );
 
 CREATE TABLE IF NOT EXISTS gym_pricing (
-  id TEXT PRIMARY KEY NOT NULL,
+  id INTEGER PRIMARY KEY NOT NULL,
   base_day_pass_price REAL,
+  created_at TEXT,
   updated_at TEXT
 );
 
