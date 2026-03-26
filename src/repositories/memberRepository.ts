@@ -1,51 +1,70 @@
+// src/repositories/memberRepository.ts
 import { sqliteService } from "../localdb/sqliteService";
 
 export interface LocalMember {
-    id: string;
-    qr_code: string;
-    first_name: string;
-    last_name: string;
-    full_name: string;
-    membership_type_id: string;
-    membership_status: string;
-    start_date: string;
-    end_date: string;
-    is_active: number;
-    updated_at: string;
+  member_id: string;
+  email: string | null;
+  contact_number: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  membership_type: number | null;
+  membership_plan_id: number | null;
+  membership_expiry: string | null;
+  credits: number | null;
+  registered_by: string | null;
+  is_active: number;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export async function upsertMembers(members: LocalMember[]) {
-    for (const m of members) {
-        await sqliteService.run(
-            `
+  for (const member of members) {
+    await sqliteService.run(
+      `
       INSERT OR REPLACE INTO members (
-        id, qr_code, first_name, last_name, full_name,
-        membership_type_id, membership_status, start_date,
-        end_date, is_active, updated_at
+        member_id,
+        email,
+        contact_number,
+        first_name,
+        last_name,
+        membership_type,
+        membership_plan_id,
+        membership_expiry,
+        credits,
+        registered_by,
+        is_active,
+        created_at,
+        updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
-            [
-                m.id,
-                m.qr_code,
-                m.first_name,
-                m.last_name,
-                m.full_name,
-                m.membership_type_id,
-                m.membership_status,
-                m.start_date,
-                m.end_date,
-                m.is_active,
-                m.updated_at,
-            ]
-        );
-    }
+      [
+        member.member_id,
+        member.email,
+        member.contact_number,
+        member.first_name,
+        member.last_name,
+        member.membership_type,
+        member.membership_plan_id,
+        member.membership_expiry,
+        member.credits,
+        member.registered_by,
+        member.is_active,
+        member.created_at,
+        member.updated_at,
+      ]
+    );
+  }
 }
 
-export async function getMemberByQr(qrCode: string) {
-    const rows = await sqliteService.query<LocalMember>(
-        `SELECT * FROM members WHERE qr_code = ? LIMIT 1`,
-        [qrCode]
-    );
-    return rows[0] ?? null;
+export async function getMemberById(memberId: string) {
+  const rows = await sqliteService.query<LocalMember>(
+    `SELECT * FROM members WHERE member_id = ? LIMIT 1`,
+    [memberId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function getAllMembers() {
+  return sqliteService.query<LocalMember>(`SELECT * FROM members`);
 }

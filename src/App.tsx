@@ -57,27 +57,33 @@ import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
+//sync
+import { syncMembersFromServer } from "./logicHandlers/syncMembers";  
+
 setupIonicReact();
 
 const App: React.FC = () => {
 
   useEffect(() => {
-    const initDb = async () => {
-      if (Capacitor.getPlatform() === "web") {
-        console.log("Skipping SQLite init on web");
-        return;
-      }
+      const initApp = async () => {
+        if (Capacitor.getPlatform() === "web") {
+          console.log("Skipping SQLite init on web");
+          return;
+        }
 
-      try {
-        await sqliteService.init();
-        console.log("✅ SQLite initialized");
-      } catch (err) {
-        console.error("❌ SQLite init failed:", err);
-      }
-    };
+        try {
+          await sqliteService.init();
+          console.log("SQLite initialized");
 
-    initDb();
-  }, []);
+          const count = await syncMembersFromServer();
+          console.log(`Synced ${count} members to SQLite`);
+        } catch (err) {
+          console.error("App init failed:", err);
+        }
+      };
+
+      initApp();
+    }, []);
 
   return (
     <IonApp>

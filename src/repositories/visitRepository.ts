@@ -8,29 +8,34 @@ export interface PendingSyncItem {
 }
 
 export async function saveOfflineVisit(params: {
-    member_id: string | null;
-    qr_code: string;
-    access_granted: boolean;
-    denial_reason?: string | null;
-    direction?: string;
+  member_id: string;
+  direction: "inbound" | "outbound";
+  access_granted: boolean;
+  denial_reason?: string | null;
+  amount_paid?: number;
 }) {
-    await sqliteService.run(
-        `
+  await sqliteService.run(
+    `
     INSERT INTO offline_visits (
-      member_id, qr_code, direction, access_granted,
-      denial_reason, scanned_at, synced
+      member_id,
+      direction,
+      access_granted,
+      denial_reason,
+      amount_paid,
+      created_at,
+      synced
     )
     VALUES (?, ?, ?, ?, ?, ?, 0)
     `,
-        [
-            params.member_id,
-            params.qr_code,
-            params.direction ?? "inbound",
-            params.access_granted ? 1 : 0,
-            params.denial_reason ?? null,
-            new Date().toISOString(),
-        ]
-    );
+    [
+      params.member_id,
+      params.direction,
+      params.access_granted ? 1 : 0,
+      params.denial_reason ?? null,
+      params.amount_paid ?? 0,
+      new Date().toISOString(),
+    ]
+  );
 }
 
 export async function addPendingSync(item: PendingSyncItem) {

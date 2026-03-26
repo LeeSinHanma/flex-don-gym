@@ -45,13 +45,13 @@ CREATE TABLE IF NOT EXISTS gym_pricing (
 );
 
 CREATE TABLE IF NOT EXISTS offline_visits (
-  local_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  member_id TEXT,
-  qr_code TEXT,
-  direction TEXT DEFAULT 'inbound',
+  local_visit_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  member_id TEXT NOT NULL,
+  direction TEXT NOT NULL,
   access_granted INTEGER,
   denial_reason TEXT,
-  scanned_at TEXT NOT NULL,
+  amount_paid REAL DEFAULT 0,
+  created_at TEXT NOT NULL,
   synced INTEGER DEFAULT 0
 );
 
@@ -70,4 +70,8 @@ CREATE TABLE IF NOT EXISTS sync_meta (
   key TEXT PRIMARY KEY NOT NULL,
   value TEXT
 );
+
+CREATE INDEX IF NOT EXISTS idx_members_member_id ON members(member_id);
+CREATE INDEX IF NOT EXISTS idx_pending_sync_status ON pending_sync(status);
+CREATE INDEX IF NOT EXISTS idx_offline_visits_synced ON offline_visits(synced);
 `;
