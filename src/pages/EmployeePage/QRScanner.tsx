@@ -18,6 +18,9 @@ import dondonLogo from "../../resource/dondon-logo.png";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import scanSound from "../../resource/scanSound.mp3";
 import scanError from "../../resource/scanError.mp3";
+import { manualAdmitVisit, ManualAdmitInput } from "../../logicHandlers/visits";
+import { getCurrentUser } from "../../logicHandlers/userServices";
+import { getGymPricing, GymPricing } from "../../logicHandlers/gymPricing";
 
 type ScanVisitResult = {
   visit: {
@@ -81,6 +84,16 @@ const QRScannerHome: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isMirrored, setIsMirrored] = useState(false);
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("Cash");
+  const [amountGiven, setAmountGiven] = useState<number | "">("");
+  const [isSubmittingManual, setIsSubmittingManual] = useState(false);
+  const [showManualConfirm, setShowManualConfirm] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<any>(null);
+  const [amountToPay, setAmountToPay] = useState<number | "">(0);
+  const [gymPricing, setGymPricing] = useState<GymPricing | null>(null);
+
   const scanAudio = useRef<HTMLAudioElement | null>(null);
   const errorAudio = useRef<HTMLAudioElement | null>(null);
 
@@ -155,6 +168,17 @@ const QRScannerHome: React.FC = () => {
   }, [handleDecoded]);
 
   useEffect(() => {
+    const loadPricing = async () => {
+      try {
+        const data = await getGymPricing();
+        setGymPricing(data);
+        setAmountToPay(data.base_day_pass_price);
+      } catch (err) {
+        console.error("Failed to load gym pricing:", err);
+      }
+    };
+    loadPricing();
+
     startQrScanner("qr-reader", handleDecoded);
 
     return () => {
@@ -201,6 +225,61 @@ const QRScannerHome: React.FC = () => {
     }
 
     lastTap.current = now;
+  };
+
+  const handleSubmitManualAdmit = async () => {
+    if (!visitResult) return;
+
+    if (amountToPay === "" || Number(amountToPay) < 0) {
+      alert("Please enter a valid amount to pay.");
+      return;
+    }
+
+    if (amountGiven === "" || Number(amountGiven) < 0) {
+      alert("Please enter a valid amount given.");
+      return;
+    }
+
+    if (Number(amountGiven) < Number(amountToPay)) {
+      alert("Inefficient amount");
+      return;
+    }
+
+    setShowManualConfirm(true);
+  };
+
+  const handleFinalSubmit = async () => {
+    if (!visitResult) return;
+
+    setIsSubmittingManual(true);
+    try {
+      const user = getCurrentUser();
+      const payload: ManualAdmitInput = {
+        member_id: visitResult.visit.member_id,
+        transacted_by: String(user?.userID || user?.user_id || "unknown"),
+        payment_method: paymentMethod,
+        amount_given: Number(amountGiven),
+      };
+
+      const response = await manualAdmitVisit(payload);
+
+      setReceiptData({
+        member_name: visitResult.member_name,
+        payment_method: paymentMethod,
+        amount_given: Number(amountGiven),
+        date: new Date().toLocaleString(),
+        transaction_id: response?.visit_id || response?.id || "N/A",
+      });
+
+      setShowManualConfirm(false);
+      setShowManualModal(false);
+      setShowReceipt(true);
+    } catch (err: any) {
+      console.error("Failed to manual admit:", err?.message || err);
+      alert(err.message || "Failed to process manual admission.");
+    } finally {
+      setIsSubmittingManual(false);
+    }
   };
 
   return (
@@ -316,11 +395,9 @@ const QRScannerHome: React.FC = () => {
                     type="button"
                     className="renew-btn"
                     onClick={() => {
-                      console.log("Add Cash payment", {
-                        member_id: visitResult.visit.member_id,
-                        name: visitResult.member_name,
-                        reason: visitResult.visit.denial_reason,
-                      });
+                      setPaymentMethod("Cash");
+                      setAmountGiven("");
+                      setShowManualModal(true);
                     }}
                   >
                     Pay Via Cash
@@ -485,6 +562,153 @@ const QRScannerHome: React.FC = () => {
           }
         }}
       />
+
+      <Modal
+        className="modal-box"
+        isOpen={showManualModal}
+        title="Manual Admission"
+        showCloseButton={false}
+        onClose={() => {
+          setShowManualModal(false);
+          setAmountGiven("");
+          setPaymentMethod("Cash");
+        }}
+      >
+        <div className="employee-form">
+          <div className="form-group">
+            <label>Payment Method</label>
+            <select
+              className="employee-input"
+              value={paymentMethod}
+              onChange={(e) => {
+                const val = e.target.value;
+                setPaymentMethod(val);
+                if (val === "GCash") {
+                  setAmountGiven(amountToPay || 0);
+                }
+              }}
+            >
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Amount to Pay</label>
+            <p>₱{amountToPay}</p>
+          </div>
+
+          <div className="form-group">
+            <label>Amount Given</label>
+            <input
+              className="employee-input"
+              type="number"
+              placeholder="Enter amount given"
+              value={amountGiven}
+              onChange={(e) => setAmountGiven(e.target.value === "" ? "" : Number(e.target.value))}
+            />
+            {paymentMethod === "GCash" && (
+              <small style={{ color: "#666" }}>GCash amount defaults to amount to pay (exact).</small>
+            )}
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+            <Button
+              type="button"
+              className="btn-modal"
+              style={{ background: "#ccc", color: "#333" }}
+              onClick={() => setShowManualModal(false)}
+              disabled={isSubmittingManual}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={handleSubmitManualAdmit}
+              disabled={isSubmittingManual}
+            >
+              {isSubmittingManual ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <ConfirmModal
+        isOpen={showManualConfirm}
+        title="Confirm Manual Admission"
+        message={`Admit ${visitResult?.member_name} with a payment of P${amountGiven} via ${paymentMethod}?`}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        loading={isSubmittingManual}
+        onCancel={() => setShowManualConfirm(false)}
+        onConfirm={handleFinalSubmit}
+      />
+
+      <Modal
+        className="modal-box"
+        isOpen={showReceipt}
+        title="Admission Receipt"
+        showCloseButton={false}
+        onClose={async () => {
+          setShowReceipt(false);
+          setShowModal(false);
+          setVisitResult(null);
+          setAmountGiven("");
+          setPaymentMethod("Cash");
+          setReceiptData(null);
+          await restartScanner();
+        }}
+      >
+        {receiptData ? (
+          <div className="visit-result-card">
+            <div className="visit-result-row">
+              <span>Member Name</span>
+              <strong>{receiptData.member_name}</strong>
+            </div>
+
+            <div className="visit-result-row">
+              <span>Payment Method</span>
+              <strong>{receiptData.payment_method}</strong>
+            </div>
+
+            <div className="visit-result-row">
+              <span>Amount Given</span>
+              <strong>P{receiptData.amount_given}</strong>
+            </div>
+
+            <div className="visit-result-row">
+              <span>Date</span>
+              <strong>{receiptData.date}</strong>
+            </div>
+
+            <div className="visit-result-row" style={{ borderBottom: "none" }}>
+              <span>Transaction ID</span>
+              <strong>{receiptData.transaction_id}</strong>
+            </div>
+
+            <div className="form-actions" style={{ marginTop: "24px" }}>
+              <Button
+                type="button"
+                className="btn-modal btn-submit-modal"
+                onClick={async () => {
+                  setShowReceipt(false);
+                  setShowModal(false);
+                  setVisitResult(null);
+                  setAmountGiven("");
+                  setPaymentMethod("Cash");
+                  setReceiptData(null);
+                  await restartScanner();
+                }}
+              >
+                OK
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p style={{ textAlign: "center" }}>No receipt data found.</p>
+        )}
+      </Modal>
 
       <Menu
         isOpen={showEmployeeMenu}
