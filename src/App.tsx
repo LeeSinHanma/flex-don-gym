@@ -3,6 +3,12 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
 import { sqliteService } from "./localdb/sqliteService";
+import { syncMembershipTypesFromServer } from "./logicHandlers/syncMembershipTypes";
+import { getAllMembershipTypes } from "./repositories/membershipRepository";
+import { syncGymPricingFromServer } from "./logicHandlers/syncGymPricing";
+import { getLocalGymPricing } from "./repositories/pricingRepository";
+import { syncInventoryFromServer } from "./logicHandlers/syncInventory";
+import { getAllInventoryItems } from "./repositories/inventoryRepository";
 import { useEffect } from "react";
 
 import "./App.css";
@@ -58,32 +64,43 @@ import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
 //sync
-import { syncMembersFromServer } from "./logicHandlers/syncMembers";  
+import { syncMembersFromServer } from "./logicHandlers/syncMembers";
+import { getAllMembers } from "./repositories/memberRepository";
 
 setupIonicReact();
 
 const App: React.FC = () => {
 
   useEffect(() => {
-      const initApp = async () => {
-        if (Capacitor.getPlatform() === "web") {
-          console.log("Skipping SQLite init on web");
-          return;
-        }
+    const initApp = async () => {
+      if (Capacitor.getPlatform() === "web") {
+        console.log("Skipping SQLite init on web");
+        return;
+      }
 
-        try {
-          await sqliteService.init();
-          console.log("SQLite initialized");
+      try {
+        await sqliteService.init();
+        console.log("SQLite initialized");
 
-          const count = await syncMembersFromServer();
-          console.log(`Synced ${count} members to SQLite`);
-        } catch (err) {
-          console.error("App init failed:", err);
-        }
-      };
+        const memberCount = await syncMembersFromServer();
+        console.log(`Synced ${memberCount} members to SQLite`);
 
-      initApp();
-    }, []);
+        const membershipTypeCount = await syncMembershipTypesFromServer();
+        console.log(`Synced ${membershipTypeCount} membership types to SQLite`);
+
+        const pricing = await syncGymPricingFromServer();
+        console.log("Synced gym pricing:", pricing);
+
+        const inventoryCount = await syncInventoryFromServer();
+        console.log(`Synced ${inventoryCount} inventory items to SQLite`);
+
+      } catch (err) {
+        console.error("App init failed:", err);
+      }
+    };
+
+    initApp();
+  }, []);
 
   return (
     <IonApp>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useHistory } from "react-router-dom";
+import { Network } from "@capacitor/network";
+import { processQrOffline } from "../../logicHandlers/offlineQr";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
@@ -32,6 +34,39 @@ type ScanVisitResult = {
   message: string;
 };
 
+type OfflineQrResult = {
+  success: boolean;
+  message: string;
+  member: {
+    member_id: string;
+    first_name: string | null;
+    last_name: string | null;
+    membership_type: number | null;
+  } | null;
+};
+
+function mapOfflineResultToVisitResult(
+  memberId: string,
+  result: OfflineQrResult
+): ScanVisitResult {
+  return {
+    visit: {
+      visit_id: 0,
+      member_id: result.member?.member_id ?? memberId,
+      direction: "inbound",
+      access_granted: result.success,
+      denial_reason: result.success ? "" : result.message,
+      amount_paid: 0,
+      created_at: new Date().toISOString(),
+    },
+    member_name: result.member
+      ? `${result.member.first_name ?? ""} ${result.member.last_name ?? ""}`.trim()
+      : "Unknown Member",
+    membership_type: result.member?.membership_type ?? -1,
+    message: result.message,
+  };
+}
+
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
 
@@ -54,17 +89,31 @@ const QRScannerHome: React.FC = () => {
     errorAudio.current = new Audio(scanError);
   }, []);
 
+  const processVisit = useCallback(async (memberId: string) => {
+    const status = await Network.getStatus();
+
+    if (status.connected) {
+      return await scanVisit({
+        member_id: memberId,
+        direction: "inbound",
+      });
+    }
+
+    const offlineResult = await processQrOffline(memberId);
+    return mapOfflineResultToVisitResult(memberId, offlineResult);
+  }, []);
+
   const playSuccessSound = () => {
     if (scanAudio.current) {
       scanAudio.current.currentTime = 0;
-      scanAudio.current.play().catch(() => {});
+      scanAudio.current.play().catch(() => { });
     }
   };
 
   const playErrorSound = () => {
     if (errorAudio.current) {
       errorAudio.current.currentTime = 0;
-      errorAudio.current.play().catch(() => {});
+      errorAudio.current.play().catch(() => { });
     }
   };
 
@@ -84,10 +133,7 @@ const QRScannerHome: React.FC = () => {
       const id = decodedText.trim();
       if (!id) return;
 
-      const result = await scanVisit({
-        member_id: id,
-        direction: "inbound",
-      });
+      const result = await processVisit(id);
 
       if (result.visit.access_granted) {
         playSuccessSound();
@@ -101,7 +147,7 @@ const QRScannerHome: React.FC = () => {
       console.error("Failed to scan visit:", err?.message || err);
       playErrorSound();
     }
-  }, []);
+  }, [processVisit]);
 
   const restartScanner = useCallback(async () => {
     await stopQrScanner();
@@ -251,11 +297,10 @@ const QRScannerHome: React.FC = () => {
 
             <div className="form-group">
               <div
-                className={`employee-message ${
-                  visitResult.visit.access_granted
-                    ? "employee-message-success"
-                    : "employee-message-error"
-                }`}
+                className={`employee-message ${visitResult.visit.access_granted
+                  ? "employee-message-success"
+                  : "employee-message-error"
+                  }`}
               >
                 {visitResult.message || "No message available."}
               </div>
@@ -414,10 +459,7 @@ const QRScannerHome: React.FC = () => {
           if (!selectedMember) return;
 
           try {
-            const result = await scanVisit({
-              member_id: selectedMember.member_id,
-              direction: "inbound",
-            });
+            const result = await processVisit(selectedMember.member_id);
 
             setShowConfirmModal(false);
             setShowSearchModal(false);
@@ -429,7 +471,6 @@ const QRScannerHome: React.FC = () => {
             setVisitResult(result);
             setShowModal(true);
 
-            // 🔊 optional sounds (same behavior as scanner)
             if (result.visit.access_granted) {
               playSuccessSound();
             } else {

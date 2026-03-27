@@ -1,3 +1,4 @@
+// src/logicHandlers/processQrOffline.ts
 import { getMemberById } from "../repositories/memberRepository";
 import { saveOfflineVisit, addPendingSync } from "../repositories/visitRepository";
 
@@ -21,6 +22,7 @@ export async function processQrOffline(qrCode: string) {
     return {
       success: false,
       message: "Member not found",
+      member: null,
     };
   }
 
