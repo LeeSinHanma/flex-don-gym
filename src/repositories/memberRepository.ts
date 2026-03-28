@@ -68,3 +68,10 @@ export async function getMemberById(memberId: string) {
 export async function getAllMembers() {
   return sqliteService.query<LocalMember>(`SELECT * FROM members`);
 }
+
+export async function deductMemberCredits(memberId: string, amount: number) {
+  await sqliteService.run(
+    `UPDATE members SET credits = credits - ? WHERE member_id = ?`,
+    [amount, memberId]
+  );
+}

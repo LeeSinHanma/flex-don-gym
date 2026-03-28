@@ -3,7 +3,7 @@ import {
     markPendingSyncDone,
     markPendingSyncFailed,
 } from "../repositories/visitRepository";
-import { scanVisit } from "./visits";
+import { scanVisit, manualAdmitVisit } from "./visits";
 
 export async function syncPendingQueue() {
     const items = await getPendingSyncItems();
@@ -12,9 +12,11 @@ export async function syncPendingQueue() {
         try {
             const payload = JSON.parse(item.payload_json);
 
-            if (item.entity_type === "visit" && item.action_type === "create") {
-                if (payload.member_id) {
+            if (item.entity_type === "visit") {
+                if (item.action_type === "create" && payload.member_id) {
                     await scanVisit(payload.member_id);
+                } else if (item.action_type === "manual_admit") {
+                    await manualAdmitVisit(payload);
                 }
             }
 

@@ -57,7 +57,7 @@ const StatusMemberPage: React.FC = () => {
             const membership = await getMembershipTypeById(
               m.membership_plan_id,
             );
-            map[m.membership_plan_id] = membership.name;
+            map[m.membership_plan_id] = membership.name || "Unknown";
           }
         }
 
@@ -129,7 +129,6 @@ const StatusMemberPage: React.FC = () => {
           <div className="nav-carousel">
             <div className="nav-item">Active</div>
             <div className="nav-item">Inactive</div>
-            <div className="nav-item">Discounted</div>
             <div className="nav-item">All</div>
           </div>
         </div>

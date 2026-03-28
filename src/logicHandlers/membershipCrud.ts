@@ -2,13 +2,13 @@ import api from "../api/axios";
 
 export interface MembershipTypeResponse {
   membership_id: number;
-  name: string;
-  type: number;
-  price: number;
+  name: string | null;
+  type: number | null;
+  price: number | null;
   discount_amount: number | null;
-  duration_months: number;
-  created_at: string;
-  updated_at: string;
+  duration_months: number | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 interface APIResponse {
