@@ -4,8 +4,8 @@ import api from "../api/axios";
 export interface GymPricing {
   id: number;
   base_day_pass_price: number;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 // ✅ GET /gym-pricing/

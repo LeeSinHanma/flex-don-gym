@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useHistory } from "react-router-dom";
+import { Network } from "@capacitor/network";
+import { processQrOffline, processManualAdmitOffline } from "../../logicHandlers/offlineQr";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
@@ -16,6 +18,16 @@ import dondonLogo from "../../resource/dondon-logo.png";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import scanSound from "../../resource/scanSound.mp3";
 import scanError from "../../resource/scanError.mp3";
+import { manualAdmitVisit, ManualAdmitInput } from "../../logicHandlers/visits";
+import { getCurrentUser } from "../../logicHandlers/userServices";
+import { getGymPricing, GymPricing } from "../../logicHandlers/gymPricing";
+import { getMembershipTypes, MembershipTypeResponse } from "../../logicHandlers/membershipCrud";
+import { getMemberById } from "../../logicHandlers/memberCrud";
+
+// Local Repository Fallbacks
+import { getLocalGymPricing } from "../../repositories/pricingRepository";
+import { getAllMembershipTypes } from "../../repositories/membershipRepository";
+import { getMemberById as getMemberByIdLocal } from "../../repositories/memberRepository";
 
 type ScanVisitResult = {
   visit: {
@@ -32,6 +44,39 @@ type ScanVisitResult = {
   message: string;
 };
 
+type OfflineQrResult = {
+  success: boolean;
+  message: string;
+  member: {
+    member_id: string;
+    first_name: string | null;
+    last_name: string | null;
+    membership_type: number | null;
+  } | null;
+};
+
+function mapOfflineResultToVisitResult(
+  memberId: string,
+  result: OfflineQrResult
+): ScanVisitResult {
+  return {
+    visit: {
+      visit_id: 0,
+      member_id: result.member?.member_id ?? memberId,
+      direction: "inbound",
+      access_granted: result.success,
+      denial_reason: result.success ? "" : result.message,
+      amount_paid: 0,
+      created_at: new Date().toISOString(),
+    },
+    member_name: result.member
+      ? `${result.member.first_name ?? ""} ${result.member.last_name ?? ""}`.trim()
+      : "Unknown Member",
+    membership_type: result.member?.membership_type ?? -1,
+    message: result.message,
+  };
+}
+
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
 
@@ -46,6 +91,17 @@ const QRScannerHome: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isMirrored, setIsMirrored] = useState(false);
+  const [showManualModal, setShowManualModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("Cash");
+  const [amountGiven, setAmountGiven] = useState<number | "">("");
+  const [isSubmittingManual, setIsSubmittingManual] = useState(false);
+  const [showManualConfirm, setShowManualConfirm] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [receiptData, setReceiptData] = useState<any>(null);
+  const [amountToPay, setAmountToPay] = useState<number | "">(0);
+  const [gymPricing, setGymPricing] = useState<GymPricing | null>(null);
+  const [membershipTypes, setMembershipTypes] = useState<MembershipTypeResponse[]>([]);
+
   const scanAudio = useRef<HTMLAudioElement | null>(null);
   const errorAudio = useRef<HTMLAudioElement | null>(null);
 
@@ -54,28 +110,74 @@ const QRScannerHome: React.FC = () => {
     errorAudio.current = new Audio(scanError);
   }, []);
 
+  const processVisit = useCallback(async (memberId: string) => {
+    const status = await Network.getStatus();
+
+    if (status.connected) {
+      return await scanVisit({
+        member_id: memberId,
+        direction: "inbound",
+      });
+    }
+
+    const offlineResult = await processQrOffline(memberId);
+    return mapOfflineResultToVisitResult(memberId, offlineResult);
+  }, []);
+
   const playSuccessSound = () => {
     if (scanAudio.current) {
       scanAudio.current.currentTime = 0;
-      scanAudio.current.play().catch(() => {});
+      scanAudio.current.play().catch(() => { });
     }
   };
 
   const playErrorSound = () => {
     if (errorAudio.current) {
       errorAudio.current.currentTime = 0;
-      errorAudio.current.play().catch(() => {});
+      errorAudio.current.play().catch(() => { });
     }
   };
 
   const getMembershipLabel = (type: number) => {
     switch (type) {
       case 0:
-        return "Member";
+        return "Postpaid";
       case 1:
-        return "Casual";
+        return "Prepaid";
       default:
         return `Type ${type}`;
+    }
+  };
+
+  const calculateDiscountedAmount = async (memberId: string) => {
+    if (!gymPricing) return 0;
+
+    try {
+      let member: any = null;
+      try {
+        member = await getMemberById(memberId);
+      } catch (apiErr) {
+        console.warn("API member fetch failed, trying local fallback...");
+        member = await getMemberByIdLocal(memberId);
+      }
+
+      if (!member || !member.membership_plan_id) {
+        return gymPricing.base_day_pass_price;
+      }
+
+      const plan = membershipTypes.find(
+        (t) => t.membership_id === member.membership_plan_id
+      );
+
+      if (!plan || !plan.discount_amount) {
+        return gymPricing.base_day_pass_price;
+      }
+
+      const discounted = gymPricing.base_day_pass_price - plan.discount_amount;
+      return Math.max(0, discounted);
+    } catch (err) {
+      console.error("Failed to calculate discount:", err);
+      return gymPricing.base_day_pass_price;
     }
   };
 
@@ -84,10 +186,7 @@ const QRScannerHome: React.FC = () => {
       const id = decodedText.trim();
       if (!id) return;
 
-      const result = await scanVisit({
-        member_id: id,
-        direction: "inbound",
-      });
+      const result = await processVisit(id);
 
       if (result.visit.access_granted) {
         playSuccessSound();
@@ -101,7 +200,7 @@ const QRScannerHome: React.FC = () => {
       console.error("Failed to scan visit:", err?.message || err);
       playErrorSound();
     }
-  }, []);
+  }, [processVisit]);
 
   const restartScanner = useCallback(async () => {
     await stopQrScanner();
@@ -109,6 +208,32 @@ const QRScannerHome: React.FC = () => {
   }, [handleDecoded]);
 
   useEffect(() => {
+    const loadPricing = async () => {
+      try {
+        const data = await getGymPricing().catch(async () => {
+          console.warn("Pricing API failed, using local...");
+          return await getLocalGymPricing();
+        });
+
+        if (data) {
+          setGymPricing(data);
+          setAmountToPay(data.base_day_pass_price);
+        }
+
+        const mTypes = await getMembershipTypes().catch(async () => {
+          console.warn("Membership API failed, using local...");
+          return await getAllMembershipTypes();
+        });
+
+        if (mTypes) {
+          setMembershipTypes(mTypes);
+        }
+      } catch (err) {
+        console.error("Failed to load gym pricing and membership types:", err);
+      }
+    };
+    loadPricing();
+
     startQrScanner("qr-reader", handleDecoded);
 
     return () => {
@@ -155,6 +280,69 @@ const QRScannerHome: React.FC = () => {
     }
 
     lastTap.current = now;
+  };
+
+  const handleSubmitManualAdmit = async () => {
+    if (!visitResult) return;
+
+    if (amountToPay === "" || Number(amountToPay) < 0) {
+      alert("Please enter a valid amount to pay.");
+      return;
+    }
+
+    if (amountGiven === "" || Number(amountGiven) < 0) {
+      alert("Please enter a valid amount given.");
+      return;
+    }
+
+    if (Number(amountGiven) < Number(amountToPay)) {
+      alert("Inefficient amount");
+      return;
+    }
+
+    setShowManualConfirm(true);
+  };
+
+  const handleFinalSubmit = async () => {
+    if (!visitResult) return;
+
+    setIsSubmittingManual(true);
+    try {
+      const user = getCurrentUser();
+      const payload: ManualAdmitInput = {
+        member_id: visitResult.visit.member_id,
+        transacted_by: String(user?.userID || user?.user_id || "unknown"),
+        payment_method: paymentMethod,
+        amount_given: Number(amountGiven),
+      };
+
+      let visitId = "";
+      try {
+        const response = await manualAdmitVisit(payload);
+        visitId = response?.visit_id || response?.id || "N/A";
+      } catch (apiErr) {
+        console.warn("Manual admit API failed, saving offline...");
+        const offlineResult = await processManualAdmitOffline(payload);
+        visitId = offlineResult.visit_id;
+      }
+
+      setReceiptData({
+        member_name: visitResult.member_name,
+        payment_method: paymentMethod,
+        amount_given: Number(amountGiven),
+        date: new Date().toLocaleString(),
+        transaction_id: visitId,
+      });
+
+      setShowManualConfirm(false);
+      setShowManualModal(false);
+      setShowReceipt(true);
+    } catch (err: any) {
+      console.error("Failed to manual admit:", err?.message || err);
+      alert(err.message || "Failed to process manual admission.");
+    } finally {
+      setIsSubmittingManual(false);
+    }
   };
 
   return (
@@ -251,11 +439,10 @@ const QRScannerHome: React.FC = () => {
 
             <div className="form-group">
               <div
-                className={`employee-message ${
-                  visitResult.visit.access_granted
-                    ? "employee-message-success"
-                    : "employee-message-error"
-                }`}
+                className={`employee-message ${visitResult.visit.access_granted
+                  ? "employee-message-success"
+                  : "employee-message-error"
+                  }`}
               >
                 {visitResult.message || "No message available."}
               </div>
@@ -270,12 +457,14 @@ const QRScannerHome: React.FC = () => {
                   <Button
                     type="button"
                     className="renew-btn"
-                    onClick={() => {
-                      console.log("Add Cash payment", {
-                        member_id: visitResult.visit.member_id,
-                        name: visitResult.member_name,
-                        reason: visitResult.visit.denial_reason,
-                      });
+                    onClick={async () => {
+                      setPaymentMethod("Cash");
+                      setAmountGiven("");
+                      
+                      const discounted = await calculateDiscountedAmount(visitResult.visit.member_id);
+                      setAmountToPay(discounted);
+                      
+                      setShowManualModal(true);
                     }}
                   >
                     Pay Via Cash
@@ -414,10 +603,7 @@ const QRScannerHome: React.FC = () => {
           if (!selectedMember) return;
 
           try {
-            const result = await scanVisit({
-              member_id: selectedMember.member_id,
-              direction: "inbound",
-            });
+            const result = await processVisit(selectedMember.member_id);
 
             setShowConfirmModal(false);
             setShowSearchModal(false);
@@ -429,7 +615,11 @@ const QRScannerHome: React.FC = () => {
             setVisitResult(result);
             setShowModal(true);
 
-            // 🔊 optional sounds (same behavior as scanner)
+            if (!result.visit.access_granted && result.visit.denial_reason === "No remaining credits") {
+              const discounted = await calculateDiscountedAmount(selectedMember.member_id);
+              setAmountToPay(discounted);
+            }
+
             if (result.visit.access_granted) {
               playSuccessSound();
             } else {
@@ -444,6 +634,160 @@ const QRScannerHome: React.FC = () => {
           }
         }}
       />
+
+      <Modal
+        className="modal-box"
+        isOpen={showManualModal}
+        title="Manual Admission"
+        showCloseButton={false}
+        onClose={() => {
+          setShowManualModal(false);
+          setAmountGiven("");
+          setPaymentMethod("Cash");
+        }}
+      >
+        <div className="employee-form">
+          <div className="form-group">
+            <label>Payment Method</label>
+            <select
+              className="employee-input"
+              value={paymentMethod}
+              onChange={(e) => {
+                const val = e.target.value;
+                setPaymentMethod(val);
+                if (val === "GCash") {
+                  setAmountGiven(amountToPay || 0);
+                }
+              }}
+            >
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Amount to Pay</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <p style={{ margin: 0, fontWeight: "bold" }}>₱{amountToPay}</p>
+              {gymPricing && amountToPay !== gymPricing.base_day_pass_price && (
+                <small style={{ color: "#d9534f" }}>
+                  (Discounted from ₱{gymPricing.base_day_pass_price})
+                </small>
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Amount Given</label>
+            <input
+              className="employee-input"
+              type="number"
+              placeholder="Enter amount given"
+              value={amountGiven}
+              onChange={(e) => setAmountGiven(e.target.value === "" ? "" : Number(e.target.value))}
+            />
+            {paymentMethod === "GCash" && (
+              <small style={{ color: "#666" }}>GCash amount defaults to amount to pay (exact).</small>
+            )}
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+            <Button
+              type="button"
+              className="btn-modal"
+              style={{ background: "#ccc", color: "#333" }}
+              onClick={() => setShowManualModal(false)}
+              disabled={isSubmittingManual}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={handleSubmitManualAdmit}
+              disabled={isSubmittingManual}
+            >
+              {isSubmittingManual ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <ConfirmModal
+        isOpen={showManualConfirm}
+        title="Confirm Manual Admission"
+        message={`Admit ${visitResult?.member_name} with a payment of P${amountGiven} via ${paymentMethod}?`}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        loading={isSubmittingManual}
+        onCancel={() => setShowManualConfirm(false)}
+        onConfirm={handleFinalSubmit}
+      />
+
+      <Modal
+        className="modal-box"
+        isOpen={showReceipt}
+        title="Admission Receipt"
+        showCloseButton={false}
+        onClose={async () => {
+          setShowReceipt(false);
+          setShowModal(false);
+          setVisitResult(null);
+          setAmountGiven("");
+          setPaymentMethod("Cash");
+          setReceiptData(null);
+          await restartScanner();
+        }}
+      >
+        {receiptData ? (
+          <div className="visit-result-card">
+            <div className="visit-result-row">
+              <span>Member Name</span>
+              <strong>{receiptData.member_name}</strong>
+            </div>
+
+            <div className="visit-result-row">
+              <span>Payment Method</span>
+              <strong>{receiptData.payment_method}</strong>
+            </div>
+
+            <div className="visit-result-row">
+              <span>Amount Given</span>
+              <strong>P{receiptData.amount_given}</strong>
+            </div>
+
+            <div className="visit-result-row">
+              <span>Date</span>
+              <strong>{receiptData.date}</strong>
+            </div>
+
+            <div className="visit-result-row" style={{ borderBottom: "none" }}>
+              <span>Transaction ID</span>
+              <strong>{receiptData.transaction_id}</strong>
+            </div>
+
+            <div className="form-actions" style={{ marginTop: "24px" }}>
+              <Button
+                type="button"
+                className="btn-modal btn-submit-modal"
+                onClick={async () => {
+                  setShowReceipt(false);
+                  setShowModal(false);
+                  setVisitResult(null);
+                  setAmountGiven("");
+                  setPaymentMethod("Cash");
+                  setReceiptData(null);
+                  await restartScanner();
+                }}
+              >
+                OK
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p style={{ textAlign: "center" }}>No receipt data found.</p>
+        )}
+      </Modal>
 
       <Menu
         isOpen={showEmployeeMenu}
