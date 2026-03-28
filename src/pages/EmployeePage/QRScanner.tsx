@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { Network } from "@capacitor/network";
-import { processQrOffline } from "../../logicHandlers/offlineQr";
+import { processQrOffline, processManualAdmitOffline } from "../../logicHandlers/offlineQr";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
@@ -21,6 +21,13 @@ import scanError from "../../resource/scanError.mp3";
 import { manualAdmitVisit, ManualAdmitInput } from "../../logicHandlers/visits";
 import { getCurrentUser } from "../../logicHandlers/userServices";
 import { getGymPricing, GymPricing } from "../../logicHandlers/gymPricing";
+import { getMembershipTypes, MembershipTypeResponse } from "../../logicHandlers/membershipCrud";
+import { getMemberById } from "../../logicHandlers/memberCrud";
+
+// Local Repository Fallbacks
+import { getLocalGymPricing } from "../../repositories/pricingRepository";
+import { getAllMembershipTypes } from "../../repositories/membershipRepository";
+import { getMemberById as getMemberByIdLocal } from "../../repositories/memberRepository";
 
 type ScanVisitResult = {
   visit: {
@@ -93,6 +100,7 @@ const QRScannerHome: React.FC = () => {
   const [receiptData, setReceiptData] = useState<any>(null);
   const [amountToPay, setAmountToPay] = useState<number | "">(0);
   const [gymPricing, setGymPricing] = useState<GymPricing | null>(null);
+  const [membershipTypes, setMembershipTypes] = useState<MembershipTypeResponse[]>([]);
 
   const scanAudio = useRef<HTMLAudioElement | null>(null);
   const errorAudio = useRef<HTMLAudioElement | null>(null);
@@ -133,11 +141,43 @@ const QRScannerHome: React.FC = () => {
   const getMembershipLabel = (type: number) => {
     switch (type) {
       case 0:
-        return "Member";
+        return "Postpaid";
       case 1:
-        return "Casual";
+        return "Prepaid";
       default:
         return `Type ${type}`;
+    }
+  };
+
+  const calculateDiscountedAmount = async (memberId: string) => {
+    if (!gymPricing) return 0;
+
+    try {
+      let member: any = null;
+      try {
+        member = await getMemberById(memberId);
+      } catch (apiErr) {
+        console.warn("API member fetch failed, trying local fallback...");
+        member = await getMemberByIdLocal(memberId);
+      }
+
+      if (!member || !member.membership_plan_id) {
+        return gymPricing.base_day_pass_price;
+      }
+
+      const plan = membershipTypes.find(
+        (t) => t.membership_id === member.membership_plan_id
+      );
+
+      if (!plan || !plan.discount_amount) {
+        return gymPricing.base_day_pass_price;
+      }
+
+      const discounted = gymPricing.base_day_pass_price - plan.discount_amount;
+      return Math.max(0, discounted);
+    } catch (err) {
+      console.error("Failed to calculate discount:", err);
+      return gymPricing.base_day_pass_price;
     }
   };
 
@@ -170,11 +210,26 @@ const QRScannerHome: React.FC = () => {
   useEffect(() => {
     const loadPricing = async () => {
       try {
-        const data = await getGymPricing();
-        setGymPricing(data);
-        setAmountToPay(data.base_day_pass_price);
+        const data = await getGymPricing().catch(async () => {
+          console.warn("Pricing API failed, using local...");
+          return await getLocalGymPricing();
+        });
+
+        if (data) {
+          setGymPricing(data);
+          setAmountToPay(data.base_day_pass_price);
+        }
+
+        const mTypes = await getMembershipTypes().catch(async () => {
+          console.warn("Membership API failed, using local...");
+          return await getAllMembershipTypes();
+        });
+
+        if (mTypes) {
+          setMembershipTypes(mTypes);
+        }
       } catch (err) {
-        console.error("Failed to load gym pricing:", err);
+        console.error("Failed to load gym pricing and membership types:", err);
       }
     };
     loadPricing();
@@ -261,14 +316,22 @@ const QRScannerHome: React.FC = () => {
         amount_given: Number(amountGiven),
       };
 
-      const response = await manualAdmitVisit(payload);
+      let visitId = "";
+      try {
+        const response = await manualAdmitVisit(payload);
+        visitId = response?.visit_id || response?.id || "N/A";
+      } catch (apiErr) {
+        console.warn("Manual admit API failed, saving offline...");
+        const offlineResult = await processManualAdmitOffline(payload);
+        visitId = offlineResult.visit_id;
+      }
 
       setReceiptData({
         member_name: visitResult.member_name,
         payment_method: paymentMethod,
         amount_given: Number(amountGiven),
         date: new Date().toLocaleString(),
-        transaction_id: response?.visit_id || response?.id || "N/A",
+        transaction_id: visitId,
       });
 
       setShowManualConfirm(false);
@@ -394,9 +457,13 @@ const QRScannerHome: React.FC = () => {
                   <Button
                     type="button"
                     className="renew-btn"
-                    onClick={() => {
+                    onClick={async () => {
                       setPaymentMethod("Cash");
                       setAmountGiven("");
+                      
+                      const discounted = await calculateDiscountedAmount(visitResult.visit.member_id);
+                      setAmountToPay(discounted);
+                      
                       setShowManualModal(true);
                     }}
                   >
@@ -548,6 +615,11 @@ const QRScannerHome: React.FC = () => {
             setVisitResult(result);
             setShowModal(true);
 
+            if (!result.visit.access_granted && result.visit.denial_reason === "No remaining credits") {
+              const discounted = await calculateDiscountedAmount(selectedMember.member_id);
+              setAmountToPay(discounted);
+            }
+
             if (result.visit.access_granted) {
               playSuccessSound();
             } else {
@@ -595,7 +667,14 @@ const QRScannerHome: React.FC = () => {
 
           <div className="form-group">
             <label>Amount to Pay</label>
-            <p>₱{amountToPay}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <p style={{ margin: 0, fontWeight: "bold" }}>₱{amountToPay}</p>
+              {gymPricing && amountToPay !== gymPricing.base_day_pass_price && (
+                <small style={{ color: "#d9534f" }}>
+                  (Discounted from ₱{gymPricing.base_day_pass_price})
+                </small>
+              )}
+            </div>
           </div>
 
           <div className="form-group">

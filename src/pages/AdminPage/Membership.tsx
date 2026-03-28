@@ -262,8 +262,8 @@ const MembershipPage: React.FC = () => {
               memberships.map((membership) => (
                 <POSCard
                   key={membership.membership_id}
-                  productName={membership.name}
-                  price={membership.price}
+                  productName={membership.name || ""}
+                  price={membership.price || 0}
                   buttonLabel="Edit amount"
                   onButtonClick={() =>
                     history.push(
@@ -318,7 +318,6 @@ const MembershipPage: React.FC = () => {
             >
               <option value={0}>Postpaid</option>
               <option value={1}>Prepaid</option>
-              <option value={2}>Discount</option>
             </select>
           </div>
 
