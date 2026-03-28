@@ -260,3 +260,9 @@ h3 {
     overscroll-behavior: contain;
   }
 }
+
+/* Skeleton loading shimmer – blue tint */
+ion-skeleton-text {
+  --background: rgba(59, 130, 246, 0.25);
+  --background-rgb: 59, 130, 246;
+}

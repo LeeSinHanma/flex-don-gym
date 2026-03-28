@@ -2,13 +2,13 @@ import api from "../api/axios";
 
 export interface MembershipTypeResponse {
   membership_id: number;
-  name: string;
-  type: number;
-  price: number;
+  name: string | null;
+  type: number | null;
+  price: number | null;
   discount_amount: number | null;
-  duration_months: number;
-  created_at: string;
-  updated_at: string;
+  duration_months: number | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 interface APIResponse {
@@ -40,6 +40,17 @@ export const getMembershipTypeById = async (
 ): Promise<MembershipTypeResponse> => {
   const res = await api.get<MembershipTypeResponse>(
     `/membership-types/${membership_id}`
+  );
+
+  return res.data;
+};
+
+// ✅ GET /membership-types/by-type/{type_id}
+export const getMembershipTypesByType = async (
+  type_id: number
+): Promise<MembershipTypeResponse[]> => {
+  const res = await api.get<MembershipTypeResponse[]>(
+    `/membership-types/by-type/${type_id}`
   );
 
   return res.data;

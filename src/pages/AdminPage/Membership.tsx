@@ -5,7 +5,7 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import { useHistory } from "react-router-dom";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import StatusModal from "../../components/Reusable/StatusModal";
 import NumberInput from "../../components/Reusable/NumberInput";
@@ -237,13 +237,33 @@ const MembershipPage: React.FC = () => {
         <div className="admin-main-content">
           <div className="product-card-wrapper">
             {loading ? (
-              <p>Loading membership types...</p>
+              [1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="pos-card-item">
+                  <div className="pos-cards-container">
+                    <div className="pos-status-card">
+                      <div className="pos-status-info">
+                        <div className="pos-left-info">
+                          <h2 className="pos-card-product-name">
+                            <IonSkeletonText animated style={{ width: "150px", display: "block" }} />
+                          </h2>
+                          <p className="pos-card-product-price">
+                            <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                          </p>
+                        </div>
+                        <div className="pos-card-top-right">
+                          <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
             ) : memberships.length > 0 ? (
               memberships.map((membership) => (
                 <POSCard
                   key={membership.membership_id}
-                  productName={membership.name}
-                  price={membership.price}
+                  productName={membership.name || ""}
+                  price={membership.price || 0}
                   buttonLabel="Edit amount"
                   onButtonClick={() =>
                     history.push(
@@ -298,7 +318,6 @@ const MembershipPage: React.FC = () => {
             >
               <option value={0}>Postpaid</option>
               <option value={1}>Prepaid</option>
-              <option value={2}>Discount</option>
             </select>
           </div>
 

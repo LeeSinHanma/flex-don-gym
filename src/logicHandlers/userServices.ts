@@ -21,7 +21,7 @@ export type UpdateUserInput = {
   last_name: string;
   role: number;
   is_active: boolean;
-  access_list?: string[];
+  access_list: string[];
 };
 
 export type APIResponse = any;
@@ -78,10 +78,11 @@ export async function createUser(
   firstName: string,
   lastName: string,
   role: number,
-  accessList: string[]
+  accessList: string[],
+  isActive: boolean = true
 ): Promise<APIResponse> {
   try {
-    const res = await api.post<APIResponse>("/users/create", {
+    const payload = {
       username,
       email,
       password,
@@ -89,7 +90,10 @@ export async function createUser(
       last_name: lastName,
       role,
       access_list: accessList,
-    });
+      is_active: isActive,
+    };
+    console.log("📤 POST /users/create payload:", JSON.stringify(payload, null, 2));
+    const res = await api.post<APIResponse>("/users/create", payload);
 
     return res.data;
   } catch (err) {
@@ -116,6 +120,7 @@ export async function updateUser(
   data: UpdateUserInput
 ): Promise<User> {
   try {
+    console.log(`📤 PUT /users/update/${userId} payload:`, JSON.stringify(data, null, 2));
     const res = await api.put<User>(`/users/update/${userId}`, data);
     return res.data;
   } catch (err) {

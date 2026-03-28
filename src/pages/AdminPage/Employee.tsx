@@ -5,9 +5,11 @@ import { Modal } from "../../components/Reusable/Modals";
 import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import Menu from "../../components/Reusable/Menu";
+import ConfirmModal from "../../components/Reusable/ConfirmModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 import "./AdminDashboard.css";
 import "./Employee.css";
 
@@ -19,6 +21,7 @@ const EmployeeMenu: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -26,8 +29,17 @@ const EmployeeMenu: React.FC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<number>(1);
+  const [isActive, setIsActive] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [access, setAccess] = useState<string[]>([]);
+
+  // Modals state
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<"success" | "error" | "warning" | "info">("info");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const accessOptions = [
     { label: "Dashboard", value: "dashboard" },
@@ -51,12 +63,21 @@ const EmployeeMenu: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    if (role === 0) {
+      setAccess(accessOptions.map((opt) => opt.value));
+    }
+  }, [role]);
+
   const loadUsers = async () => {
     try {
+      setLoading(true);
       const data = await getUsers();
       setUsers(data);
     } catch (error) {
       console.error("Failed to load users:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,23 +124,39 @@ const EmployeeMenu: React.FC = () => {
     setFirstName("");
     setLastName("");
     setRole(1);
+    setIsActive(true);
     setAccess([]);
   };
 
-  const handleSubmit = async () => {
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
+
+  const handleSubmit = () => {
+    if (!username || !email || !password || !firstName || !lastName) {
+      openStatusModal("Missing Fields", "Please fill in all fields.", "warning");
+      return;
+    }
+
+    if (role === 1 && access.length === 0) {
+      openStatusModal("Missing Access", "Please select at least one access.", "warning");
+      return;
+    }
+
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmCreate = async () => {
+    setShowConfirmModal(false);
+    setIsSubmitting(true);
     try {
-      if (!username || !email || !password || !firstName || !lastName) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      if (role === 1 && access.length === 0) {
-        alert("Please select at least one access.");
-        return;
-      }
-
-      const finalAccess = role === 0 ? accessOptions.map(opt => opt.value) : access;
-
       await createUser(
         username,
         email,
@@ -127,15 +164,18 @@ const EmployeeMenu: React.FC = () => {
         firstName,
         lastName,
         role,
-        finalAccess
+        access,
+        isActive
       );
 
       await loadUsers();
       handleCloseModal();
-      alert("Employee created successfully.");
+      openStatusModal("Success", "Employee created successfully.", "success");
     } catch (error: any) {
       console.error("Failed to create user:", error);
-      alert(error.message || "Failed to create user.");
+      openStatusModal("Error", error.message || "Failed to create user.", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -170,33 +210,51 @@ const EmployeeMenu: React.FC = () => {
         </div>
 
         <div className="cards-container">
-          {filteredUsers.length === 0 && (
-            <p style={{ textAlign: "center" }}>No users found.</p>
-          )}
-
-          {filteredUsers.map((u) => (
-            <div
-              key={u.id}
-              className="status-card"
-              onClick={() => history.push(`/employee/edit/${u.id}`)}
-            >
-              <div className="status-info">
-                <div className="left-info">
-                  <h2 className="client-name">
-                    {u.first_name} {u.last_name}
-                  </h2>
-
-                  <div className="client-details">
-                    <p className="client-type">{u.username}</p>
+          {loading ? (
+            [1, 2, 3].map((i) => (
+              <div key={i} className="status-card">
+                <div className="status-info">
+                  <div className="left-info">
+                    <h2 className="client-name">
+                      <IonSkeletonText animated style={{ width: "60%" }} />
+                    </h2>
+                    <div className="client-details">
+                      <p className="client-type">
+                        <IonSkeletonText animated style={{ width: "40%" }} />
+                      </p>
+                    </div>
                   </div>
                 </div>
+                <div className="client-status">
+                  <IonSkeletonText animated style={{ width: "50px" }} />
+                </div>
               </div>
-
-              <div className="client-status">
-                {u.role === 0 ? "Admin" : "Employee"}
+            ))
+          ) : filteredUsers.length === 0 ? (
+            <p style={{ textAlign: "center" }}>No users found.</p>
+          ) : (
+            filteredUsers.map((u) => (
+              <div
+                key={u.id}
+                className="status-card"
+                onClick={() => history.push(`/employee/edit/${u.id}`)}
+              >
+                <div className="status-info">
+                  <div className="left-info">
+                    <h2 className="client-name">
+                      {u.first_name} {u.last_name}
+                    </h2>
+                    <div className="client-details">
+                      <p className="client-type">{u.username}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="client-status">
+                  {u.role === 0 ? "Admin" : "Employee"}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="bottom-container">
@@ -287,6 +345,19 @@ const EmployeeMenu: React.FC = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="status">Status</label>
+            <select
+              id="status"
+              className="employee-input"
+              value={isActive ? "true" : "false"}
+              onChange={(e) => setIsActive(e.target.value === "true")}
+            >
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+
+          <div className="form-group">
             <label>Access</label>
 
             <div className="access-group">
@@ -316,6 +387,25 @@ const EmployeeMenu: React.FC = () => {
       </Modal>
 
       <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Confirm Creation"
+        message={`Are you sure you want to create employee ${firstName} ${lastName}?`}
+        confirmText="Create"
+        cancelText="Cancel"
+        onCancel={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmCreate}
+        loading={isSubmitting}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+      />
     </div>
   );
 };

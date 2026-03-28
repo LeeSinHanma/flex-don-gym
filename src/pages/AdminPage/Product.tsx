@@ -3,7 +3,7 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import Menu from "../../components/Reusable/Menu";
@@ -378,29 +378,49 @@ const ProductPage: React.FC = () => {
           </div>
 
           <div className="product-card-wrapper">
-            {isLoading && <p style={{ textAlign: "center" }}>Loading...</p>}
-
-            {!isLoading && filteredItems.length === 0 && (
+            {isLoading ? (
+              [1, 2, 3, 4, 5, 6, 7].map((i) => (
+                <div key={i} className="pos-card-item">
+                  <div className="pos-cards-container">
+                    <div className="pos-status-card">
+                      <div className="pos-status-info">
+                        <div className="pos-left-info">
+                          <h2 className="pos-card-product-name">
+                            <IonSkeletonText animated style={{ width: "150px", display: "block" }} />
+                          </h2>
+                          <p className="pos-card-product-price">
+                            <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                          </p>
+                        </div>
+                        <div className="pos-card-top-right">
+                          <IonSkeletonText animated style={{ width: "60px", display: "block" }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : filteredItems.length === 0 ? (
               <p style={{ textAlign: "center" }}>No products found.</p>
+            ) : (
+              filteredItems.map((item) => (
+                <div
+                  key={item.item_id}
+                  onClick={() => history.push("/admin-item-info", { item })}
+                  style={{ cursor: "pointer" }}
+                >
+                  <POSCard
+                    productName={item.item_name}
+                    price={item.price}
+                    topRight={
+                      <span className="product-stock-text">
+                        {item.quantity} stocks
+                      </span>
+                    }
+                  />
+                </div>
+              ))
             )}
-
-            {filteredItems.map((item) => (
-              <div
-                key={item.item_id}
-                onClick={() => history.push("/admin-item-info", { item })}
-                style={{ cursor: "pointer" }}
-              >
-                <POSCard
-                  productName={item.item_name}
-                  price={item.price}
-                  topRight={
-                    <span className="product-stock-text">
-                      {item.quantity} stocks
-                    </span>
-                  }
-                />
-              </div>
-            ))}
           </div>
         </div>
 

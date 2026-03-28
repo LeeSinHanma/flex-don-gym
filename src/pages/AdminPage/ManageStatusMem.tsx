@@ -77,7 +77,7 @@ const ManageStatusMemPage: React.FC = () => {
           const membershipData = await getMembershipTypeById(
             data.membership_plan_id,
           );
-          setMembershipName(membershipData.name);
+          setMembershipName(membershipData.name || "Unknown");
         }
 
         const visitData = await getVisitsByMemberId(memberId);

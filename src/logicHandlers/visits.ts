@@ -38,8 +38,50 @@ export async function scanVisit(
   }
 }
 
+// Manual Admit
+export type ManualAdmitInput = {
+  member_id: string;
+  transacted_by: string;
+  payment_method: string;
+  amount_given: number;
+};
+
+// Walk-in
+export type WalkInInput = {
+  transacted_by: string;
+  payment_method: string;
+  amount_given: number;
+  guest_label: string;
+};
+
 // ✅ GET /visits/member/{member_id}
 export async function getVisitsByMemberId(member_id: string): Promise<Visit[]> {
   const res = await api.get(`/visits/member/${encodeURIComponent(member_id)}`);
   return res.data;
+}
+
+// POST /visits/manual-admit
+export async function manualAdmitVisit(
+  data: ManualAdmitInput,
+): Promise<any> {
+  try {
+    const response = await api.post("/visits/manual-admit", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error manual admit:", error);
+    throw error;
+  }
+}
+
+// POST /visits/walk-in
+export async function walkInVisit(
+  data: WalkInInput,
+): Promise<any> {
+  try {
+    const response = await api.post("/visits/walk-in", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error walk-in:", error);
+    throw error;
+  }
 }
