@@ -3,7 +3,7 @@ import { getMemberById, deductMemberCredits } from "../repositories/memberReposi
 import { saveOfflineVisit, addPendingSync } from "../repositories/visitRepository";
 import { getLocalGymPricing } from "../repositories/pricingRepository";
 import { getLocalMembershipTypeById } from "../repositories/membershipRepository";
-import { ManualAdmitInput } from "./visits";
+import { ManualAdmitInput, WalkInInput } from "./visits";
 
 export async function processQrOffline(qrCode: string) {
   const member = await getMemberById(qrCode);
@@ -181,6 +181,31 @@ export async function processManualAdmitOffline(payload: ManualAdmitInput) {
   return {
     success: true,
     visit_id: `OFFLINE-${Math.random()
+      .toString(36)
+      .substring(2, 9)
+      .toUpperCase()}`,
+  };
+}
+
+export async function processWalkInOffline(payload: WalkInInput) {
+  await saveOfflineVisit({
+    member_id: `WALK-IN: ${payload.guest_label}`,
+    direction: "inbound",
+    access_granted: true,
+    denial_reason: null,
+    amount_paid: payload.amount_given,
+  });
+
+  await addPendingSync({
+    entity_type: "visit",
+    action_type: "walk_in",
+    payload_json: JSON.stringify(payload),
+    created_at: new Date().toISOString(),
+  });
+
+  return {
+    success: true,
+    visit_id: `OFFLINE-WALKIN-${Math.random()
       .toString(36)
       .substring(2, 9)
       .toUpperCase()}`,

@@ -8,6 +8,7 @@ import { arrowBack, menu } from "ionicons/icons";
 import { getMembers, Member } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 import Menu from "../../components/Reusable/Menu";
+import { Button } from "../../components/Reusable/Button";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
@@ -191,6 +192,15 @@ const StatusMemberPage: React.FC = () => {
               </div>
             ))
           )}
+        </div>
+        <div className="bottom-container">
+          <Button
+            className="btn btn-submit"
+            type="button"
+            onClick={() => history.push("/member")}
+          >
+            Add New Member
+          </Button>
         </div>
       </div>
 

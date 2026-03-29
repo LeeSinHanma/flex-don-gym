@@ -63,7 +63,7 @@ import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
-//sync
+import { syncPendingQueue } from "./logicHandlers/syncPending";
 import { syncMembersFromServer } from "./logicHandlers/syncMembers";
 import { getAllMembers } from "./repositories/memberRepository";
 
@@ -94,6 +94,11 @@ const App: React.FC = () => {
         const inventoryCount = await syncInventoryFromServer();
         console.log(`Synced ${inventoryCount} inventory items to SQLite`);
 
+        // ✅ Sync any pending offline visits/walk-ins
+        // Temporarily disabled per user request
+        // await syncPendingQueue();
+        console.log("Pending sync complete (Syncing currently disabled)");
+
       } catch (err) {
         console.error("App init failed:", err);
       }
@@ -101,6 +106,7 @@ const App: React.FC = () => {
 
     initApp();
   }, []);
+
 
   return (
     <IonApp>

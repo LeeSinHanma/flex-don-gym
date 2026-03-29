@@ -3,7 +3,7 @@ import {
     markPendingSyncDone,
     markPendingSyncFailed,
 } from "../repositories/visitRepository";
-import { scanVisit, manualAdmitVisit } from "./visits";
+import { scanVisit, manualAdmitVisit, walkInVisit } from "./visits";
 
 export async function syncPendingQueue() {
     const items = await getPendingSyncItems();
@@ -17,6 +17,8 @@ export async function syncPendingQueue() {
                     await scanVisit(payload.member_id);
                 } else if (item.action_type === "manual_admit") {
                     await manualAdmitVisit(payload);
+                } else if (item.action_type === "walk_in") {
+                    await walkInVisit(payload);
                 }
             }
 
@@ -25,4 +27,4 @@ export async function syncPendingQueue() {
             await markPendingSyncFailed(item.id, error?.message ?? "Sync failed");
         }
     }
-}
+}
