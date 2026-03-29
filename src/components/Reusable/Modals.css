@@ -60,6 +60,17 @@
   width: 100%;
 }
 
+/* Buttons container - not scrollable by default */
+.modal-buttons-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: auto;
+  overflow-y: hidden;
+  padding-right: 4px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: center;
@@ -123,4 +134,60 @@
 
 .add-credit-modal {
   width: 300px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 90vw;
+    max-width: 320px;
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .modal-title {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+  }
+
+  .modal-actions {
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .modal-action-btn {
+    width: 100px;
+    height: 44px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+
+  .modal-close-btn {
+    margin-top: 10px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .confirm-modals {
+    width: 90vw;
+    max-width: 320px;
+  }
+
+  .add-credit-modal {
+    width: 90vw;
+    max-width: 280px;
+  }
+
+  .modal-buttons-container {
+    max-height: 300px;
+    gap: 8px;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .modal-buttons-container::-webkit-scrollbar {
+    display: none;
+  }
 }

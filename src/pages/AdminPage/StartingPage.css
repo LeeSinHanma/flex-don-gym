@@ -54,6 +54,9 @@
 
 .dondon-logo {
   height: 379px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 /* Button group */
@@ -119,17 +122,76 @@
 
 /* Responsive adjustments */
 @media (max-width: 480px) {
+  .admin-login-container {
+    padding: 0.75rem;
+  }
+
   .admin-main-container {
     max-width: 100%;
     height: 100vh;
     height: 100dvh;
+    padding: 0.75rem 0.75rem;
+    border-radius: 0;
+  }
+
+  .admin-main-container h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-image-group {
+    flex: 0 0 auto;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-gym-name {
+    font-size: 18px;
+    margin-bottom: 0.5rem;
+  }
+
+  .login-gym-name {
+    font-size: 13px;
+  }
+
+  .dondon-logo {
+    height: 200px;
+    width: auto;
+    max-width: 90vw;
+    object-fit: contain;
+  }
+
+  .login-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .admin-button-group {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-form {
+    width: 100%;
+    gap: 1rem;
+  }
+
+  .login-form input {
+    height: 40px;
+    padding: 0 0.75rem;
+    font-size: 14px;
+    border-radius: 8px;
   }
 
   .btn-signup,
   .btn-logout {
-    height: 50px;
-    font-size: 14px;
+    height: 45px;
+    font-size: 13px;
     font-weight: 600;
-    border-radius: 12px;
+    border-radius: 10px;
+    width: 100%;
   }
 }
