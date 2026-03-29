@@ -218,13 +218,14 @@
 }
 
 .bottom-container .btn-submit {
-  width: 400px;
-  height: 62px;
+  width: 100%;
+  max-width: 400px;
+  height: 60px;
   border-radius: 15px;
   background-color: #04354f;
   color: white;
   border: none;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   font-family: "Inter", sans-serif;
   cursor: pointer;
@@ -385,8 +386,10 @@
   .bottom-container .btn-submit {
     width: 100%;
     max-width: 350px;
-    height: 42px;
+    height: 50px;
     font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
   }
 
   .employee-input {

@@ -74,16 +74,22 @@
   background-color: #04354f;
   color: #d9d9d9;
   font-family: "Inter", sans-serif;
-  font-weight: bold;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 16px;
   border: none;
-  border-radius: 16px;
+  border-radius: 15px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-signup:hover {
-  background-color: #2d5580;
+  background-color: #053a56;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-signup:active {
+  transform: translateY(0);
 }
 
 .btn-logout {
@@ -93,21 +99,35 @@
   background-color: #920303;
   color: #d9d9d9;
   font-family: "Inter", sans-serif;
-  font-weight: bold;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 16px;
   border: none;
-  border-radius: 16px;
+  border-radius: 15px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-logout:hover {
   background-color: #640000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
 }
 
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .admin-main-container {
     max-width: 100%;
+  }
+
+  .btn-signup,
+  .btn-logout {
+    height: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
   }
 }

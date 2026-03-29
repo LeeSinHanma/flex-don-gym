@@ -82,7 +82,8 @@
 }
 
 .btn-cancel {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   height: 60px;
   border-radius: 15px;
   border: none;
@@ -97,6 +98,12 @@
 
 .btn-cancel:hover {
   background-color: #b71c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cancel:active {
+  transform: translateY(0);
 }
 .pos-nav {
   display: flex; /* ⬅️ horizontal */
@@ -382,6 +389,13 @@
   .btn-add-member {
     height: 42px;
     font-size: 14px;
+  }
+
+  .btn-cancel {
+    height: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
   }
 
   .add-member-container {

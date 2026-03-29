@@ -67,6 +67,12 @@
   gap: 0.9rem;
   padding: 1rem;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-dashboard-container .admin-main-content::-webkit-scrollbar {
+  display: none;
 }
 
 .admin-dashboard-container .ad-stats-row {
@@ -255,7 +261,7 @@
 
 .admin-dashboard-container .ad-bottom-grid {
   display: grid;
-  grid-template-columns: 1.25fr 0.95fr;
+  grid-template-columns: 1fr;
   gap: 0.9rem;
 }
 
@@ -349,6 +355,13 @@
   }
 }
 
+@media (min-width: 1200px) {
+  .admin-dashboard-container .admin-main-container {
+    max-width: 95vw;
+    width: 95vw;
+  }
+}
+
 @media (max-width: 720px) {
   .admin-dashboard-container {
     padding: 0.6rem;
@@ -371,6 +384,16 @@
 
   .admin-dashboard-container .ad-donut-chart {
     height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-btn {
+    height: 50px;
+    font-size: 14px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    border-radius: 12px;
   }
 }
 
@@ -412,10 +435,4 @@
 
 .menu-btn-close:hover {
   background-color: #4b5563;
-}
-
-/* Skeleton loading shimmer – blue tint */
-ion-skeleton-text {
-  --background: rgba(59, 130, 246, 0.25);
-  --background-rgb: 59, 130, 246;
 }
