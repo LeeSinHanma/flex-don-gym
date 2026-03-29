@@ -28,3 +28,10 @@
   justify-content: center;
   gap: 16px;
 }
+
+@media (max-width: 480px) {
+  .admin-dashboard-container .admin-main-container {
+    height: 100vh;
+    height: 100dvh;
+  }
+}

@@ -343,8 +343,8 @@
 
   /* ✅ fixed — keep height constrained so cards-container can scroll */
   .main-container {
-    height: 95vh;
-    height: 95dvh; /* ✅ keep fixed height */
+    height: 100vh;
+    height: 100dvh; /* ✅ mobile viewport height */
     min-height: unset; /* ✅ remove min-height fighting against it */
     overflow: hidden; /* ✅ scroll belongs on cards-container, not here */
     -webkit-overflow-scrolling: unset;

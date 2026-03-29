@@ -361,8 +361,7 @@
   }
 
   .main-container.product-main-container .admin-main-content {
-    flex: 1;
-    min-height: 0;
+    height: calc(100dvh - 250px);
     overflow: hidden;
   }
 

@@ -334,6 +334,11 @@
 }
 
 @media (max-width: 480px) {
+  .main-container {
+    height: 100vh;
+    height: 100dvh;
+  }
+
   .text-container {
     gap: 6px;
   }
