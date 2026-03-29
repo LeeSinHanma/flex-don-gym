@@ -6,6 +6,10 @@ import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 import LogoutModal from "../../components/Reusable/LogoutModal";
 import { getCurrentUser, logout } from "../../logicHandlers/userServices";
+import {
+  OfflineBanner,
+  BannerStatus,
+} from "../../components/Reusable/OfflineBanner";
 
 const StartingPageAdmin: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +18,8 @@ const StartingPageAdmin: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loggedUser, setLoggedUser] = useState<string | null>(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [bannerStatus, setBannerStatus] = useState<BannerStatus>("offline");
+  const [showBanner, setShowBanner] = useState(true);
 
   const handleLogout = () => {
     logout();
@@ -46,6 +52,7 @@ const StartingPageAdmin: React.FC = () => {
 
   return (
     <div className="admin-login-container">
+      <OfflineBanner status={bannerStatus} visible={showBanner} />
       <div className="admin-main-container">
         <div className="admin-image-group">
           <IonImg src={dondonLogo} className="dondon-logo" alt="Logo" />
