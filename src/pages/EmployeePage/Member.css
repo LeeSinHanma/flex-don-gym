@@ -171,7 +171,6 @@ input:focus {
   margin-bottom: 10px;
 }
 
-
 .qr-header h2 {
   font-size: 16px;
   font-weight: 800;
@@ -264,9 +263,37 @@ input:focus {
 }
 
 @media (max-width: 480px) {
+  .member-menu-container {
+    padding: 0.5rem;
+  }
+
+  .top-container {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+    margin: 0;
+  }
+
+  .btn-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+  }
+
   .qr-wrapper {
-    width: min(88vw, 280px);
+    width: min(85vw, 260px);
     border-width: 2px;
     border-radius: 8px;
+    padding: 12px;
+  }
+
+  .btn-submit {
+    height: 40px;
+    font-size: 13px;
+    border-radius: 8px;
+    width: 100%;
   }
 }

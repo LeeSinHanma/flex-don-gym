@@ -321,53 +321,76 @@
 
 @media (max-width: 480px) {
   .qr-wrapper {
-    width: min(88vw, 280px);
+    width: min(85vw, 260px);
     border-width: 2px;
     border-radius: 8px;
+    padding: 12px;
   }
 
   .qr-member-name {
-    font-size: 18px;
+    font-size: 16px;
+    margin-bottom: 0.75rem;
   }
 
   .renew-btn,
   .cancel-btn {
-    height: 42px;
-    font-size: 14px;
+    height: 38px;
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 8px;
   }
 
   .btn-qr {
-    height: 42px;
-    font-size: 14px;
+    height: 38px;
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 8px;
   }
 
   /* ✅ fixed — keep height constrained so cards-container can scroll */
   .main-container {
-    height: 95vh;
-    height: 95dvh; /* ✅ keep fixed height */
+    height: 100vh;
+    height: 100dvh; /* ✅ mobile viewport height */
     min-height: unset; /* ✅ remove min-height fighting against it */
     overflow: hidden; /* ✅ scroll belongs on cards-container, not here */
     -webkit-overflow-scrolling: unset;
+    max-width: 100%;
   }
 
   .status-content-scroll {
-    padding-right: 0;
+    padding: 0.75rem;
+    padding-right: 0.5rem;
   }
 
   .member-container {
     flex-direction: column;
-    padding: 12px 14px;
+    padding: 10px 12px;
+    border-radius: 10px;
   }
 
   .middle-container {
     max-height: none;
+    gap: 0.5rem;
   }
 
   .history-box {
-    max-height: 150px;
+    max-height: 140px;
+    max-width: 100%;
   }
 
   .status-button-container {
-    padding-bottom: 2rem;
+    padding: 1rem 0.75rem 1.5rem 0.75rem;
+  }
+
+  .status-button {
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .status-button button {
+    width: 100%;
+    height: 40px;
+    font-size: 13px;
+    border-radius: 8px;
   }
 }
