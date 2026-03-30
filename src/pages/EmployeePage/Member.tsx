@@ -10,6 +10,7 @@ import { Modal } from "../../components/Reusable/Modals";
 import { createMember } from "../../logicHandlers/memberCrud";
 import dondonLogo from "../../resource/dondon-logo.png";
 import QrCodeModal from "../../components/Reusable/QrCodeModal";
+import StatusModal from "../../components/Reusable/StatusModal";
 import {
   getMembershipTypes,
   MembershipTypeResponse,
@@ -37,6 +38,13 @@ const MemberMenu: React.FC = () => {
   >([]);
   const qrCardRef = useRef<HTMLDivElement | null>(null);
 
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
   const [acceptedData, setAcceptedData] = useState<{
     email: string;
     contactNumber: string;
@@ -46,6 +54,17 @@ const MemberMenu: React.FC = () => {
     paymentMethod: string;
     amountGiven: number | string;
   } | null>(null);
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
 
   useEffect(() => {
     const loadMemberships = async () => {
@@ -89,7 +108,7 @@ const MemberMenu: React.FC = () => {
       link.click();
     } catch (error) {
       console.error("Failed to download QR image:", error);
-      alert("Failed to download QR image.");
+      openStatusModal("Download Failed", "Failed to download QR image.", "error");
     }
   };
 
@@ -107,17 +126,17 @@ const MemberMenu: React.FC = () => {
       !trimmedFirstName ||
       !trimmedLastName
     ) {
-      alert("All fields are required.");
+      openStatusModal("Validation Error", "All fields are required.", "warning");
       return;
     }
 
     if (membershipType === 0) {
-      alert("Please select a membership.");
+      openStatusModal("No Membership selected", "Please select a membership.", "warning");
       return;
     }
 
     if (amountGiven === "" || Number(amountGiven) < 0) {
-      alert("Please enter a valid amount given.");
+      openStatusModal("Amount Required", "Please enter a valid amount given.", "warning");
       return;
     }
 
@@ -139,7 +158,7 @@ const MemberMenu: React.FC = () => {
 
       const qrValue = response?.member_id;
       if (!qrValue) {
-        alert("Member created but member_id is missing.");
+        openStatusModal("Data Error", "Member created but member_id is missing.", "error");
         return;
       }
 
@@ -156,7 +175,7 @@ const MemberMenu: React.FC = () => {
       setShowModal(true);
     } catch (err: any) {
       console.log("API ERROR:", err.message);
-      alert(err.message || "Failed to add member");
+      openStatusModal("Failed to add member", err.message || "Something went wrong.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -435,6 +454,14 @@ const MemberMenu: React.FC = () => {
               ? `${acceptedData.firstName}-${acceptedData.lastName}-qr`
               : "member-qr"
           }
+        />
+
+        <StatusModal
+          isOpen={showStatusModal}
+          onClose={() => setShowStatusModal(false)}
+          title={statusTitle}
+          message={statusMessage}
+          type={statusType}
         />
       </div>
     </>
