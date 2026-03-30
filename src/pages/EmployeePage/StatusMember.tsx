@@ -10,6 +10,11 @@ import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 import Menu from "../../components/Reusable/Menu";
 import { Button } from "../../components/Reusable/Button";
 
+import { Network } from "@capacitor/network";
+import { getAllMembers } from "../../repositories/memberRepository";
+import { getAllMembershipTypes } from "../../repositories/membershipRepository";
+import StatusModal from "../../components/Reusable/StatusModal";
+
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
 
@@ -21,48 +26,109 @@ const StatusMemberPage: React.FC = () => {
   >({});
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusTitle, setStatusTitle] = useState("");
+  const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
+
+  const openStatusModal = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info",
+  ) => {
+    setStatusTitle(title);
+    setStatusMessage(message);
+    setStatusType(type);
+    setShowStatusModal(true);
+  };
+
   const formatDateDash = (dateString: string | null) => {
     if (!dateString) return "No Expiry";
 
     const datePart = dateString.split("T")[0];
     const [yyyy, mm, dd] = datePart.split("-");
-    return `${mm}-${dd}-${yyyy}`;
-  };
-
-  const getMembershipLabel = (member: Member) => {
-    if (
-      member.membership_plan_id !== null &&
-      member.membership_plan_id !== undefined
-    ) {
-      return `Plan ID: ${member.membership_plan_id}`;
-    }
-
-    return "No Plan";
+    const formatted = `${mm}-${dd}-${yyyy}`;
+    return formatted === "null-undefined-undefined" ? "No Expiry" : formatted;
   };
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
-        const data = await getMembers();
-        setAllMembers(data);
+        const status = await Network.getStatus();
+        let membersData: Member[] = [];
+        const mNamesMap: Record<number, string> = {};
 
-        const map: Record<number, string> = {};
+        if (status.connected) {
+          try {
+            membersData = await getMembers();
 
-        for (const m of data) {
-          if (
-            m.membership_plan_id !== null &&
-            m.membership_plan_id !== undefined &&
-            !map[m.membership_plan_id]
-          ) {
-            const membership = await getMembershipTypeById(
-              m.membership_plan_id,
-            );
-            map[m.membership_plan_id] = membership.name || "Unknown";
+            for (const m of membersData) {
+              if (
+                m.membership_plan_id !== null &&
+                m.membership_plan_id !== undefined &&
+                !mNamesMap[m.membership_plan_id]
+              ) {
+                try {
+                  const membership = await getMembershipTypeById(
+                    m.membership_plan_id,
+                  );
+                  mNamesMap[m.membership_plan_id] = membership.name || "Unknown";
+                } catch (apiErr) {
+                   console.warn(`Failed to fetch membership ${m.membership_plan_id} from API, skipping...`);
+                }
+              }
+            }
+          } catch (apiErr) {
+            console.warn("API member fetch failed, falling back to local...");
+            const localMembers = await getAllMembers();
+            membersData = localMembers.map(m => ({
+              ...m,
+              is_active: m.is_active === 1,
+              email: m.email || "",
+              contact_number: m.contact_number || "",
+              first_name: m.first_name || "",
+              last_name: m.last_name || "",
+              membership_type: m.membership_type || 0,
+              membership_plan_id: m.membership_plan_id || 0,
+              credits: m.credits || 0,
+              registered_by: m.registered_by || "unknown",
+              created_at: m.created_at || "",
+              updated_at: m.updated_at || "",
+            }));
+
+            const localPlans = await getAllMembershipTypes();
+            localPlans.forEach(p => {
+              mNamesMap[p.membership_id] = p.name || "Unknown";
+            });
           }
+        } else {
+          const localMembers = await getAllMembers();
+          membersData = localMembers.map(m => ({
+            ...m,
+            is_active: m.is_active === 1,
+            email: m.email || "",
+            contact_number: m.contact_number || "",
+            first_name: m.first_name || "",
+            last_name: m.last_name || "",
+            membership_type: m.membership_type || 0,
+            membership_plan_id: m.membership_plan_id || 0,
+            credits: m.credits || 0,
+            registered_by: m.registered_by || "unknown",
+            created_at: m.created_at || "",
+            updated_at: m.updated_at || "",
+          }));
+
+          const localPlans = await getAllMembershipTypes();
+          localPlans.forEach(p => {
+            mNamesMap[p.membership_id] = p.name || "Unknown";
+          });
         }
 
-        setMembershipNames(map);
+        setAllMembers(membersData);
+        setMembershipNames(mNamesMap);
       } catch (e) {
         console.error(e);
       } finally {
@@ -72,6 +138,19 @@ const StatusMemberPage: React.FC = () => {
 
     load();
   }, []);
+
+  const handleMemberClick = async (memberId: string) => {
+    const status = await Network.getStatus();
+    if (!status.connected) {
+      openStatusModal(
+        "Currently Offline",
+        "You are currently offline, please try again when network is available.",
+        "warning"
+      );
+      return;
+    }
+    history.push(`/manage-status/${memberId}`);
+  };
 
   const filteredMembers = useMemo(() => {
     const q = (search ?? "").trim().toLowerCase();
@@ -165,7 +244,7 @@ const StatusMemberPage: React.FC = () => {
               <div
                 key={m.member_id}
                 className="status-card"
-                onClick={() => history.push(`/manage-status/${m.member_id}`)}
+                onClick={() => handleMemberClick(m.member_id)}
               >
                 <div className="status-info">
                   <div className="left-info">
@@ -207,6 +286,14 @@ const StatusMemberPage: React.FC = () => {
       <Menu
         isOpen={showEmployeeMenu}
         onClose={() => setShowEmployeeMenu(false)}
+      />
+
+      <StatusModal
+        isOpen={showStatusModal}
+        title={statusTitle}
+        message={statusMessage}
+        type={statusType}
+        onClose={() => setShowStatusModal(false)}
       />
     </div>
   );

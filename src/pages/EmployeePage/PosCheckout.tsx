@@ -23,6 +23,9 @@ type LocationState = {
   totalAmount?: number;
 };
 
+import { Network } from "@capacitor/network";
+import { processSaleOffline } from "../../logicHandlers/offlineSales";
+
 const PosCheckout: React.FC = () => {
   const history = useHistory();
   const location = useLocation<LocationState>();
@@ -99,7 +102,28 @@ const PosCheckout: React.FC = () => {
         })),
       };
 
-      await createSale(salePayload);
+      console.log("Placing order with payload:", salePayload);
+
+      setIsLoading(true);
+      let saleId = "";
+      const networkStatus = await Network.getStatus();
+
+      if (networkStatus.connected) {
+        try {
+          const response = await createSale(salePayload);
+          saleId = response.sale_id;
+          console.log("Online sale created with ID:", saleId);
+        } catch (apiErr) {
+          console.warn("API sale creation failed, trying offline fallback...");
+          const offlineResult = await processSaleOffline(salePayload);
+          saleId = offlineResult.sale_id;
+          console.log("Offline fallback sale created with ID:", saleId);
+        }
+      } else {
+        const offlineResult = await processSaleOffline(salePayload);
+        saleId = offlineResult.sale_id;
+        console.log("Offline sale created with ID:", saleId);
+      }
 
       // close transaction modal
       setShowTransacModal(false);
@@ -113,6 +137,9 @@ const PosCheckout: React.FC = () => {
       setShowReceiptModal(true);
     } catch (error) {
       console.error("Checkout failed:", error);
+      openStatusModal("Checkout Failed", "An error occurred while processing your order.", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 

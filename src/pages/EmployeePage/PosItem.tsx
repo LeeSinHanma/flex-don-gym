@@ -18,6 +18,9 @@ type PosItemLocationState = {
   cartItems?: CartItem[];
 };
 
+import { Network } from "@capacitor/network";
+import { getAllInventoryItems } from "../../repositories/inventoryRepository";
+
 const PosItemPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<PosItemLocationState>();
@@ -31,7 +34,40 @@ const PosItemPage: React.FC = () => {
   useEffect(() => {
     const loadItems = async () => {
       try {
-        const data = await getInventoryItems();
+        let data: InventoryItem[] = [];
+        const status = await Network.getStatus();
+
+        if (status.connected) {
+          try {
+            data = await getInventoryItems();
+          } catch (apiErr) {
+            console.warn("API inventory load failed, trying local fallback...");
+            const local = await getAllInventoryItems();
+            data = local.map((l) => ({
+              item_id: l.item_id,
+              item_name: l.item_name || "Unknown Item",
+              description: l.description || "",
+              price: l.price || 0,
+              quantity: l.quantity || 0,
+              added_by: l.added_by || "unknown",
+              created_at: l.created_at || "",
+              updated_at: l.updated_at || "",
+            }));
+          }
+        } else {
+          const local = await getAllInventoryItems();
+          data = local.map((l) => ({
+            item_id: l.item_id,
+            item_name: l.item_name || "Unknown Item",
+            description: l.description || "",
+            price: l.price || 0,
+            quantity: l.quantity || 0,
+            added_by: l.added_by || "unknown",
+            created_at: l.created_at || "",
+            updated_at: l.updated_at || "",
+          }));
+        }
+
         setItems(data);
       } catch (err) {
         console.error("Failed to load inventory:", err);

@@ -55,3 +55,10 @@ export async function getLocalInventoryItemById(itemId: string) {
     );
     return rows[0] ?? null;
 }
+
+export async function decrementLocalInventoryQuantity(itemId: string, quantity: number) {
+    await sqliteService.run(
+        `UPDATE inventory_items SET quantity = quantity - ? WHERE item_id = ?`,
+        [quantity, itemId]
+    );
+}

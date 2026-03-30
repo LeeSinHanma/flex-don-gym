@@ -55,6 +55,26 @@ CREATE TABLE IF NOT EXISTS offline_visits (
   synced INTEGER DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS offline_sales (
+  sale_id TEXT PRIMARY KEY NOT NULL,
+  sold_by TEXT,
+  total_price REAL,
+  payment_method TEXT,
+  amount_given REAL,
+  created_at TEXT NOT NULL,
+  synced INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS offline_sale_items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  sale_id TEXT NOT NULL,
+  item_id TEXT NOT NULL,
+  item_name TEXT,
+  quantity INTEGER,
+  unit_price REAL,
+  FOREIGN KEY (sale_id) REFERENCES offline_sales (sale_id)
+);
+
 CREATE TABLE IF NOT EXISTS pending_sync (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   entity_type TEXT NOT NULL,
@@ -74,4 +94,5 @@ CREATE TABLE IF NOT EXISTS sync_meta (
 CREATE INDEX IF NOT EXISTS idx_members_member_id ON members(member_id);
 CREATE INDEX IF NOT EXISTS idx_pending_sync_status ON pending_sync(status);
 CREATE INDEX IF NOT EXISTS idx_offline_visits_synced ON offline_visits(synced);
+CREATE INDEX IF NOT EXISTS idx_offline_sales_synced ON offline_sales(synced);
 `;
