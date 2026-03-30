@@ -63,14 +63,13 @@ import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
-import { syncPendingQueue } from "./logicHandlers/syncPending";
 import { syncMembersFromServer } from "./logicHandlers/syncMembers";
 import { getAllMembers } from "./repositories/memberRepository";
+import { OfflineBanner } from "./components/Reusable/OfflineBanner";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-
   useEffect(() => {
     const initApp = async () => {
       if (Capacitor.getPlatform() === "web") {
@@ -107,9 +106,9 @@ const App: React.FC = () => {
     initApp();
   }, []);
 
-
   return (
     <IonApp>
+      <OfflineBanner />
       <IonReactRouter>
         <IonRouterOutlet>
           <Switch>

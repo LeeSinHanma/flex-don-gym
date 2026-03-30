@@ -12,6 +12,7 @@ import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import StatusModal from "../../components/Reusable/StatusModal";
 import "./AdminDashboard.css";
 import "./Employee.css";
+import { useNetworkStatus } from "../../hooks/useNetworkStatus";
 
 import { createUser, getUsers, getCurrentUser, User } from "../../logicHandlers/userServices";
 
@@ -22,6 +23,7 @@ const EmployeeMenu: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const { isOffline } = useNetworkStatus();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -205,9 +207,16 @@ const EmployeeMenu: React.FC = () => {
             type="text"
             placeholder="Search employee"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+
+        {isOffline && (
+          <div className="offline-notice-container">
+            <p className="offline-notice-text">
+              Offline Mode: Actions are currently restricted.
+            </p>
+          </div>
+        )}
 
         <div className="cards-container">
           {loading ? (
@@ -231,13 +240,15 @@ const EmployeeMenu: React.FC = () => {
               </div>
             ))
           ) : filteredUsers.length === 0 ? (
-            <p style={{ textAlign: "center" }}>No users found.</p>
+            <p style={{ textAlign: "center" }}>
+              {isOffline ? "Currently Offline" : "No users found."}
+            </p>
           ) : (
             filteredUsers.map((u) => (
               <div
                 key={u.id}
-                className="status-card"
-                onClick={() => history.push(`/employee/edit/${u.id}`)}
+                className={`status-card ${isOffline ? "disabled-card" : ""}`}
+                onClick={() => !isOffline && history.push(`/employee/edit/${u.id}`)}
               >
                 <div className="status-info">
                   <div className="left-info">
@@ -262,6 +273,7 @@ const EmployeeMenu: React.FC = () => {
             className="btn btn-submit"
             type="button"
             onClick={handleAddEmployee}
+            disabled={isOffline}
           >
             Add employee
           </Button>

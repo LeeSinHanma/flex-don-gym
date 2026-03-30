@@ -12,6 +12,7 @@ import NumberInput from "../../components/Reusable/NumberInput";
 import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
+import { useNetworkStatus } from "../../hooks/useNetworkStatus";
 import {
   createMembershipType,
   getMembershipTypes,
@@ -30,6 +31,7 @@ const MembershipPage: React.FC = () => {
 
   const [memberships, setMemberships] = useState<MembershipTypeResponse[]>([]);
   const [loading, setLoading] = useState(false);
+  const { isOffline } = useNetworkStatus();
 
   const [name, setName] = useState("");
   const [type, setType] = useState(0);
@@ -226,13 +228,22 @@ const MembershipPage: React.FC = () => {
           <POSCard
             productName={"Daily Rate"}
             price={gymPricing?.base_day_pass_price ?? 55}
-            buttonLabel="Edit amount"
+            buttonLabel={isOffline ? "Offline" : "Edit amount"}
             onButtonClick={() => {
+              if (isOffline) return;
               setDailyRateInput(String(gymPricing?.base_day_pass_price ?? 55));
               setIsEditDailyRateOpen(true);
             }}
           />
         </div>
+
+        {isOffline && (
+          <div className="offline-notice-container">
+            <p className="offline-notice-text">
+              Offline Mode: Actions are currently restricted.
+            </p>
+          </div>
+        )}
 
         <div className="admin-main-content">
           <div className="product-card-wrapper">
@@ -264,16 +275,16 @@ const MembershipPage: React.FC = () => {
                   key={membership.membership_id}
                   productName={membership.name || ""}
                   price={membership.price || 0}
-                  buttonLabel="Edit amount"
+                  buttonLabel={isOffline ? "Offline" : "Edit amount"}
                   onButtonClick={() =>
-                    history.push(
+                    !isOffline && history.push(
                       `/admin-edit-membership/${membership.membership_id}`,
                     )
                   }
                 />
               ))
             ) : (
-              <p>No membership types found.</p>
+              <p>{isOffline ? "Currently Offline" : "No membership types found."}</p>
             )}
           </div>
         </div>
@@ -283,6 +294,7 @@ const MembershipPage: React.FC = () => {
             className="btn btn-submit"
             type="button"
             onClick={handleAddMembership}
+            disabled={isOffline}
           >
             Add Membership Type
           </Button>
