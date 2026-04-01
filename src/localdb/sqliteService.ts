@@ -10,10 +10,14 @@ class SQLiteService {
     private sqlite!: SQLiteConnection;
     private db!: SQLiteDBConnection;
     private readonly dbName = "dondon_gym_offline";
+    private initialized = false;
 
     async init() {
+        if (this.initialized) return;
+
         if (Capacitor.getPlatform() === "web") {
             console.warn("SQLite native plugin is mainly for Android/iOS. Skipping native init on web.");
+            this.initialized = true;
             return;
         }
 
@@ -36,6 +40,11 @@ class SQLiteService {
 
         await this.db.open();
         await this.db.execute(CREATE_TABLES_SQL);
+        this.initialized = true;
+    }
+
+    get isInitialized() {
+        return this.initialized;
     }
 
     getConnection() {

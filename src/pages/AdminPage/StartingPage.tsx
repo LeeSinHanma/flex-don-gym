@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./StartingPage.css";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
@@ -7,8 +7,9 @@ import dondonLogo from "../../resource/dondon-logo.png";
 import LogoutModal from "../../components/Reusable/LogoutModal";
 import { getCurrentUser, logout } from "../../logicHandlers/userServices";
 const StartingPageAdmin: React.FC = () => {
-  const [loggedUser, setLoggedUser] = useState<string | null>(null);
+
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [user, setUser] = useState(getCurrentUser());
 
   const history = useHistory();
 
@@ -23,7 +24,7 @@ const StartingPageAdmin: React.FC = () => {
     if (!parsedUser) {
       history.push("/");
     } else {
-      setLoggedUser(parsedUser.username);
+      setUser(parsedUser);
     }
   }, [history]);
 
@@ -34,22 +35,18 @@ const StartingPageAdmin: React.FC = () => {
           <IonImg src={dondonLogo} className="dondon-logo" alt="Logo" />
 
           <h1 className="admin-gym-name">DONDON'S FITNESS GYM</h1>
-          <h1 className="login-gym-name">Logged in as: {loggedUser}</h1>
+          <h1 className="login-gym-name">
+               Hello, {user?.firstName || user?.username} {user?.lastName}!
+             </h1>
         </div>
         <div className="admin-button-group">
           <Button
             className="btn btn-signup"
             type="submit"
-            onClick={() => history.push("/qr")}
+            onClick={() => 
+              user?.role === 0 ? history.push("/admin-dashboard") : history.push("/qr")}
           >
-            Employee Page
-          </Button>
-          <Button
-            className="btn btn-signup"
-            type="submit"
-            onClick={() => history.push("/admin-dashboard")}
-          >
-            Admin Page
+            Start
           </Button>
 
           <Button

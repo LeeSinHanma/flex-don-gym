@@ -190,7 +190,7 @@ const MemberMenu: React.FC = () => {
             <div className="top-item-container">
               <BackButton
                 className="btn btn-back"
-                onClick={() => history.push("/menu")}
+                onClick={() => history.push("/status-member")}
               >
                 <IonIcon icon={arrowBack} />
               </BackButton>

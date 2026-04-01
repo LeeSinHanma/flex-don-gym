@@ -2,13 +2,6 @@ import { Capacitor } from "@capacitor/core";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
-import { sqliteService } from "./localdb/sqliteService";
-import { syncMembershipTypesFromServer } from "./logicHandlers/syncMembershipTypes";
-import { getAllMembershipTypes } from "./repositories/membershipRepository";
-import { syncGymPricingFromServer } from "./logicHandlers/syncGymPricing";
-import { getLocalGymPricing } from "./repositories/pricingRepository";
-import { syncInventoryFromServer } from "./logicHandlers/syncInventory";
-import { getAllInventoryItems } from "./repositories/inventoryRepository";
 import { useEffect } from "react";
 
 import "./App.css";
@@ -16,7 +9,6 @@ import "./App.css";
 import Page from "./pages/Page";
 
 import LoginRegister from "./pages/EmployeePage/LoginRegister";
-import MenuButtons from "./pages/EmployeePage/Menu";
 import MemberMenu from "./pages/EmployeePage/Member";
 import WalkInMenu from "./pages/EmployeePage/WalkIn";
 import PrepaidMenu from "./pages/EmployeePage/Prepaid";
@@ -63,51 +55,18 @@ import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
-import { syncMembersFromServer } from "./logicHandlers/syncMembers";
 import { getAllMembers } from "./repositories/memberRepository";
 import { OfflineBanner } from "./components/Reusable/OfflineBanner";
+import AppInitializer from "./components/Reusable/AppInitializer";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  useEffect(() => {
-    const initApp = async () => {
-      if (Capacitor.getPlatform() === "web") {
-        console.log("Skipping SQLite init on web");
-        return;
-      }
 
-      try {
-        await sqliteService.init();
-        console.log("SQLite initialized");
-
-        const memberCount = await syncMembersFromServer();
-        console.log(`Synced ${memberCount} members to SQLite`);
-
-        const membershipTypeCount = await syncMembershipTypesFromServer();
-        console.log(`Synced ${membershipTypeCount} membership types to SQLite`);
-
-        const pricing = await syncGymPricingFromServer();
-        console.log("Synced gym pricing:", pricing);
-
-        const inventoryCount = await syncInventoryFromServer();
-        console.log(`Synced ${inventoryCount} inventory items to SQLite`);
-
-        // ✅ Sync any pending offline visits/walk-ins
-        // Temporarily disabled per user request
-        // await syncPendingQueue();
-        console.log("Pending sync complete (Syncing currently disabled)");
-
-      } catch (err) {
-        console.error("App init failed:", err);
-      }
-    };
-
-    initApp();
-  }, []);
 
   return (
     <IonApp>
+      <AppInitializer showStatus />
       <OfflineBanner />
       <IonReactRouter>
         <IonRouterOutlet>
@@ -122,7 +81,6 @@ const App: React.FC = () => {
             <Route exact path="/login" component={LoginRegister} />
 
             {/* Employee Routes */}
-            <PrivateRoute exact path="/menu" component={MenuButtons} />
             <PrivateRoute exact path="/member" requiredAccess="status" component={MemberMenu} />
             <PrivateRoute exact path="/walkin" component={WalkInMenu} />
             <PrivateRoute exact path="/prepaid" component={PrepaidMenu} />
