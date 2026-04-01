@@ -76,6 +76,21 @@ class SQLiteService {
         const db = this.getConnection();
         return db.execute(sql);
     }
+
+    async beginTransaction() {
+        const db = this.getConnection();
+        return db.run("BEGIN TRANSACTION");
+    }
+
+    async commitTransaction() {
+        const db = this.getConnection();
+        return db.run("COMMIT");
+    }
+
+    async rollbackTransaction() {
+        const db = this.getConnection();
+        return db.run("ROLLBACK");
+    }
 }
 
 export const sqliteService = new SQLiteService();

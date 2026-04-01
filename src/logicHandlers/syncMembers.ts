@@ -1,6 +1,6 @@
 // src/logicHandlers/syncMembers.ts
 import { getMembers, Member } from "./memberCrud";
-import { upsertMembers, LocalMember } from "../repositories/memberRepository";
+import { syncMembersLocal, LocalMember } from "../repositories/memberRepository";
 
 export async function syncMembersFromServer() {
   const apiMembers: Member[] = await getMembers();
@@ -24,7 +24,7 @@ export async function syncMembersFromServer() {
     updated_at: member.updated_at ?? null,
   }));
 
-  await upsertMembers(mappedMembers);
+  await syncMembersLocal(mappedMembers);
 
   return mappedMembers.length;
 }

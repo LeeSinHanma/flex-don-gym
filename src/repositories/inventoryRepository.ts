@@ -12,33 +12,46 @@ export interface LocalInventoryItem {
     updated_at: string | null;
 }
 
-export async function upsertInventoryItems(items: LocalInventoryItem[]) {
-    for (const item of items) {
-        await sqliteService.run(
-            `
-      INSERT OR REPLACE INTO inventory_items (
-        item_id,
-        item_name,
-        description,
-        price,
-        quantity,
-        added_by,
-        created_at,
-        updated_at
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-            [
-                item.item_id,
-                item.item_name,
-                item.description,
-                item.price,
-                item.quantity,
-                item.added_by,
-                item.created_at,
-                item.updated_at,
-            ]
-        );
+export async function syncInventoryLocal(items: LocalInventoryItem[]) {
+    try {
+        await sqliteService.beginTransaction();
+
+        // 1. Wipe existing data (Mirror strategy)
+        await sqliteService.run(`DELETE FROM inventory_items`);
+
+        // 2. Insert fresh data
+        for (const item of items) {
+            await sqliteService.run(
+                `
+          INSERT INTO inventory_items (
+            item_id,
+            item_name,
+            description,
+            price,
+            quantity,
+            added_by,
+            created_at,
+            updated_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `,
+                [
+                    item.item_id,
+                    item.item_name,
+                    item.description,
+                    item.price,
+                    item.quantity,
+                    item.added_by,
+                    item.created_at,
+                    item.updated_at,
+                ]
+            );
+        }
+
+        await sqliteService.commitTransaction();
+    } catch (error) {
+        await sqliteService.rollbackTransaction();
+        throw error;
     }
 }
 

@@ -1,8 +1,6 @@
-import { Capacitor } from "@capacitor/core";
 import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Route, Redirect, Switch } from "react-router-dom";
-import { useEffect } from "react";
 
 import "./App.css";
 
@@ -55,18 +53,13 @@ import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
-import { getAllMembers } from "./repositories/memberRepository";
 import { OfflineBanner } from "./components/Reusable/OfflineBanner";
-import AppInitializer from "./components/Reusable/AppInitializer";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-
-
   return (
     <IonApp>
-      <AppInitializer showStatus />
       <OfflineBanner />
       <IonReactRouter>
         <IonRouterOutlet>

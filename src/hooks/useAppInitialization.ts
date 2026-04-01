@@ -6,17 +6,41 @@ import { syncMembershipTypesFromServer } from '../logicHandlers/syncMembershipTy
 import { syncGymPricingFromServer } from '../logicHandlers/syncGymPricing';
 import { syncInventoryFromServer } from '../logicHandlers/syncInventory';
 
+// 🟢 Shared state across the entire session to prevent redundant API calls
+let hasSyncedInSession = false;
+let lastSyncTimestamp = 0;
+
+/**
+ * Resets the initialization state. 
+ * Call this during logout to ensure the next user gets a fresh sync.
+ */
+export const resetAppInitialization = () => {
+  hasSyncedInSession = false;
+  lastSyncTimestamp = 0;
+};
+
 export const useAppInitialization = () => {
   const [isInitializing, setIsInitializing] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
+  const [isReady, setIsReady] = useState(hasSyncedInSession);
   const [error, setError] = useState<string | null>(null);
 
-  const initApp = useCallback(async (forceSync = false) => {
-    // If already initializing, don't start again
-    if (isInitializing || isSyncing) return;
+  const initApp = useCallback(async (forceSync = false, silent = false) => {
+    // 🛑 Optimization: If already synced this session, don't hit the API again
+    if (hasSyncedInSession && !forceSync) {
+      setIsReady(true);
+      return;
+    }
 
-    setIsInitializing(true);
+    // If already in middle of init/sync, don't start again
+    if (isInitializing || isSyncing || isBackgroundSyncing) return;
+
+    if (silent) {
+      setIsBackgroundSyncing(true);
+    } else {
+      setIsInitializing(true);
+    }
     setError(null);
 
     try {
@@ -45,6 +69,8 @@ export const useAppInitialization = () => {
       const inventoryCount = await syncInventoryFromServer();
       console.log(`Synced ${inventoryCount} inventory items`);
 
+      hasSyncedInSession = true;
+      lastSyncTimestamp = Date.now();
       setIsReady(true);
     } catch (err: any) {
       console.error('App initialization failed:', err);
@@ -52,12 +78,14 @@ export const useAppInitialization = () => {
     } finally {
       setIsInitializing(false);
       setIsSyncing(false);
+      setIsBackgroundSyncing(false);
     }
-  }, [isInitializing, isSyncing]);
+  }, [isInitializing, isSyncing, isBackgroundSyncing]);
 
   return {
     isInitializing,
     isSyncing,
+    isBackgroundSyncing,
     isReady,
     error,
     initApp

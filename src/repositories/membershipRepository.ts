@@ -12,33 +12,46 @@ export interface LocalMembershipType {
     updated_at: string | null;
 }
 
-export async function upsertMembershipTypes(items: LocalMembershipType[]) {
-    for (const item of items) {
-        await sqliteService.run(
-            `
-      INSERT OR REPLACE INTO membership_types (
-        membership_id,
-        name,
-        type,
-        price,
-        discount_amount,
-        duration_months,
-        created_at,
-        updated_at
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-            [
-                item.membership_id,
-                item.name,
-                item.type,
-                item.price,
-                item.discount_amount,
-                item.duration_months,
-                item.created_at,
-                item.updated_at,
-            ]
-        );
+export async function syncMembershipTypesLocal(items: LocalMembershipType[]) {
+    try {
+        await sqliteService.beginTransaction();
+
+        // 1. Wipe existing data (Mirror strategy)
+        await sqliteService.run(`DELETE FROM membership_types`);
+
+        // 2. Insert fresh data
+        for (const item of items) {
+            await sqliteService.run(
+                `
+          INSERT INTO membership_types (
+            membership_id,
+            name,
+            type,
+            price,
+            discount_amount,
+            duration_months,
+            created_at,
+            updated_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `,
+                [
+                    item.membership_id,
+                    item.name,
+                    item.type,
+                    item.price,
+                    item.discount_amount,
+                    item.duration_months,
+                    item.created_at,
+                    item.updated_at,
+                ]
+            );
+        }
+
+        await sqliteService.commitTransaction();
+    } catch (error) {
+        await sqliteService.rollbackTransaction();
+        throw error;
     }
 }
 

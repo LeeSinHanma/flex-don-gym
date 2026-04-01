@@ -4,7 +4,7 @@ import {
     MembershipTypeResponse,
 } from "./membershipCrud";
 import {
-    upsertMembershipTypes,
+    syncMembershipTypesLocal,
     LocalMembershipType,
 } from "../repositories/membershipRepository";
 
@@ -22,7 +22,7 @@ export async function syncMembershipTypesFromServer() {
         updated_at: item.updated_at ?? null,
     }));
 
-    await upsertMembershipTypes(mappedItems);
+    await syncMembershipTypesLocal(mappedItems);
 
     return mappedItems.length;
 }

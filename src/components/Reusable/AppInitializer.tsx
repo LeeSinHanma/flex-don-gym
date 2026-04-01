@@ -25,29 +25,48 @@ const AppInitializer: React.FC<AppInitializerProps> = ({
   onSuccess,
   onError
 }) => {
-  const { isInitializing, isSyncing, isReady, error, initApp } = useAppInitialization();
+  const { 
+    isInitializing, 
+    isSyncing, 
+    isBackgroundSyncing, 
+    isReady, 
+    error, 
+    initApp 
+  } = useAppInitialization();
 
+  // 1. Initial Sync on Mount
   useEffect(() => {
     const runInit = async () => {
-      // Logic: Only initialize if not ready, or if forceSync is true.
       if (!isReady || forceSync) {
         await initApp();
       }
     };
-    
     runInit();
   }, [forceSync, initApp, isReady]);
 
+  // 2. Periodic Background Sync (Every 10 minutes)
+  useEffect(() => {
+    const INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+    
+    const interval = setInterval(() => {
+      console.log('🕒 Triggering periodic background sync...');
+      initApp(true, true); // forceSync=true, silent=true
+    }, INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [initApp]);
+
   // Handle success/error callbacks
   useEffect(() => {
-    if (isReady && !isInitializing && !isSyncing) {
+    if (isReady && !isInitializing && !isSyncing && !isBackgroundSyncing) {
       onSuccess?.();
     }
     if (error) {
       onError?.(error);
     }
-  }, [isReady, isInitializing, isSyncing, error, onSuccess, onError]);
+  }, [isReady, isInitializing, isSyncing, isBackgroundSyncing, error, onSuccess, onError]);
 
+  // Only show status for foreground initialization/syncing
   if (showStatus && (isInitializing || isSyncing)) {
     return (
       <div style={{
