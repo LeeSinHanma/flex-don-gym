@@ -24,6 +24,7 @@ const StatusMemberPage: React.FC = () => {
   const [membershipNames, setMembershipNames] = useState<
     Record<number, string>
   >({});
+  const [selectedFilter, setSelectedFilter] = useState<number | string>("All");
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -153,10 +154,24 @@ const StatusMemberPage: React.FC = () => {
   };
 
   const filteredMembers = useMemo(() => {
-    const q = (search ?? "").trim().toLowerCase();
-    if (!q) return allMembers;
+    let filtered = allMembers;
 
-    return allMembers.filter((m) => {
+    // Filter by membership plan if selected
+    if (selectedFilter !== "All") {
+      if (selectedFilter === "Active") {
+        filtered = filtered.filter((m) => m.is_active);
+      } else if (selectedFilter === "Inactive") {
+        filtered = filtered.filter((m) => !m.is_active);
+      } else {
+        // Assume selectedFilter is a membership plan ID (number)
+        filtered = filtered.filter((m) => m.membership_plan_id === selectedFilter);
+      }
+    }
+
+    const q = (search ?? "").trim().toLowerCase();
+    if (!q) return filtered;
+
+    return filtered.filter((m) => {
       const first = (m.first_name ?? "").toLowerCase();
       const last = (m.last_name ?? "").toLowerCase();
       const email = (m.email ?? "").toLowerCase();
@@ -169,7 +184,7 @@ const StatusMemberPage: React.FC = () => {
         email.includes(q)
       );
     });
-  }, [search, allMembers]);
+  }, [search, allMembers, selectedFilter]);
 
   return (
     <div className="manage-member-container">
@@ -207,9 +222,21 @@ const StatusMemberPage: React.FC = () => {
           </div>
 
           <div className="nav-carousel">
-            <div className="nav-item">Active</div>
-            <div className="nav-item">Inactive</div>
-            <div className="nav-item">All</div>
+            <div
+              className={`nav-item ${selectedFilter === "All" ? "active" : ""}`}
+              onClick={() => setSelectedFilter("All")}
+            >
+              All
+            </div>
+            {Object.entries(membershipNames).map(([id, name]) => (
+              <div
+                key={id}
+                className={`nav-item ${selectedFilter === Number(id) ? "active" : ""}`}
+                onClick={() => setSelectedFilter(Number(id))}
+              >
+                {name}
+              </div>
+            ))}
           </div>
         </div>
 

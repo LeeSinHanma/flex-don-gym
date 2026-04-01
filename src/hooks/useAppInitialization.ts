@@ -27,7 +27,6 @@ export const useAppInitialization = () => {
   const [error, setError] = useState<string | null>(null);
 
   const initApp = useCallback(async (forceSync = false, silent = false) => {
-    // 🛑 Optimization: If already synced this session, don't hit the API again
     if (hasSyncedInSession && !forceSync) {
       setIsReady(true);
       return;
