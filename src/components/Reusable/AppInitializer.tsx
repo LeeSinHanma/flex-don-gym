@@ -36,13 +36,9 @@ const AppInitializer: React.FC<AppInitializerProps> = ({
 
   // 1. Initial Sync on Mount
   useEffect(() => {
-    const runInit = async () => {
-      if (!isReady || forceSync) {
-        await initApp();
-      }
-    };
-    runInit();
-  }, [forceSync, initApp, isReady]);
+    initApp();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forceSync]);
 
   // 2. Periodic Background Sync (Every 10 minutes)
   useEffect(() => {

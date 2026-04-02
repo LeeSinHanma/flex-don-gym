@@ -13,16 +13,15 @@ export interface LocalMembershipType {
 }
 
 export async function syncMembershipTypesLocal(items: LocalMembershipType[]) {
-    try {
-        await sqliteService.beginTransaction();
+    const statements: Array<{ statement: string; values: any[] }> = [];
 
-        // 1. Wipe existing data (Mirror strategy)
-        await sqliteService.run(`DELETE FROM membership_types`);
+    // 1. Wipe existing data (Mirror strategy)
+    statements.push({ statement: `DELETE FROM membership_types`, values: [] });
 
-        // 2. Insert fresh data
-        for (const item of items) {
-            await sqliteService.run(
-                `
+    // 2. Insert fresh data
+    for (const item of items) {
+        statements.push({
+            statement: `
           INSERT INTO membership_types (
             membership_id,
             name,
@@ -35,28 +34,20 @@ export async function syncMembershipTypesLocal(items: LocalMembershipType[]) {
           )
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
           `,
-                [
-                    item.membership_id,
-                    item.name,
-                    item.type,
-                    item.price,
-                    item.discount_amount,
-                    item.duration_months,
-                    item.created_at,
-                    item.updated_at,
-                ]
-            );
-        }
-
-        await sqliteService.commitTransaction();
-    } catch (error) {
-        try {
-            await sqliteService.rollbackTransaction();
-        } catch (rollbackErr) {
-            console.warn('Rollback failed (no active transaction?):', rollbackErr);
-        }
-        throw error;
+            values: [
+                item.membership_id,
+                item.name,
+                item.type,
+                item.price,
+                item.discount_amount,
+                item.duration_months,
+                item.created_at,
+                item.updated_at,
+            ],
+        });
     }
+
+    await sqliteService.executeSet(statements);
 }
 
 export async function getAllMembershipTypes() {

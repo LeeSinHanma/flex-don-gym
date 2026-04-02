@@ -18,16 +18,15 @@ export interface LocalMember {
 }
 
 export async function syncMembersLocal(members: LocalMember[]) {
-  try {
-    await sqliteService.beginTransaction();
-    
-    // 1. Wipe existing data (Mirror strategy)
-    await sqliteService.run(`DELETE FROM members`);
+  const statements: Array<{ statement: string; values: any[] }> = [];
 
-    // 2. Insert fresh data
-    for (const member of members) {
-      await sqliteService.run(
-        `
+  // 1. Wipe existing data (Mirror strategy)
+  statements.push({ statement: `DELETE FROM members`, values: [] });
+
+  // 2. Insert fresh data
+  for (const member of members) {
+    statements.push({
+      statement: `
         INSERT INTO members (
           member_id,
           email,
@@ -45,34 +44,25 @@ export async function syncMembersLocal(members: LocalMember[]) {
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
-        [
-          member.member_id,
-          member.email,
-          member.contact_number,
-          member.first_name,
-          member.last_name,
-          member.membership_type,
-          member.membership_plan_id,
-          member.membership_expiry,
-          member.credits,
-          member.registered_by,
-          member.is_active,
-          member.created_at,
-          member.updated_at,
-        ]
-      );
-    }
-
-    await sqliteService.commitTransaction();
-  } catch (error) {
-    try {
-      await sqliteService.rollbackTransaction();
-    } catch (rollbackErr) {
-      // Suppress rollback error if no transaction was active
-      console.warn('Rollback failed (no active transaction?):', rollbackErr);
-    }
-    throw error;
+      values: [
+        member.member_id,
+        member.email,
+        member.contact_number,
+        member.first_name,
+        member.last_name,
+        member.membership_type,
+        member.membership_plan_id,
+        member.membership_expiry,
+        member.credits,
+        member.registered_by,
+        member.is_active,
+        member.created_at,
+        member.updated_at,
+      ],
+    });
   }
+
+  await sqliteService.executeSet(statements);
 }
 
 export async function getMemberById(memberId: string) {

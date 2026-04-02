@@ -9,36 +9,22 @@ export interface LocalGymPricing {
 }
 
 export async function syncGymPricingLocal(item: LocalGymPricing) {
-    try {
-        await sqliteService.beginTransaction();
-
-        // 1. Wipe existing data (Mirror strategy)
-        await sqliteService.run(`DELETE FROM gym_pricing`);
-
-        // 2. Insert fresh data
-        await sqliteService.run(
-            `
-          INSERT INTO gym_pricing (
-            id,
-            base_day_pass_price,
-            created_at,
-            updated_at
-          )
-          VALUES (?, ?, ?, ?)
-          `,
-            [
-                item.id,
-                item.base_day_pass_price,
-                item.created_at,
-                item.updated_at,
-            ]
-        );
-
-        await sqliteService.commitTransaction();
-    } catch (error) {
-        await sqliteService.rollbackTransaction();
-        throw error;
-    }
+    // Use executeSet with transaction=true for atomic wipe-and-reload
+    await sqliteService.executeSet(
+        [
+            { statement: `DELETE FROM gym_pricing`, values: [] },
+            {
+                statement: `INSERT INTO gym_pricing (id, base_day_pass_price, created_at, updated_at) VALUES (?, ?, ?, ?)`,
+                values: [
+                    item.id,
+                    item.base_day_pass_price,
+                    item.created_at,
+                    item.updated_at,
+                ],
+            },
+        ],
+        true
+    );
 }
 
 export async function getLocalGymPricing() {

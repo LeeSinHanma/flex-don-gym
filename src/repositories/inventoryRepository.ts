@@ -13,46 +13,25 @@ export interface LocalInventoryItem {
 }
 
 export async function syncInventoryLocal(items: LocalInventoryItem[]) {
-    try {
-        await sqliteService.beginTransaction();
+    // Build all statements for atomic wipe-and-reload
+    const statements: Array<{ statement: string; values: any[] }> = [
+        { statement: `DELETE FROM inventory_items`, values: [] },
+        ...items.map((item) => ({
+            statement: `INSERT INTO inventory_items (item_id, item_name, description, price, quantity, added_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            values: [
+                item.item_id,
+                item.item_name,
+                item.description,
+                item.price,
+                item.quantity,
+                item.added_by,
+                item.created_at,
+                item.updated_at,
+            ],
+        })),
+    ];
 
-        // 1. Wipe existing data (Mirror strategy)
-        await sqliteService.run(`DELETE FROM inventory_items`);
-
-        // 2. Insert fresh data
-        for (const item of items) {
-            await sqliteService.run(
-                `
-          INSERT INTO inventory_items (
-            item_id,
-            item_name,
-            description,
-            price,
-            quantity,
-            added_by,
-            created_at,
-            updated_at
-          )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `,
-                [
-                    item.item_id,
-                    item.item_name,
-                    item.description,
-                    item.price,
-                    item.quantity,
-                    item.added_by,
-                    item.created_at,
-                    item.updated_at,
-                ]
-            );
-        }
-
-        await sqliteService.commitTransaction();
-    } catch (error) {
-        await sqliteService.rollbackTransaction();
-        throw error;
-    }
+    await sqliteService.executeSet(statements, true);
 }
 
 export async function getAllInventoryItems() {

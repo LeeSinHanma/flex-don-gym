@@ -21,6 +21,7 @@ const InitializationContext = createContext<InitializationContextType | undefine
 // Module-level shared state across the entire session
 let hasSyncedInSession = false;
 let lastSyncTimestamp = 0;
+let isRunning = false; // Synchronous mutex to prevent concurrent initApp calls
 
 export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isInitializing, setIsInitializing] = useState(false);
@@ -41,9 +42,9 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
       return;
     }
 
-    // If already in middle of init/sync, don't start again
-    // However, if we are in background sync, we're okay to wait
-    if (isInitializing || isSyncing || isBackgroundSyncing) return;
+    // Synchronous mutex — prevents concurrent calls regardless of React state timing
+    if (isRunning) return;
+    isRunning = true;
 
     if (silent) {
       setIsBackgroundSyncing(true);
@@ -85,14 +86,13 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
     } catch (err: any) {
       console.error('App initialization failed:', err);
       setError(err.message || 'Unknown initialization error');
-      // If we failed, but we had already successfully initialized once in the session, 
-      // maybe we keep isReady as true? For now, we follow the current error logic.
     } finally {
+      isRunning = false;
       setIsInitializing(false);
       setIsSyncing(false);
       setIsBackgroundSyncing(false);
     }
-  }, [isInitializing, isSyncing, isBackgroundSyncing]);
+  }, []); // Empty deps — stable reference prevents useEffect re-triggers
 
   return (
     <InitializationContext.Provider value={{
