@@ -50,7 +50,11 @@ export async function syncMembershipTypesLocal(items: LocalMembershipType[]) {
 
         await sqliteService.commitTransaction();
     } catch (error) {
-        await sqliteService.rollbackTransaction();
+        try {
+            await sqliteService.rollbackTransaction();
+        } catch (rollbackErr) {
+            console.warn('Rollback failed (no active transaction?):', rollbackErr);
+        }
         throw error;
     }
 }

@@ -65,7 +65,12 @@ export async function syncMembersLocal(members: LocalMember[]) {
 
     await sqliteService.commitTransaction();
   } catch (error) {
-    await sqliteService.rollbackTransaction();
+    try {
+      await sqliteService.rollbackTransaction();
+    } catch (rollbackErr) {
+      // Suppress rollback error if no transaction was active
+      console.warn('Rollback failed (no active transaction?):', rollbackErr);
+    }
     throw error;
   }
 }
@@ -87,4 +92,13 @@ export async function deductMemberCredits(memberId: string, amount: number) {
     `UPDATE members SET credits = credits - ? WHERE member_id = ?`,
     [amount, memberId]
   );
-}
+}
+
+export async function getMembershipDistribution() {
+  return sqliteService.query<{ label: string; count: number }>(
+    `SELECT mt.name as label, COUNT(m.member_id) as count 
+     FROM membership_types mt 
+     LEFT JOIN members m ON m.membership_plan_id = mt.membership_id 
+     GROUP BY mt.membership_id, mt.name`
+  );
+}

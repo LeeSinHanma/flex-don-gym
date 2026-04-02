@@ -46,6 +46,7 @@ const MembershipPage: React.FC = () => {
   const [isEditDailyRateOpen, setIsEditDailyRateOpen] = useState(false);
   const [isConfirmDailyRateOpen, setIsConfirmDailyRateOpen] = useState(false);
   const [isSavingDailyRate, setIsSavingDailyRate] = useState(false);
+  const [loadingPricing, setLoadingPricing] = useState(false);
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmType, setConfirmType] = useState<"save" | "delete" | null>(
@@ -84,10 +85,13 @@ const MembershipPage: React.FC = () => {
 
   const loadGymPricing = async () => {
     try {
+      setLoadingPricing(true);
       const data = await getGymPricing();
       setGymPricing(data);
     } catch (error) {
       console.error("Failed to fetch gym pricing:", error);
+    } finally {
+      setLoadingPricing(false);
     }
   };
 
@@ -225,16 +229,38 @@ const MembershipPage: React.FC = () => {
         </div>
 
         <div className="membership-top-card">
-          <POSCard
-            productName={"Daily Rate"}
-            price={gymPricing?.base_day_pass_price ?? 55}
-            buttonLabel={isOffline ? "Offline" : "Edit amount"}
-            onButtonClick={() => {
-              if (isOffline) return;
-              setDailyRateInput(String(gymPricing?.base_day_pass_price ?? 55));
-              setIsEditDailyRateOpen(true);
-            }}
-          />
+          {loadingPricing ? (
+            <div className="pos-card-item">
+              <div className="pos-cards-container">
+                <div className="pos-status-card">
+                  <div className="pos-status-info">
+                    <div className="pos-left-info">
+                      <h2 className="pos-card-product-name">
+                        <IonSkeletonText animated style={{ width: "120px" }} />
+                      </h2>
+                      <p className="pos-card-product-price">
+                        <IonSkeletonText animated style={{ width: "60px" }} />
+                      </p>
+                    </div>
+                    <div className="pos-card-top-right">
+                      <IonSkeletonText animated style={{ width: "100px", height: "35px", borderRadius: "10px" }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <POSCard
+              productName={"Daily Rate"}
+              price={gymPricing?.base_day_pass_price ?? 55}
+              buttonLabel={isOffline ? "Offline" : "Edit amount"}
+              onButtonClick={() => {
+                if (isOffline) return;
+                setDailyRateInput(String(gymPricing?.base_day_pass_price ?? 55));
+                setIsEditDailyRateOpen(true);
+              }}
+            />
+          )}
         </div>
 
         {isOffline && (
@@ -262,7 +288,7 @@ const MembershipPage: React.FC = () => {
                           </p>
                         </div>
                         <div className="pos-card-top-right">
-                          <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                          <IonSkeletonText animated style={{ width: "100px", height: "35px", borderRadius: "10px" }} />
                         </div>
                       </div>
                     </div>

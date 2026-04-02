@@ -1,7 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { IonIcon } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import { getMembershipDistribution } from "../../repositories/memberRepository";
+import { getMembers } from "../../logicHandlers/memberCrud";
+import { getMembershipTypes } from "../../logicHandlers/membershipCrud";
+import { getAllTransactions, TransactionResponse } from "../../logicHandlers/transactionHandler";
+import { Capacitor } from "@capacitor/core";
+import { useAppInitialization } from "../../hooks/useAppInitialization";
+import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
 import { BackButton } from "../../components/Reusable/BackButton";
 import Menu from "../../components/Reusable/Menu";
 import {
@@ -38,8 +45,8 @@ const AdminDashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
   const history = useHistory();
 
-  const activeMembers = 248;
-  const checkInsToday = 43;
+  const [activeMembers, setActiveMembers] = useState(0);
+  const [checkInsToday, setCheckInsToday] = useState(0);
 
   const monthlyRevenue = 184950;
   const revenueChange = 8.4;
@@ -52,20 +59,14 @@ const AdminDashboard: React.FC = () => {
     { label: "Products", amount: 62450, percent: 34 },
   ];
 
-  const latestPayments = [
-    { date: "22-03-2026", type: "New Member", amount: 1600 },
-    { date: "22-03-2026", type: "Monthly Renewal", amount: 1200 },
-    { date: "21-03-2026", type: "Product Purchase", amount: 850 },
-    { date: "20-03-2026", type: "Student Plan", amount: 900 },
-    { date: "20-03-2026", type: "Yearly Plan", amount: 9800 },
-  ];
+  const [latestPayments, setLatestPayments] = useState<{ date: string; type: string; amount: number }[]>([]);
 
-  const membershipPlans = [
-    { label: "Prepaid", count: 72 },
-    { label: "Monthly", count: 109 },
-    { label: "Yearly", count: 41 },
-    { label: "Student", count: 26 },
-  ];
+  const [membershipPlans, setMembershipPlans] = useState<{ label: string; count: number }[]>([
+    { label: "Prepaid", count: 0 },
+    { label: "Monthly", count: 0 },
+    { label: "Yearly", count: 0 },
+    { label: "Student", count: 0 },
+  ]);
 
   const membershipColors = ["#14b8a6", "#22c55e", "#38bdf8", "#f59e0b"];
 
@@ -203,13 +204,70 @@ const AdminDashboard: React.FC = () => {
       tooltip: {
         callbacks: {
           label: (context: { label?: string; parsed: number }) => {
-            const pct = Math.round((context.parsed / membershipTotal) * 100);
+            const pct = membershipTotal > 0 ? Math.round((context.parsed / membershipTotal) * 100) : 0;
             return `${context.label || "Plan"}: ${context.parsed} (${pct}%)`;
           },
         },
       },
     },
   };
+
+  const { isReady } = useAppInitialization();
+
+  const fetchDashboardData = useCallback(async () => {
+    if (!isReady) return;
+    try {
+      const platform = Capacitor.getPlatform();
+      
+      if (platform === "web") {
+        // Fetch from API on web
+        const [members, types, transactions] = await Promise.all([
+          getMembers(),
+          getMembershipTypes(),
+          getAllTransactions({ limit: 5 })
+        ]);
+
+        // Calculate distribution
+        const distribution = types.map(type => {
+          const count = members.filter(m => m.membership_plan_id === type.membership_id).length;
+          return { label: type.name || "Unknown", count };
+        });
+
+        setMembershipPlans(distribution);
+
+        // Calculate active members
+        const activeCount = members.filter(m => m.is_active).length;
+        setActiveMembers(activeCount);
+
+        // Map transactions to table format
+        const formattedTransactions = transactions.map(t => ({
+          date: new Date(t.created_at).toLocaleDateString("en-GB").replace(/\//g, "-"),
+          type: t.transaction_type,
+          amount: t.total_price
+        }));
+        setLatestPayments(formattedTransactions);
+        
+        // Note: For checkInsToday on web, we would need a visits API that returns all visits.
+        // For now, we'll leave it at 0 or fetch if available.
+      } else {
+        // Fetch from SQLite on native
+        const distribution = await getMembershipDistribution();
+        if (distribution && distribution.length > 0) {
+          setMembershipPlans(distribution);
+        }
+        
+        // We could also add SQLite queries for activeMembers and checkInsToday here if needed
+      }
+    } catch (error) {
+      console.error("Failed to fetch dashboard data:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isReady) {
+      fetchDashboardData();
+    }
+  }, [fetchDashboardData, isReady]);
 
   const handleMenuClick = () => {
     setIsMenuOpen(true);
@@ -241,7 +299,14 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         <div className="admin-main-content">
-          <div className="ad-stats-row">
+          {!isReady ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '400px' }}>
+              <LoadingSpinner />
+              <p style={{ marginTop: '20px', color: '#666' }}>Preparing your dashboard...</p>
+            </div>
+          ) : (
+            <>
+              <div className="ad-stats-row">
             <section className="ad-stat-card ad-stat-card-dark">
               <span className="ad-card-label">Active Members</span>
               <strong className="ad-stat-value">{activeMembers}</strong>
@@ -351,9 +416,9 @@ const AdminDashboard: React.FC = () => {
               <div className="ad-membership-layout">
                 <ul className="ad-membership-legend">
                   {membershipPlans.map((plan, index) => {
-                    const percentage = Math.round(
+                    const percentage = membershipTotal > 0 ? Math.round(
                       (plan.count / membershipTotal) * 100,
-                    );
+                    ) : 0;
                     return (
                       <li
                         key={plan.label}
@@ -408,6 +473,8 @@ const AdminDashboard: React.FC = () => {
               </button>
             </section>
           </div>
+          </>
+          )}
         </div>
       </div>
 

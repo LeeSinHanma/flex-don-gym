@@ -54,16 +54,20 @@ import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
 import { OfflineBanner } from "./components/Reusable/OfflineBanner";
+import { InitializationProvider } from "./contexts/InitializationContext";
+import AppInitializer from "./components/Reusable/AppInitializer";
 
 setupIonicReact();
 
 const App: React.FC = () => {
   return (
-    <IonApp>
-      <OfflineBanner />
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Switch>
+    <InitializationProvider>
+      <IonApp>
+        <AppInitializer showStatus={true} />
+        <OfflineBanner />
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Switch>
             {/* Default Redirect */}
             <Route exact path="/">
               <Redirect to="/get-started" />
@@ -100,7 +104,8 @@ const App: React.FC = () => {
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
-  );
+  </InitializationProvider>
+);
 };
 
 export default App;

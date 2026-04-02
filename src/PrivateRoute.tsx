@@ -1,7 +1,6 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
 import { getCurrentUser } from "./logicHandlers/userServices";
-import AppInitializer from "./components/Reusable/AppInitializer";
 
 const PrivateRoute = ({ component: Component, requiredAccess, ...rest }: any) => (
   <Route
@@ -17,14 +16,9 @@ const PrivateRoute = ({ component: Component, requiredAccess, ...rest }: any) =>
         return <Redirect to="/" />;
       }
 
-      return (
-        <>
-          <AppInitializer showStatus={true} />
-          <Component {...props} />
-        </>
-      );
+      return <Component {...props} />;
     }}
   />
 );
 
-export default PrivateRoute;
+export default PrivateRoute;
