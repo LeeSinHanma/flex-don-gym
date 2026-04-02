@@ -10,6 +10,7 @@ import { Capacitor } from "@capacitor/core";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
 import { BackButton } from "../../components/Reusable/BackButton";
+import { connectCheckInsWS, disconnectCheckInsWS } from "../../logicHandlers/webSocket";
 import Menu from "../../components/Reusable/Menu";
 import {
   ArcElement,
@@ -261,13 +262,23 @@ const AdminDashboard: React.FC = () => {
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     }
-  }, []);
+  }, [isReady]);
 
   useEffect(() => {
-    if (isReady) {
-      fetchDashboardData();
-    }
-  }, [fetchDashboardData, isReady]);
+    if (!isReady) return;
+
+    fetchDashboardData();
+
+    // ✅ connect WebSocket
+    connectCheckInsWS((count) => {
+      setCheckInsToday(count);
+    });
+
+    // cleanup
+    return () => {
+      disconnectCheckInsWS();
+    };
+  }, [isReady, fetchDashboardData]);
 
   const handleMenuClick = () => {
     setIsMenuOpen(true);
