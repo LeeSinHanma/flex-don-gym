@@ -1,7 +1,7 @@
 // src/logicHandlers/syncGymPricing.ts
 import { getGymPricing, GymPricing } from "./gymPricing";
 import {
-    upsertGymPricing,
+    syncGymPricingLocal,
     LocalGymPricing,
 } from "../repositories/pricingRepository";
 
@@ -15,7 +15,7 @@ export async function syncGymPricingFromServer() {
         updated_at: apiItem.updated_at ?? null,
     };
 
-    await upsertGymPricing(mapped);
+    await syncGymPricingLocal(mapped);
 
     return mapped;
 }

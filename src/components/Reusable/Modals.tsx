@@ -35,11 +35,13 @@ export function Modal({
         {title && <h2 className="modal-title">{title}</h2>}
 
         <div className="modal-body">{children}</div>
-        {showCloseButton && (
-          <button className="modal-close-btn" onClick={onClose}>
-            {closeText}
-          </button>
-        )}
+        <div className="modal-buttons-container">
+          {showCloseButton && (
+            <button className="modal-close-btn" onClick={onClose}>
+              {closeText}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

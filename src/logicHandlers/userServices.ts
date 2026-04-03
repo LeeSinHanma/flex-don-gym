@@ -1,5 +1,6 @@
 import api from "../api/axios";
 import axios from "axios";
+import { resetAppInitialization } from "../hooks/useAppInitialization";
 
 export interface User {
   id: string;
@@ -158,4 +159,5 @@ export const getCurrentUser = () => {
 
 export const logout = () => {
   localStorage.removeItem("user");
+  resetAppInitialization();
 };

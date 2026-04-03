@@ -12,23 +12,29 @@ export interface LocalMembershipType {
     updated_at: string | null;
 }
 
-export async function upsertMembershipTypes(items: LocalMembershipType[]) {
+export async function syncMembershipTypesLocal(items: LocalMembershipType[]) {
+    const statements: Array<{ statement: string; values: any[] }> = [];
+
+    // 1. Wipe existing data (Mirror strategy)
+    statements.push({ statement: `DELETE FROM membership_types`, values: [] });
+
+    // 2. Insert fresh data
     for (const item of items) {
-        await sqliteService.run(
-            `
-      INSERT OR REPLACE INTO membership_types (
-        membership_id,
-        name,
-        type,
-        price,
-        discount_amount,
-        duration_months,
-        created_at,
-        updated_at
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-            [
+        statements.push({
+            statement: `
+          INSERT INTO membership_types (
+            membership_id,
+            name,
+            type,
+            price,
+            discount_amount,
+            duration_months,
+            created_at,
+            updated_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          `,
+            values: [
                 item.membership_id,
                 item.name,
                 item.type,
@@ -37,9 +43,11 @@ export async function upsertMembershipTypes(items: LocalMembershipType[]) {
                 item.duration_months,
                 item.created_at,
                 item.updated_at,
-            ]
-        );
+            ],
+        });
     }
+
+    await sqliteService.executeSet(statements);
 }
 
 export async function getAllMembershipTypes() {

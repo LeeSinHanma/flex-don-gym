@@ -8,23 +8,22 @@ export interface LocalGymPricing {
     updated_at: string | null;
 }
 
-export async function upsertGymPricing(item: LocalGymPricing) {
-    await sqliteService.run(
-        `
-    INSERT OR REPLACE INTO gym_pricing (
-      id,
-      base_day_pass_price,
-      created_at,
-      updated_at
-    )
-    VALUES (?, ?, ?, ?)
-    `,
+export async function syncGymPricingLocal(item: LocalGymPricing) {
+    // Use executeSet with transaction=true for atomic wipe-and-reload
+    await sqliteService.executeSet(
         [
-            item.id,
-            item.base_day_pass_price,
-            item.created_at,
-            item.updated_at,
-        ]
+            { statement: `DELETE FROM gym_pricing`, values: [] },
+            {
+                statement: `INSERT INTO gym_pricing (id, base_day_pass_price, created_at, updated_at) VALUES (?, ?, ?, ?)`,
+                values: [
+                    item.id,
+                    item.base_day_pass_price,
+                    item.created_at,
+                    item.updated_at,
+                ],
+            },
+        ],
+        true
     );
 }
 

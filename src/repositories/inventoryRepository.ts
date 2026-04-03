@@ -12,23 +12,13 @@ export interface LocalInventoryItem {
     updated_at: string | null;
 }
 
-export async function upsertInventoryItems(items: LocalInventoryItem[]) {
-    for (const item of items) {
-        await sqliteService.run(
-            `
-      INSERT OR REPLACE INTO inventory_items (
-        item_id,
-        item_name,
-        description,
-        price,
-        quantity,
-        added_by,
-        created_at,
-        updated_at
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-            [
+export async function syncInventoryLocal(items: LocalInventoryItem[]) {
+    // Build all statements for atomic wipe-and-reload
+    const statements: Array<{ statement: string; values: any[] }> = [
+        { statement: `DELETE FROM inventory_items`, values: [] },
+        ...items.map((item) => ({
+            statement: `INSERT INTO inventory_items (item_id, item_name, description, price, quantity, added_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            values: [
                 item.item_id,
                 item.item_name,
                 item.description,
@@ -37,9 +27,11 @@ export async function upsertInventoryItems(items: LocalInventoryItem[]) {
                 item.added_by,
                 item.created_at,
                 item.updated_at,
-            ]
-        );
-    }
+            ],
+        })),
+    ];
+
+    await sqliteService.executeSet(statements, true);
 }
 
 export async function getAllInventoryItems() {
@@ -54,4 +46,11 @@ export async function getLocalInventoryItemById(itemId: string) {
         [itemId]
     );
     return rows[0] ?? null;
+}
+
+export async function decrementLocalInventoryQuantity(itemId: string, quantity: number) {
+    await sqliteService.run(
+        `UPDATE inventory_items SET quantity = quantity - ? WHERE item_id = ?`,
+        [quantity, itemId]
+    );
 }

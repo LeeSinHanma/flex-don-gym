@@ -37,6 +37,30 @@ button {
   transition: background-color 0.2s;
 }
 
+/* Mobile button styles - consistent across all pages */
+@media (max-width: 480px) {
+  button {
+    height: 50px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.6rem;
+  }
+
+  button.btn-submit,
+  .btn-submit {
+    height: 50px;
+    font-size: 14px;
+  }
+
+  .btn-signup,
+  .btn-logout,
+  .btn-cancel {
+    height: 50px;
+    font-size: 14px;
+  }
+}
+
 p {
   align-items: center;
   color: #04354f;

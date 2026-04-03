@@ -67,11 +67,17 @@
   gap: 0.9rem;
   padding: 1rem;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-dashboard-container .admin-main-content::-webkit-scrollbar {
+  display: none;
 }
 
 .admin-dashboard-container .ad-stats-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.9rem;
 }
 
@@ -105,6 +111,52 @@
   padding: 0.95rem;
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
   border: 1px solid #eef2f7;
+}
+
+/* Revenue Card - Teal */
+.admin-dashboard-container .ad-revenue-card .ad-section-head h2 {
+  color: #0891b2;
+}
+
+/* Source Card - Emerald */
+.admin-dashboard-container .ad-source-card .ad-section-head h2 {
+  color: #059669;
+}
+
+/* Table Card - Blue */
+.admin-dashboard-container .ad-table-card .ad-section-head h2 {
+  color: #2563eb;
+}
+
+/* Membership Card - Purple */
+.admin-dashboard-container .ad-membership-card .ad-section-head h2 {
+  color: #7c3aed;
+}
+
+/* Best Sellers Card - Indigo */
+.admin-dashboard-container .ad-best-sellers-card {
+  border-top-color: #6366f1;
+}
+
+.admin-dashboard-container .ad-best-sellers-card .ad-section-head h2 {
+  color: #6366f1;
+}
+
+.admin-dashboard-container .ad-best-sellers-card .ad-seller-rank {
+  color: #6366f1;
+}
+
+/* Low On Stocks Card - Orange */
+.admin-dashboard-container .ad-low-stock-card {
+  border-top-color: #ea580c;
+}
+
+.admin-dashboard-container .ad-low-stock-card .ad-section-head h2 {
+  color: #ea580c;
+}
+
+.admin-dashboard-container .ad-low-stock-card .ad-seller-rank {
+  color: #ea580c;
 }
 
 .admin-dashboard-container .ad-section-head {
@@ -255,7 +307,7 @@
 
 .admin-dashboard-container .ad-bottom-grid {
   display: grid;
-  grid-template-columns: 1.25fr 0.95fr;
+  grid-template-columns: 1fr;
   gap: 0.9rem;
 }
 
@@ -349,6 +401,13 @@
   }
 }
 
+@media (min-width: 1200px) {
+  .admin-dashboard-container .admin-main-container {
+    max-width: 95vw;
+    width: 95vw;
+  }
+}
+
 @media (max-width: 720px) {
   .admin-dashboard-container {
     padding: 0.6rem;
@@ -374,15 +433,173 @@
   }
 }
 
+@media (max-width: 480px) {
+  .admin-dashboard-container {
+    padding: 0.5rem;
+  }
+
+  .admin-dashboard-container .admin-main-container {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-radius: 8px;
+  }
+
+  .admin-dashboard-container .admin-top-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .admin-dashboard-container .admin-top-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .admin-dashboard-container .admin-top-header .menu-icon {
+    font-size: 1.4rem;
+  }
+
+  .admin-dashboard-container .admin-main-content {
+    height: calc(100dvh - 120px);
+    overflow-y: auto;
+    padding: 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .admin-dashboard-container .ad-stats-row {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .admin-dashboard-container .ad-stat-card {
+    padding: 0.75rem;
+  }
+
+  .admin-dashboard-container .ad-stat-value {
+    font-size: 1.3rem;
+  }
+
+  .admin-dashboard-container .ad-card-label {
+    font-size: 0.75rem;
+  }
+
+  .admin-dashboard-container .ad-dashboard-card {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .admin-dashboard-container .ad-section-head {
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .admin-dashboard-container .ad-section-head h2 {
+    font-size: 0.9rem;
+  }
+
+  .admin-dashboard-container .ad-section-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .admin-dashboard-container .ad-period-select {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .admin-dashboard-container .ad-revenue-total {
+    font-size: 1.3rem;
+  }
+
+  .admin-dashboard-container .ad-change-badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .admin-dashboard-container .ad-revenue-chart {
+    height: 140px;
+  }
+
+  .admin-dashboard-container .ad-source-chart {
+    height: 55px;
+  }
+
+  .admin-dashboard-container .ad-source-item {
+    font-size: 0.8rem;
+  }
+
+  .admin-dashboard-container .ad-member-stat {
+    font-size: 0.75rem;
+  }
+
+  .admin-dashboard-container .ad-member-count {
+    font-size: 1.2rem;
+  }
+
+  .admin-dashboard-container .ad-best-seller-item {
+    padding: 0.3rem 0;
+  }
+
+  .admin-dashboard-container .ad-seller-rank {
+    font-size: 0.8rem;
+  }
+
+  .admin-dashboard-container .ad-seller-name {
+    font-size: 0.75rem;
+  }
+
+  .admin-dashboard-container .ad-seller-sales {
+    font-size: 0.7rem;
+  }
+
+  .admin-dashboard-container .ad-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .admin-dashboard-container .ad-donut-chart {
+    height: 180px;
+  }
+
+  .menu-btn {
+    height: 50px;
+    font-size: 14px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+  }
+
+  .menu-buttons {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .menu-buttons::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .menu-buttons {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   width: 100%;
+  max-height: calc(90dvh - 200px);
+  overflow-y: auto;
+  padding-right: 4px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.menu-buttons::-webkit-scrollbar {
+  display: none;
 }
 
 .menu-btn {
   width: 100%;
+  height: 50px;
   padding: 0.875rem 1.5rem;
   font-size: 1rem;
   font-weight: 500;
@@ -414,8 +631,44 @@
   background-color: #4b5563;
 }
 
-/* Skeleton loading shimmer – blue tint */
-ion-skeleton-text {
-  --background: rgba(59, 130, 246, 0.25);
-  --background-rgb: 59, 130, 246;
+/* Offline Restricted Mode Styles */
+.offline-notice-container {
+  background-color: #fee2e2;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 0.85rem;
+  border-radius: 12px;
+  margin: 0 1rem 0.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.offline-notice-text {
+  color: #b91c1c;
+  font-weight: 600;
+  margin: 0;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.disabled-card {
+  opacity: 0.75;
+  filter: grayscale(0.4);
+  cursor: not-allowed !important;
+}
+
+.btn-submit:disabled {
+  background-color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

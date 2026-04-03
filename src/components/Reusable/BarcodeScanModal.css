@@ -30,3 +30,23 @@
   display: flex;
   justify-content: center;
 }
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .barcode-modal-content {
+    gap: 8px;
+  }
+
+  .barcode-modal-reader {
+    min-height: 200px;
+    border-radius: 6px;
+  }
+
+  .barcode-scan-text {
+    font-size: 12px;
+  }
+
+  .barcode-scan-error {
+    font-size: 12px;
+  }
+}

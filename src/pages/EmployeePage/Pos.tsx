@@ -19,6 +19,12 @@ import {
   InventoryItem,
 } from "../../logicHandlers/itemInvCrud";
 
+import { Network } from "@capacitor/network";
+import {
+  getLocalInventoryItemById,
+  LocalInventoryItem,
+} from "../../repositories/inventoryRepository";
+
 type CartItem = InventoryItem & {
   cartQuantity: number;
 };
@@ -90,7 +96,43 @@ const PosPage: React.FC = () => {
         const itemId = decodedText.trim();
         if (!itemId) return;
 
-        const item = await getInventoryItemById(itemId);
+        let item: InventoryItem | null = null;
+        const status = await Network.getStatus();
+
+        if (status.connected) {
+          try {
+            item = await getInventoryItemById(itemId);
+          } catch (err) {
+            console.warn("API inventory check failed, trying local fallback...");
+            const local = await getLocalInventoryItemById(itemId);
+            if (local) {
+              item = {
+                item_id: local.item_id,
+                item_name: local.item_name || "Unknown Item",
+                description: local.description || "",
+                price: local.price || 0,
+                quantity: local.quantity || 0,
+                added_by: local.added_by || "unknown",
+                created_at: local.created_at || "",
+                updated_at: local.updated_at || "",
+              };
+            }
+          }
+        } else {
+          const local = await getLocalInventoryItemById(itemId);
+          if (local) {
+            item = {
+              item_id: local.item_id,
+              item_name: local.item_name || "Unknown Item",
+              description: local.description || "",
+              price: local.price || 0,
+              quantity: local.quantity || 0,
+              added_by: local.added_by || "unknown",
+              created_at: local.created_at || "",
+              updated_at: local.updated_at || "",
+            };
+          }
+        }
 
         if (!item) {
           playErrorSound();
@@ -117,11 +159,11 @@ const PosPage: React.FC = () => {
 
         setCartItems((prev) => {
           const existingItem = prev.find(
-            (cartItem) => cartItem.item_id === item.item_id,
+            (cartItem) => cartItem.item_id === item!.item_id,
           );
 
           if (existingItem) {
-            if (existingItem.cartQuantity >= item.quantity) {
+            if (existingItem.cartQuantity >= item!.quantity) {
               reachedMaxStock = true;
               return prev;
             }
@@ -129,7 +171,7 @@ const PosPage: React.FC = () => {
             didAddItem = true;
 
             return prev.map((cartItem) =>
-              cartItem.item_id === item.item_id
+              cartItem.item_id === item!.item_id
                 ? {
                     ...cartItem,
                     cartQuantity: Math.min(
@@ -146,7 +188,7 @@ const PosPage: React.FC = () => {
           return [
             ...prev,
             {
-              ...item,
+              ...item!,
               cartQuantity: 1,
             },
           ];
@@ -169,8 +211,8 @@ const PosPage: React.FC = () => {
         console.error("Scan handling error:", error);
         playErrorSound();
         openStatusModal(
-          "Item Not Found",
-          "The scanned barcode does not match any product.",
+          "Error",
+          "An error occurred while scanning the item.",
           "error",
         );
       } finally {

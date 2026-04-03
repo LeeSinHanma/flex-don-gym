@@ -9,6 +9,7 @@ import POSCard from "../../components/Reusable/PosCard";
 import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
 import "./Product.css";
+import { useNetworkStatus } from "../../hooks/useNetworkStatus";
 import BarcodeScanModal from "../../components/Reusable/BarcodeScanModal";
 import {
   createInventoryItem,
@@ -30,6 +31,7 @@ const ProductPage: React.FC = () => {
   // list state
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { isOffline } = useNetworkStatus();
 
   // search
   const [searchValue, setSearchValue] = useState("");
@@ -377,6 +379,14 @@ const ProductPage: React.FC = () => {
             </div>
           </div>
 
+          {isOffline && (
+            <div className="offline-notice-container">
+              <p className="offline-notice-text">
+                Offline Mode: Actions are currently restricted.
+              </p>
+            </div>
+          )}
+
           <div className="product-card-wrapper">
             {isLoading ? (
               [1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -401,13 +411,16 @@ const ProductPage: React.FC = () => {
                 </div>
               ))
             ) : filteredItems.length === 0 ? (
-              <p style={{ textAlign: "center" }}>No products found.</p>
+              <p style={{ textAlign: "center" }}>
+                {isOffline ? "Currently Offline" : "No products found."}
+              </p>
             ) : (
               filteredItems.map((item) => (
                 <div
                   key={item.item_id}
-                  onClick={() => history.push("/admin-item-info", { item })}
-                  style={{ cursor: "pointer" }}
+                  onClick={() => !isOffline && history.push("/admin-item-info", { item })}
+                  className={isOffline ? "disabled-card" : ""}
+                  style={{ cursor: isOffline ? "not-allowed" : "pointer" }}
                 >
                   <POSCard
                     productName={item.item_name}
@@ -429,6 +442,7 @@ const ProductPage: React.FC = () => {
             className="btn btn-submit"
             type="button"
             onClick={openAddProductModal}
+            disabled={isOffline}
           >
             Add Product
           </Button>
