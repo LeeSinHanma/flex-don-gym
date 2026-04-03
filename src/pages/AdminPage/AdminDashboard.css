@@ -113,6 +113,52 @@
   border: 1px solid #eef2f7;
 }
 
+/* Revenue Card - Teal */
+.admin-dashboard-container .ad-revenue-card .ad-section-head h2 {
+  color: #0891b2;
+}
+
+/* Source Card - Emerald */
+.admin-dashboard-container .ad-source-card .ad-section-head h2 {
+  color: #059669;
+}
+
+/* Table Card - Blue */
+.admin-dashboard-container .ad-table-card .ad-section-head h2 {
+  color: #2563eb;
+}
+
+/* Membership Card - Purple */
+.admin-dashboard-container .ad-membership-card .ad-section-head h2 {
+  color: #7c3aed;
+}
+
+/* Best Sellers Card - Indigo */
+.admin-dashboard-container .ad-best-sellers-card {
+  border-top-color: #6366f1;
+}
+
+.admin-dashboard-container .ad-best-sellers-card .ad-section-head h2 {
+  color: #6366f1;
+}
+
+.admin-dashboard-container .ad-best-sellers-card .ad-seller-rank {
+  color: #6366f1;
+}
+
+/* Low On Stocks Card - Orange */
+.admin-dashboard-container .ad-low-stock-card {
+  border-top-color: #ea580c;
+}
+
+.admin-dashboard-container .ad-low-stock-card .ad-section-head h2 {
+  color: #ea580c;
+}
+
+.admin-dashboard-container .ad-low-stock-card .ad-seller-rank {
+  color: #ea580c;
+}
+
 .admin-dashboard-container .ad-section-head {
   display: flex;
   align-items: center;
