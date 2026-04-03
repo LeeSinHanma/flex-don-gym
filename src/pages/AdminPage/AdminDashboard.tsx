@@ -77,6 +77,14 @@ const AdminDashboard: React.FC = () => {
     { name: "Lifting Straps", sales: 8100 },
   ];
 
+  const lowOnStocks = [
+    { name: "Whey Protein 2lb", stock: 3 },
+    { name: "Creatine Monohydrate", stock: 5 },
+    { name: "Resistance Bands Set", stock: 2 },
+    { name: "Shaker Bottle", stock: 8 },
+    { name: "Lifting Straps", stock: 1 },
+  ];
+
   const membershipTotal = membershipPlans.reduce(
     (total, plan) => total + plan.count,
     0,
@@ -399,6 +407,26 @@ const AdminDashboard: React.FC = () => {
                     <span className="ad-seller-sales">
                       {formatPeso(item.sales)}
                     </span>
+                  </li>
+                ))}
+              </ol>
+
+              <button type="button" className="ad-ghost-action-btn">
+                View Details
+              </button>
+            </section>
+
+            <section className="ad-dashboard-card ad-low-stock-card">
+              <div className="ad-section-head">
+                <h2>Low On Stocks</h2>
+              </div>
+
+              <ol className="ad-best-sellers-list">
+                {lowOnStocks.map((item, index) => (
+                  <li key={item.name} className="ad-best-seller-item">
+                    <span className="ad-seller-rank">{index + 1}</span>
+                    <span className="ad-seller-name">{item.name}</span>
+                    <span className="ad-seller-sales">{item.stock}</span>
                   </li>
                 ))}
               </ol>
