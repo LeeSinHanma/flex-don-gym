@@ -31,6 +31,8 @@ const MemberMenu: React.FC = () => {
   const [credits, setCredits] = useState<number | "">("");
   const [amountGiven, setAmountGiven] = useState<number | "">("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "gcash">("cash");
+  const [note, setNote] = useState("");
+  const [createdAt, setCreatedAt] = useState(() => new Date().toISOString().split("T")[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [membershipTypes, setMembershipTypes] = useState<
@@ -88,6 +90,8 @@ const MemberMenu: React.FC = () => {
     setCredits("");
     setAmountGiven("");
     setPaymentMethod("cash");
+    setNote("");
+    setCreatedAt(new Date().toISOString().split("T")[0]);
   };
 
   const handleDownloadQr = async () => {
@@ -135,8 +139,22 @@ const MemberMenu: React.FC = () => {
       return;
     }
 
-    if (amountGiven === "" || Number(amountGiven) < 0) {
-      openStatusModal("Amount Required", "Please enter a valid amount given.", "warning");
+    const selectedPlan = membershipTypes.find((m) => m.membership_id === membershipType);
+    if (!selectedPlan) {
+      openStatusModal("Invalid Membership", "The selected membership plan could not be found.", "error");
+      return;
+    }
+
+    const planCost = selectedPlan.price || 0;
+    const creditsAdded = credits === "" ? 0 : Number(credits);
+    const expectedAmount = planCost + creditsAdded;
+
+    if (amountGiven === "" || Number(amountGiven) < expectedAmount) {
+      openStatusModal(
+        "Insufficient Amount", 
+        `Please enter a valid amount. Expected at least ₱${expectedAmount} (Plan: ₱${planCost} + Credits: ₱${creditsAdded}).`, 
+        "warning"
+      );
       return;
     }
 
@@ -154,6 +172,8 @@ const MemberMenu: React.FC = () => {
         registered_by: String(user.userID || user.user_id || "unknown"),
         payment_method: paymentMethod,
         amount_given: Number(amountGiven),
+        created_at: createdAt,
+        note: note.trim(),
       });
 
       const qrValue = response?.member_id;
@@ -190,7 +210,7 @@ const MemberMenu: React.FC = () => {
             <div className="top-item-container">
               <BackButton
                 className="btn btn-back"
-                onClick={() => history.push("/menu")}
+                onClick={() => history.push("/status-member")}
               >
                 <IonIcon icon={arrowBack} />
               </BackButton>
@@ -318,6 +338,52 @@ const MemberMenu: React.FC = () => {
                     e.target.value === "" ? "" : Number(e.target.value),
                   )
                 }
+              />
+              {membershipType !== 0 && (
+                <p style={{ margin: "4px 0 0 4px", fontSize: "12px", color: "var(--ion-color-medium, #666)" }}>
+                  Expected amount to pay: ₱{(membershipTypes.find((m) => m.membership_id === membershipType)?.price || 0) + (credits === "" ? 0 : Number(credits))}
+                </p>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label>Registration Date</label>
+              <div 
+                className="input-username" 
+                style={{ position: "relative", display: "flex", alignItems: "center", cursor: "pointer", overflow: "hidden" }}
+              >
+                <span>
+                  {new Date(createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+                <input
+                  type="date"
+                  value={createdAt}
+                  max={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => setCreatedAt(e.target.value || new Date().toISOString().split("T")[0])}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    cursor: "pointer",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Note</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Enter a note (optional)"
+                value={note}
+                onChange={(e: any) => setNote(e.target.value)}
               />
             </div>
           </div>

@@ -77,7 +77,7 @@
 
 .admin-dashboard-container .ad-stats-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.9rem;
 }
 
@@ -629,4 +629,46 @@
 
 .menu-btn-close:hover {
   background-color: #4b5563;
+}
+
+/* Offline Restricted Mode Styles */
+.offline-notice-container {
+  background-color: #fee2e2;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 0.85rem;
+  border-radius: 12px;
+  margin: 0 1rem 0.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.offline-notice-text {
+  color: #b91c1c;
+  font-weight: 600;
+  margin: 0;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.disabled-card {
+  opacity: 0.75;
+  filter: grayscale(0.4);
+  cursor: not-allowed !important;
+}
+
+.btn-submit:disabled {
+  background-color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

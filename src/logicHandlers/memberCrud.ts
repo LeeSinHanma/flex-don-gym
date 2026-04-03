@@ -29,6 +29,9 @@ export type CreateMemberPayload = {
   registered_by: string | number;
   payment_method: string;
   amount_given: number;
+  amount_to_pay?: number;
+  created_at: string;
+  note: string;
 };
 
 // ---------- Helpers ----------

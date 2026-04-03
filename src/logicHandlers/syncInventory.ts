@@ -1,7 +1,7 @@
 // src/logicHandlers/syncInventory.ts
 import { getInventoryItems, InventoryItem } from "./itemInvCrud";
 import {
-    upsertInventoryItems,
+    syncInventoryLocal,
     LocalInventoryItem,
 } from "../repositories/inventoryRepository";
 
@@ -22,7 +22,7 @@ export async function syncInventoryFromServer() {
         updated_at: item.updated_at ?? null,
     }));
 
-    await upsertInventoryItems(mappedItems);
+    await syncInventoryLocal(mappedItems);
 
     return mappedItems.length;
 }

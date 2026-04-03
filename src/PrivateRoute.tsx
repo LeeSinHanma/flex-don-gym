@@ -21,4 +21,4 @@ const PrivateRoute = ({ component: Component, requiredAccess, ...rest }: any) =>
   />
 );
 
-export default PrivateRoute;
+export default PrivateRoute;

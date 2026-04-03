@@ -387,9 +387,9 @@ const QRScannerHome: React.FC = () => {
             <Button
               className="btn-add-member"
               type="button"
-              onClick={() => history.push("/menu")}
+              onClick={() => history.push("/walkin")}
             >
-              ADD NEW MEMBER
+              MANUAL ADMIT
             </Button>
           </div>
         </div>

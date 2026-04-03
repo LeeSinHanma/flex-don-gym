@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./StartingPage.css";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
@@ -6,38 +6,16 @@ import { IonImg } from "@ionic/react";
 import dondonLogo from "../../resource/dondon-logo.png";
 import LogoutModal from "../../components/Reusable/LogoutModal";
 import { getCurrentUser, logout } from "../../logicHandlers/userServices";
-import {
-  OfflineBanner,
-  BannerStatus,
-} from "../../components/Reusable/OfflineBanner";
-
 const StartingPageAdmin: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loggedUser, setLoggedUser] = useState<string | null>(null);
+
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [bannerStatus, setBannerStatus] = useState<BannerStatus>("offline");
-  const [showBanner, setShowBanner] = useState(true);
+  const [user, setUser] = useState(getCurrentUser());
+
+  const history = useHistory();
 
   const handleLogout = () => {
     logout();
     history.replace("/");
-  };
-
-  const history = useHistory();
-
-  const handleSubmit = () => {
-    if (!isLogin && password !== confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-    console.log("Form submitted:", {
-      username,
-      password,
-      mode: isLogin ? "login" : "register",
-    });
   };
 
   useEffect(() => {
@@ -46,34 +24,29 @@ const StartingPageAdmin: React.FC = () => {
     if (!parsedUser) {
       history.push("/");
     } else {
-      setLoggedUser(parsedUser.username);
+      setUser(parsedUser);
     }
   }, [history]);
 
   return (
     <div className="admin-login-container">
-      <OfflineBanner status={bannerStatus} visible={showBanner} />
       <div className="admin-main-container">
         <div className="admin-image-group">
           <IonImg src={dondonLogo} className="dondon-logo" alt="Logo" />
 
           <h1 className="admin-gym-name">DONDON'S FITNESS GYM</h1>
-          <h1 className="login-gym-name">Logged in as: {loggedUser}</h1>
+          <h1 className="login-gym-name">
+               Hello, {user?.firstName || user?.username} {user?.lastName}!
+             </h1>
         </div>
         <div className="admin-button-group">
           <Button
             className="btn btn-signup"
             type="submit"
-            onClick={() => history.push("/qr")}
+            onClick={() => 
+              user?.role === 0 ? history.push("/admin-dashboard") : history.push("/qr")}
           >
-            Employee Page
-          </Button>
-          <Button
-            className="btn btn-signup"
-            type="submit"
-            onClick={() => history.push("/admin-dashboard")}
-          >
-            Admin Page
+            Start
           </Button>
 
           <Button

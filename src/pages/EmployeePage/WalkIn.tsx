@@ -153,7 +153,7 @@ const WalkInMenu: React.FC = () => {
           <div className="top-container">
             <BackButton
               className="btn btn-back"
-              onClick={() => history.push("/menu")}
+              onClick={() => history.push("/qr")}
             >
               <IonIcon icon={arrowBack} />
             </BackButton>

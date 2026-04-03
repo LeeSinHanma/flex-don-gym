@@ -118,13 +118,28 @@
 .nav-item {
   flex: 0 0 auto;
   padding: 0.5rem 1rem;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.08); /* Lighter default */
   color: #04354f;
   border-radius: 12px;
   font-family: "Inter", sans-serif;
   font-size: 16px;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.nav-item.active {
+  background-color: #04354f;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(4, 53, 79, 0.3);
+  font-weight: 600;
+  transform: translateY(-1px);
 }
 
 .cards-container {
