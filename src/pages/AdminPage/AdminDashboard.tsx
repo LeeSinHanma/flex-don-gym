@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getMembershipDistribution } from "../../repositories/memberRepository";
@@ -10,7 +10,7 @@ import { Capacitor } from "@capacitor/core";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
 import { BackButton } from "../../components/Reusable/BackButton";
-import { connectCheckInsWS, disconnectCheckInsWS } from "../../logicHandlers/webSocket";
+import { connectCheckInsWS, disconnectCheckInsWS, connectRevenueWS, disconnectRevenueWS } from "../../logicHandlers/webSocket";
 import Menu from "../../components/Reusable/Menu";
 import {
   ArcElement,
@@ -46,8 +46,8 @@ const AdminDashboard: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
   const history = useHistory();
 
-  const [activeMembers, setActiveMembers] = useState(0);
-  const [checkInsToday, setCheckInsToday] = useState(0);
+  const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
+  const [revenueToday, setRevenueToday] = useState<number | null>(null);
 
   const monthlyRevenue = 184950;
   const revenueChange = 8.4;
@@ -236,10 +236,6 @@ const AdminDashboard: React.FC = () => {
 
         setMembershipPlans(distribution);
 
-        // Calculate active members
-        const activeCount = members.filter(m => m.is_active).length;
-        setActiveMembers(activeCount);
-
         // Map transactions to table format
         const formattedTransactions = transactions.map(t => ({
           date: new Date(t.created_at).toLocaleDateString("en-GB").replace(/\//g, "-"),
@@ -256,8 +252,6 @@ const AdminDashboard: React.FC = () => {
         if (distribution && distribution.length > 0) {
           setMembershipPlans(distribution);
         }
-        
-        // We could also add SQLite queries for activeMembers and checkInsToday here if needed
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
@@ -269,14 +263,17 @@ const AdminDashboard: React.FC = () => {
 
     fetchDashboardData();
 
-    // ✅ connect WebSocket
     connectCheckInsWS((count) => {
       setCheckInsToday(count);
     });
 
-    // cleanup
+    connectRevenueWS((amount) => {
+      setRevenueToday(amount);
+    });
+
     return () => {
       disconnectCheckInsWS();
+      disconnectRevenueWS();
     };
   }, [isReady, fetchDashboardData]);
 
@@ -319,13 +316,42 @@ const AdminDashboard: React.FC = () => {
             <>
               <div className="ad-stats-row">
             <section className="ad-stat-card ad-stat-card-dark">
-              <span className="ad-card-label">Active Members</span>
-              <strong className="ad-stat-value">{activeMembers}</strong>
-            </section>
-
-            <section className="ad-stat-card ad-stat-card-dark">
               <span className="ad-card-label">Check-ins Today</span>
-              <strong className="ad-stat-value">{checkInsToday}</strong>
+              {checkInsToday === null ? (
+                <IonSkeletonText 
+                  animated={true} 
+                  style={{ 
+                    width: '60px', 
+                    height: '36px', 
+                    marginTop: '8px', 
+                    marginBottom: '4px',
+                    borderRadius: '4px',
+                    '--background': 'rgba(56, 189, 248, 0.1)', 
+                    '--background-rgb': '56, 189, 248' 
+                  }} 
+                />
+              ) : (
+                <strong className="ad-stat-value">{checkInsToday}</strong>
+              )}
+            </section>
+            <section className="ad-stat-card ad-stat-card-dark">
+              <span className="ad-card-label">Revenue Today</span>
+              {revenueToday === null ? (
+                <IonSkeletonText 
+                  animated={true} 
+                  style={{ 
+                    width: '60px', 
+                    height: '36px', 
+                    marginTop: '8px', 
+                    marginBottom: '4px',
+                    borderRadius: '4px',
+                    '--background': 'rgba(56, 189, 248, 0.1)', 
+                    '--background-rgb': '56, 189, 248' 
+                  }} 
+                />
+              ) : (
+                <strong className="ad-stat-value">{formatPeso(revenueToday)}</strong>
+              )}
             </section>
           </div>
 
@@ -342,9 +368,9 @@ const AdminDashboard: React.FC = () => {
                 onChange={(event) => setSelectedPeriod(event.target.value)}
                 aria-label="Revenue period selector"
               >
-                <option value="Weekly">Weekly</option>
-                <option value="Monthly">Monthly</option>
-                <option value="Quarterly">Quarterly</option>
+                <option value="Weekly">Last 7 days</option>
+                <option value="Monthly">Last 30 days</option>
+                <option value="Quarterly">Last 365 days</option>
               </select>
             </div>
 
