@@ -1,9 +1,10 @@
 .qr-download-card {
   background: #ffffff;
-  padding: 24px;
+  padding: clamp(16px, 5vw, 24px);
   border-radius: 20px;
   text-align: center;
-  width: 360px;
+  width: 100%;
+  max-width: 360px;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -15,13 +16,13 @@
 }
 
 .qr-logo {
-  width: 56px;
+  width: clamp(40px, 10vw, 56px);
   height: auto;
   margin-bottom: 10px;
 }
 
 .qr-header h2 {
-  font-size: 16px;
+  font-size: clamp(14px, 4vw, 16px);
   font-weight: 800;
   color: #04354f;
   margin: 0;
@@ -38,7 +39,7 @@
 .qr-wrapper {
   border: 4px solid #1e88d9;
   border-radius: 14px;
-  padding: 14px;
+  padding: clamp(10px, 3vw, 14px);
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -46,20 +47,47 @@
   align-items: center;
   overflow: hidden;
   background: #fff;
+  aspect-ratio: 1 / 1;
 }
 
 .qr-wrapper svg {
   width: 100%;
+  height: 100%;
   max-width: 260px;
-  height: auto;
+  max-height: 260px;
   display: block;
 }
 
 .qr-member-name {
-  margin-top: 18px;
+  margin-top: clamp(12px, 3vw, 18px);
   margin-bottom: 0;
   font-weight: 800;
-  font-size: 18px;
+  font-size: clamp(14px, 4vw, 18px);
   color: #04354f;
   word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .qr-download-card {
+    padding: 16px;
+  }
+
+  .qr-wrapper {
+    padding: 10px;
+  }
+
+  .qr-logo {
+    width: 40px;
+  }
+
+  .qr-header h2 {
+    font-size: 14px;
+  }
+
+  .qr-member-name {
+    font-size: 14px;
+    margin-top: 12px;
+  }
 }

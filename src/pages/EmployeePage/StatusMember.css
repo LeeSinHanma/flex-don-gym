@@ -113,6 +113,35 @@
   overflow-x: auto;
   padding: 0.5rem 0;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Styled scrollbar for Chrome/Safari/Edge */
+.nav-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.nav-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-carousel::-webkit-scrollbar-thumb {
+  background-color: #c5c5c5;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.nav-carousel::-webkit-scrollbar-thumb:hover {
+  background-color: #04354f;
+  background-clip: content-box;
+}
+
+/* Firefox scrollbar */
+.nav-carousel {
+  scrollbar-color: #c5c5c5 transparent;
+  scrollbar-width: thin;
 }
 
 .nav-item {
@@ -294,13 +323,11 @@ ion-skeleton-text {
 }
 
 .bottom-container .btn-submit {
-  width: 400px;
-  height: 62px;
-  border-radius: 15px;
+  height: 60px;
   background-color: #04354f;
   color: white;
   border: none;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   font-family: "Inter", sans-serif;
   cursor: pointer;
@@ -320,14 +347,14 @@ ion-skeleton-text {
 @media (max-width: 480px) {
   .bottom-container {
     padding: 1rem 1rem 2rem 1rem;
-    flex-direction: column;
     gap: 12px;
   }
 
-  .bottom-container .btn-submit {
+  .bottom-container .btn-submit,
+  .bottom-container .btn-cancel {
     width: 100%;
     max-width: 350px;
-    height: 42px;
+    height: 40px;
     font-size: 14px;
   }
 }
