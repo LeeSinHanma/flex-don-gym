@@ -13,12 +13,8 @@ import { Capacitor } from "@capacitor/core";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
 import { BackButton } from "../../components/Reusable/BackButton";
-import {
-  connectCheckInsWS,
-  disconnectCheckInsWS,
-  connectRevenueWS,
-  disconnectRevenueWS,
-} from "../../logicHandlers/webSocket";
+import { connectCheckInsWS, disconnectCheckInsWS, connectRevenueWS, disconnectRevenueWS } from "../../logicHandlers/webSocket";
+import { getRevenueLastDays, getRevenueLine, getRevenueSource } from "../../logicHandlers/graphHandler";
 import Menu from "../../components/Reusable/Menu";
 import {
   ArcElement,
@@ -52,21 +48,20 @@ ChartJS.register(
 const AdminDashboard: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
+  const [revenueSubtitle, setRevenueSubtitle] = useState("Total monthly revenue");
+  const [currentRevenue, setCurrentRevenue] = useState(184950);
   const history = useHistory();
 
   const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
   const [revenueToday, setRevenueToday] = useState<number | null>(null);
 
-  const monthlyRevenue = 184950;
   const revenueChange = 8.4;
 
-  const revenueTrendLabels = ["W1", "W2", "W3", "W4", "W5", "W6"];
-  const revenueTrendData = [28000, 26500, 31000, 29700, 33350, 36400];
+  const [revenueTrendLabels, setRevenueTrendLabels] = useState<string[]>([]);
+  const [revenueTrendData, setRevenueTrendData] = useState<number[]>([]);
 
-  const revenueSources = [
-    { label: "Gym Access", amount: 122500, percent: 66 },
-    { label: "Products", amount: 62450, percent: 34 },
-  ];
+  const [revenueSources, setRevenueSources] = useState<{ label: string; amount: number; percent: number; }[]>([]);
+  const sourceColors = ["#0f766e", "#34d399", "#3b82f6", "#f59e0b", "#8b5cf6"];
 
   const [latestPayments, setLatestPayments] = useState<
     { date: string; type: string; amount: number }[]
@@ -151,24 +146,14 @@ const AdminDashboard: React.FC = () => {
 
   const stackedSourceData = {
     labels: ["Revenue Sources"],
-    datasets: [
-      {
-        label: "Gym Access",
-        data: [revenueSources[0].amount],
-        backgroundColor: "#0f766e",
-        borderRadius: 25,
-        borderSkipped: false,
-        barThickness: 22,
-      },
-      {
-        label: "Products",
-        data: [revenueSources[1].amount],
-        backgroundColor: "#34d399",
-        borderRadius: 5,
-        borderSkipped: false,
-        barThickness: 22,
-      },
-    ],
+    datasets: revenueSources.map((source, index) => ({
+      label: source.label,
+      data: [source.amount],
+      backgroundColor: sourceColors[index % sourceColors.length],
+      borderRadius: 10,
+      borderSkipped: false,
+      barThickness: 22,
+    })),
   };
 
   const stackedSourceOptions: ChartOptions<"bar"> = {
@@ -304,6 +289,36 @@ const AdminDashboard: React.FC = () => {
     };
   }, [isReady, fetchDashboardData]);
 
+  useEffect(() => {
+    const range = selectedPeriod === "Weekly" ? "7d" : selectedPeriod === "Monthly" ? "30d" : "365d";
+    
+    getRevenueLastDays(range)
+      .then((res) => {
+        setRevenueSubtitle(`Total revenue for the last ${res.period_days} days`);
+        setCurrentRevenue(res.total_revenue);
+      })
+      .catch(console.error);
+
+    getRevenueLine(range)
+      .then((res) => {
+        setRevenueTrendLabels(res.points.map((p) => p.label));
+        setRevenueTrendData(res.points.map((p) => p.revenue));
+      })
+      .catch(console.error);
+
+    getRevenueSource(range)
+      .then((res) => {
+        setRevenueSources(
+          res.sources.map((s) => ({
+            label: s.source,
+            amount: s.amount,
+            percent: s.share,
+          }))
+        );
+      })
+      .catch(console.error);
+  }, [selectedPeriod]);
+
   const handleMenuClick = () => {
     setIsMenuOpen(true);
   };
@@ -352,73 +367,97 @@ const AdminDashboard: React.FC = () => {
           ) : (
             <>
               <div className="ad-stats-row">
-                <section className="ad-stat-card ad-stat-card-dark">
-                  <span className="ad-card-label">Check-ins Today</span>
-                  {checkInsToday === null ? (
-                    <IonSkeletonText
-                      animated={true}
-                      style={{
-                        width: "60px",
-                        height: "36px",
-                        marginTop: "8px",
-                        marginBottom: "4px",
-                        borderRadius: "4px",
-                        "--background": "rgba(56, 189, 248, 0.1)",
-                        "--background-rgb": "56, 189, 248",
-                      }}
-                    />
-                  ) : (
-                    <strong className="ad-stat-value">{checkInsToday}</strong>
-                  )}
-                </section>
-                <section className="ad-stat-card ad-stat-card-dark">
-                  <span className="ad-card-label">Revenue Today</span>
-                  {revenueToday === null ? (
-                    <IonSkeletonText
-                      animated={true}
-                      style={{
-                        width: "60px",
-                        height: "36px",
-                        marginTop: "8px",
-                        marginBottom: "4px",
-                        borderRadius: "4px",
-                        "--background": "rgba(56, 189, 248, 0.1)",
-                        "--background-rgb": "56, 189, 248",
-                      }}
-                    />
-                  ) : (
-                    <strong className="ad-stat-value">
-                      {formatPeso(revenueToday)}
-                    </strong>
-                  )}
-                </section>
+            <section className="ad-stat-card ad-stat-card-dark">
+              <span className="ad-card-label">Check-ins Today</span>
+              {checkInsToday === null ? (
+                <IonSkeletonText 
+                  animated={true} 
+                  style={{ 
+                    width: '60px', 
+                    height: '36px', 
+                    marginTop: '8px', 
+                    marginBottom: '4px',
+                    borderRadius: '4px',
+                    '--background': 'rgba(56, 189, 248, 0.1)', 
+                    '--background-rgb': '56, 189, 248' 
+                  }} 
+                />
+              ) : (
+                <strong className="ad-stat-value">{checkInsToday}</strong>
+              )}
+            </section>
+            <section className="ad-stat-card ad-stat-card-dark">
+              <span className="ad-card-label">Revenue Today</span>
+              {revenueToday === null ? (
+                <IonSkeletonText 
+                  animated={true} 
+                  style={{ 
+                    width: '60px', 
+                    height: '36px', 
+                    marginTop: '8px', 
+                    marginBottom: '4px',
+                    borderRadius: '4px',
+                    '--background': 'rgba(56, 189, 248, 0.1)', 
+                    '--background-rgb': '56, 189, 248' 
+                  }} 
+                />
+              ) : (
+                <strong className="ad-stat-value">{formatPeso(revenueToday)}</strong>
+              )}
+            </section>
+          </div>
+
+          <section className="ad-dashboard-card ad-revenue-card">
+            <div className="ad-section-head">
+              <div>
+                <h2>Revenue</h2>
+                <p className="ad-section-subtitle">{revenueSubtitle}</p>
               </div>
 
-              <section className="ad-dashboard-card ad-revenue-card">
-                <div className="ad-section-head">
-                  <div>
-                    <h2>Revenue</h2>
-                    <p className="ad-section-subtitle">Total monthly revenue</p>
-                  </div>
+              <select
+                className="ad-period-select"
+                value={selectedPeriod}
+                onChange={(event) => setSelectedPeriod(event.target.value)}
+                aria-label="Revenue period selector"
+              >
+                <option value="Weekly">Last 7 days</option>
+                <option value="Monthly">Last 30 days</option>
+                <option value="Quarterly">Last 365 days</option>
+              </select>
+            </div>
 
-                  <select
-                    className="ad-period-select"
-                    value={selectedPeriod}
-                    onChange={(event) => setSelectedPeriod(event.target.value)}
-                    aria-label="Revenue period selector"
-                  >
-                    <option value="Weekly">Last 7 days</option>
-                    <option value="Monthly">Last 30 days</option>
-                    <option value="Quarterly">Last 365 days</option>
-                  </select>
-                </div>
+            <div className="ad-revenue-summary-row">
+              <strong className="ad-revenue-total">
+                {formatPeso(currentRevenue)}
+              </strong>
+              <span className="ad-change-badge ad-positive">
+                +{revenueChange}%
+              </span>
+            </div>
 
-                <div className="ad-revenue-summary-row">
-                  <strong className="ad-revenue-total">
-                    {formatPeso(monthlyRevenue)}
-                  </strong>
-                  <span className="ad-change-badge ad-positive">
-                    +{revenueChange}%
+            <div className="ad-chart-container ad-revenue-chart">
+              <Line data={lineChartData} options={lineChartOptions} />
+            </div>
+          </section>
+
+          <section className="ad-dashboard-card ad-source-card">
+            <div className="ad-section-head">
+              <h2>Source</h2>
+            </div>
+
+            <div className="ad-chart-container ad-source-chart">
+              <Bar data={stackedSourceData} options={stackedSourceOptions} />
+            </div>
+
+            <ul className="ad-source-list">
+              {revenueSources.map((source, index) => (
+                <li key={`${source.label}-${index}`} className="ad-source-item">
+                  <span className="ad-source-name">{source.label}</span>
+                  <span className="ad-source-amount">
+                    {formatPeso(source.amount)}
+                  </span>
+                  <span className="ad-change-badge ad-neutral">
+                    {source.percent}%
                   </span>
                 </div>
 
@@ -439,18 +478,32 @@ const AdminDashboard: React.FC = () => {
                   />
                 </div>
 
-                <ul className="ad-source-list">
-                  {revenueSources.map((source) => (
-                    <li key={source.label} className="ad-source-item">
-                      <span className="ad-source-name">{source.label}</span>
-                      <span className="ad-source-amount">
-                        {formatPeso(source.amount)}
-                      </span>
-                      <span className="ad-change-badge ad-neutral">
-                        {source.percent}%
-                      </span>
-                    </li>
-                  ))}
+              <div className="ad-membership-layout">
+                <ul className="ad-membership-legend">
+                  {membershipPlans.map((plan, index) => {
+                    const percentage = membershipTotal > 0 ? Math.round(
+                      (plan.count / membershipTotal) * 100,
+                    ) : 0;
+                    return (
+                      <li
+                        key={`${plan.label}-${index}`}
+                        className="ad-membership-legend-item"
+                      >
+                        <div className="ad-legend-title-wrap">
+                          <span
+                            className="ad-legend-dot"
+                            aria-hidden="true"
+                            style={{ backgroundColor: membershipColors[index] }}
+                          />
+                          <span>{plan.label}</span>
+                        </div>
+                        <span className="ad-legend-count">{plan.count}</span>
+                        <span className="ad-change-badge ad-neutral">
+                          {percentage}%
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
 
