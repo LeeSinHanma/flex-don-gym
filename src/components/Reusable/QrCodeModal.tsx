@@ -98,10 +98,7 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
             <p className="qr-member-name">{memberName || "No Name"}</p>
           </div>
 
-          <div
-            className="form-actions"
-            style={{ display: "flex", gap: 10, marginTop: 15 }}
-          >
+          <div className="form-actions">
             <Button type="button" onClick={handleDownloadQr}>
               Download
             </Button>

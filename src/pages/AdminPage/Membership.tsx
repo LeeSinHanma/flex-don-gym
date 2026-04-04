@@ -243,7 +243,14 @@ const MembershipPage: React.FC = () => {
                       </p>
                     </div>
                     <div className="pos-card-top-right">
-                      <IonSkeletonText animated style={{ width: "100px", height: "35px", borderRadius: "10px" }} />
+                      <IonSkeletonText
+                        animated
+                        style={{
+                          width: "100px",
+                          height: "35px",
+                          borderRadius: "10px",
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -256,7 +263,9 @@ const MembershipPage: React.FC = () => {
               buttonLabel={isOffline ? "Offline" : "Edit amount"}
               onButtonClick={() => {
                 if (isOffline) return;
-                setDailyRateInput(String(gymPricing?.base_day_pass_price ?? 55));
+                setDailyRateInput(
+                  String(gymPricing?.base_day_pass_price ?? 55),
+                );
                 setIsEditDailyRateOpen(true);
               }}
             />
@@ -271,8 +280,8 @@ const MembershipPage: React.FC = () => {
           </div>
         )}
 
-        <div className="admin-main-content">
-          <div className="product-card-wrapper">
+        <div className="membership-cards-container">
+          <div className="membership-card-wrapper">
             {loading ? (
               [1, 2, 3, 4, 5].map((i) => (
                 <div key={i} className="pos-card-item">
@@ -281,14 +290,27 @@ const MembershipPage: React.FC = () => {
                       <div className="pos-status-info">
                         <div className="pos-left-info">
                           <h2 className="pos-card-product-name">
-                            <IonSkeletonText animated style={{ width: "150px", display: "block" }} />
+                            <IonSkeletonText
+                              animated
+                              style={{ width: "150px", display: "block" }}
+                            />
                           </h2>
                           <p className="pos-card-product-price">
-                            <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                            <IonSkeletonText
+                              animated
+                              style={{ width: "80px", display: "block" }}
+                            />
                           </p>
                         </div>
                         <div className="pos-card-top-right">
-                          <IonSkeletonText animated style={{ width: "100px", height: "35px", borderRadius: "10px" }} />
+                          <IonSkeletonText
+                            animated
+                            style={{
+                              width: "100px",
+                              height: "35px",
+                              borderRadius: "10px",
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
@@ -303,14 +325,17 @@ const MembershipPage: React.FC = () => {
                   price={membership.price || 0}
                   buttonLabel={isOffline ? "Offline" : "Edit amount"}
                   onButtonClick={() =>
-                    !isOffline && history.push(
+                    !isOffline &&
+                    history.push(
                       `/admin-edit-membership/${membership.membership_id}`,
                     )
                   }
                 />
               ))
             ) : (
-              <p>{isOffline ? "Currently Offline" : "No membership types found."}</p>
+              <p>
+                {isOffline ? "Currently Offline" : "No membership types found."}
+              </p>
             )}
           </div>
         </div>

@@ -294,13 +294,11 @@ ion-skeleton-text {
 }
 
 .bottom-container .btn-submit {
-  width: 400px;
-  height: 62px;
-  border-radius: 15px;
+  height: 60px;
   background-color: #04354f;
   color: white;
   border: none;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   font-family: "Inter", sans-serif;
   cursor: pointer;
@@ -320,14 +318,14 @@ ion-skeleton-text {
 @media (max-width: 480px) {
   .bottom-container {
     padding: 1rem 1rem 2rem 1rem;
-    flex-direction: column;
     gap: 12px;
   }
 
-  .bottom-container .btn-submit {
+  .bottom-container .btn-submit,
+  .bottom-container .btn-cancel {
     width: 100%;
     max-width: 350px;
-    height: 42px;
+    height: 40px;
     font-size: 14px;
   }
 }
