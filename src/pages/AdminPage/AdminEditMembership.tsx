@@ -48,7 +48,6 @@ const AdminEditMembership: React.FC = () => {
   const membershipTypeLabel: Record<number, string> = {
     0: "Postpaid",
     1: "Prepaid",
-    2: "Discount",
   };
 
   const openStatusModal = (
@@ -169,9 +168,19 @@ const AdminEditMembership: React.FC = () => {
       await deleteMembershipType(Number(membershipId));
 
       setShowDeleteModal(false);
-      history.push("/admin-membership");
-    } catch (err) {
+      setShouldGoBack(true);
+      openStatusModal(
+        "Membership Deleted",
+        "The membership has been successfully deleted.",
+        "success",
+      );
+    } catch (err: any) {
       console.error("Delete failed", err);
+      openStatusModal(
+        "Delete Failed",
+        err?.message || "Failed to delete membership",
+        "error",
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -217,7 +226,6 @@ const AdminEditMembership: React.FC = () => {
               >
                 <option value={0}>Postpaid</option>
                 <option value={1}>Prepaid</option>
-                <option value={2}>Discount</option>
               </select>
             </div>
 
