@@ -5,7 +5,10 @@ import { useHistory } from "react-router-dom";
 import { getMembershipDistribution } from "../../repositories/memberRepository";
 import { getMembers } from "../../logicHandlers/memberCrud";
 import { getMembershipTypes } from "../../logicHandlers/membershipCrud";
-import { getAllTransactions, TransactionResponse } from "../../logicHandlers/transactionHandler";
+import {
+  getAllTransactions,
+  TransactionResponse,
+} from "../../logicHandlers/transactionHandler";
 import { Capacitor } from "@capacitor/core";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
@@ -60,9 +63,13 @@ const AdminDashboard: React.FC = () => {
   const [revenueSources, setRevenueSources] = useState<{ label: string; amount: number; percent: number; }[]>([]);
   const sourceColors = ["#0f766e", "#34d399", "#3b82f6", "#f59e0b", "#8b5cf6"];
 
-  const [latestPayments, setLatestPayments] = useState<{ date: string; type: string; amount: number }[]>([]);
+  const [latestPayments, setLatestPayments] = useState<
+    { date: string; type: string; amount: number }[]
+  >([]);
 
-  const [membershipPlans, setMembershipPlans] = useState<{ label: string; count: number }[]>([
+  const [membershipPlans, setMembershipPlans] = useState<
+    { label: string; count: number }[]
+  >([
     { label: "Prepaid", count: 0 },
     { label: "Monthly", count: 0 },
     { label: "Yearly", count: 0 },
@@ -203,7 +210,10 @@ const AdminDashboard: React.FC = () => {
       tooltip: {
         callbacks: {
           label: (context: { label?: string; parsed: number }) => {
-            const pct = membershipTotal > 0 ? Math.round((context.parsed / membershipTotal) * 100) : 0;
+            const pct =
+              membershipTotal > 0
+                ? Math.round((context.parsed / membershipTotal) * 100)
+                : 0;
             return `${context.label || "Plan"}: ${context.parsed} (${pct}%)`;
           },
         },
@@ -217,31 +227,35 @@ const AdminDashboard: React.FC = () => {
     if (!isReady) return;
     try {
       const platform = Capacitor.getPlatform();
-      
+
       if (platform === "web") {
         // Fetch from API on web
         const [members, types, transactions] = await Promise.all([
           getMembers(),
           getMembershipTypes(),
-          getAllTransactions({ limit: 5 })
+          getAllTransactions({ limit: 5 }),
         ]);
 
         // Calculate distribution
-        const distribution = types.map(type => {
-          const count = members.filter(m => m.membership_plan_id === type.membership_id).length;
+        const distribution = types.map((type) => {
+          const count = members.filter(
+            (m) => m.membership_plan_id === type.membership_id,
+          ).length;
           return { label: type.name || "Unknown", count };
         });
 
         setMembershipPlans(distribution);
 
         // Map transactions to table format
-        const formattedTransactions = transactions.map(t => ({
-          date: new Date(t.created_at).toLocaleDateString("en-GB").replace(/\//g, "-"),
+        const formattedTransactions = transactions.map((t) => ({
+          date: new Date(t.created_at)
+            .toLocaleDateString("en-GB")
+            .replace(/\//g, "-"),
           type: t.transaction_type,
-          amount: t.total_price
+          amount: t.total_price,
         }));
         setLatestPayments(formattedTransactions);
-        
+
         // Note: For checkInsToday on web, we would need a visits API that returns all visits.
         // For now, we'll leave it at 0 or fetch if available.
       } else {
@@ -336,9 +350,19 @@ const AdminDashboard: React.FC = () => {
 
         <div className="admin-main-content">
           {!isReady ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '400px' }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "400px",
+              }}
+            >
               <LoadingSpinner />
-              <p style={{ marginTop: '20px', color: '#666' }}>Preparing your dashboard...</p>
+              <p style={{ marginTop: "20px", color: "#666" }}>
+                Preparing your dashboard...
+              </p>
             </div>
           ) : (
             <>
@@ -435,48 +459,24 @@ const AdminDashboard: React.FC = () => {
                   <span className="ad-change-badge ad-neutral">
                     {source.percent}%
                   </span>
-                </li>
-              ))}
-            </ul>
-          </section>
+                </div>
 
-          <section className="ad-dashboard-card ad-table-card">
-            <div className="ad-section-head">
-              <h2>Latest Payments</h2>
-            </div>
+                <div className="ad-chart-container ad-revenue-chart">
+                  <Line data={lineChartData} options={lineChartOptions} />
+                </div>
+              </section>
 
-            <div className="ad-table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                  </tr>
-                </thead>
+              <section className="ad-dashboard-card ad-source-card">
+                <div className="ad-section-head">
+                  <h2>Source</h2>
+                </div>
 
-                <tbody>
-                  {latestPayments.map((payment, index) => (
-                    <tr key={`${payment.date}-${payment.type}-${index}`}>
-                      <td>{payment.date}</td>
-                      <td>{payment.type}</td>
-                      <td>{formatPeso(payment.amount)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <button type="button" className="ad-ghost-action-btn">
-              View All
-            </button>
-          </section>
-
-          <div className="ad-bottom-grid">
-            <section className="ad-dashboard-card ad-membership-card">
-              <div className="ad-section-head">
-                <h2>Membership Plan Distribution</h2>
-              </div>
+                <div className="ad-chart-container ad-source-chart">
+                  <Bar
+                    data={stackedSourceData}
+                    options={stackedSourceOptions}
+                  />
+                </div>
 
               <div className="ad-membership-layout">
                 <ul className="ad-membership-legend">
@@ -505,60 +505,132 @@ const AdminDashboard: React.FC = () => {
                     );
                   })}
                 </ul>
+              </section>
 
-                <div className="ad-chart-container ad-donut-chart">
-                  <Doughnut data={donutData} options={donutOptions} />
+              <section className="ad-dashboard-card ad-table-card">
+                <div className="ad-section-head">
+                  <h2>Latest Payments</h2>
                 </div>
+
+                <div className="ad-table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {latestPayments.map((payment, index) => (
+                        <tr key={`${payment.date}-${payment.type}-${index}`}>
+                          <td>{payment.date}</td>
+                          <td>{payment.type}</td>
+                          <td>{formatPeso(payment.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <button type="button" className="ad-ghost-action-btn">
+                  View All
+                </button>
+              </section>
+
+              <div className="ad-bottom-grid">
+                <section className="ad-dashboard-card ad-membership-card">
+                  <div className="ad-section-head">
+                    <h2>Membership Plan Distribution</h2>
+                  </div>
+
+                  <div className="ad-membership-layout">
+                    <ul className="ad-membership-legend">
+                      {membershipPlans.map((plan, index) => {
+                        const percentage =
+                          membershipTotal > 0
+                            ? Math.round((plan.count / membershipTotal) * 100)
+                            : 0;
+                        return (
+                          <li
+                            key={plan.label}
+                            className="ad-membership-legend-item"
+                          >
+                            <div className="ad-legend-title-wrap">
+                              <span
+                                className="ad-legend-dot"
+                                aria-hidden="true"
+                                style={{
+                                  backgroundColor: membershipColors[index],
+                                }}
+                              />
+                              <span>{plan.label}</span>
+                            </div>
+                            <span className="ad-legend-count">
+                              {plan.count}
+                            </span>
+                            <span className="ad-change-badge ad-neutral">
+                              {percentage}%
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    <div className="ad-chart-container ad-donut-chart">
+                      <Doughnut data={donutData} options={donutOptions} />
+                    </div>
+                  </div>
+
+                  <button type="button" className="ad-ghost-action-btn">
+                    View Details
+                  </button>
+                </section>
+
+                <section className="ad-dashboard-card ad-best-sellers-card">
+                  <div className="ad-section-head">
+                    <h2>Best Sellers</h2>
+                  </div>
+
+                  <ol className="ad-best-sellers-list">
+                    {bestSellers.map((item, index) => (
+                      <li key={item.name} className="ad-best-seller-item">
+                        <span className="ad-seller-rank">{index + 1}</span>
+                        <span className="ad-seller-name">{item.name}</span>
+                        <span className="ad-seller-sales">
+                          {formatPeso(item.sales)}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+
+                  <button type="button" className="ad-ghost-action-btn">
+                    View Details
+                  </button>
+                </section>
+
+                <section className="ad-dashboard-card ad-low-stock-card">
+                  <div className="ad-section-head">
+                    <h2>Low On Stocks</h2>
+                  </div>
+
+                  <ol className="ad-best-sellers-list">
+                    {lowOnStocks.map((item, index) => (
+                      <li key={item.name} className="ad-best-seller-item">
+                        <span className="ad-seller-rank">{index + 1}</span>
+                        <span className="ad-seller-name">{item.name}</span>
+                        <span className="ad-seller-sales">{item.stock}</span>
+                      </li>
+                    ))}
+                  </ol>
+
+                  <button type="button" className="ad-ghost-action-btn">
+                    View Details
+                  </button>
+                </section>
               </div>
-
-              <button type="button" className="ad-ghost-action-btn">
-                View Details
-              </button>
-            </section>
-
-            <section className="ad-dashboard-card ad-best-sellers-card">
-              <div className="ad-section-head">
-                <h2>Best Sellers</h2>
-              </div>
-
-              <ol className="ad-best-sellers-list">
-                {bestSellers.map((item, index) => (
-                  <li key={item.name} className="ad-best-seller-item">
-                    <span className="ad-seller-rank">{index + 1}</span>
-                    <span className="ad-seller-name">{item.name}</span>
-                    <span className="ad-seller-sales">
-                      {formatPeso(item.sales)}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-
-              <button type="button" className="ad-ghost-action-btn">
-                View Details
-              </button>
-            </section>
-
-            <section className="ad-dashboard-card ad-low-stock-card">
-              <div className="ad-section-head">
-                <h2>Low On Stocks</h2>
-              </div>
-
-              <ol className="ad-best-sellers-list">
-                {lowOnStocks.map((item, index) => (
-                  <li key={item.name} className="ad-best-seller-item">
-                    <span className="ad-seller-rank">{index + 1}</span>
-                    <span className="ad-seller-name">{item.name}</span>
-                    <span className="ad-seller-sales">{item.stock}</span>
-                  </li>
-                ))}
-              </ol>
-
-              <button type="button" className="ad-ghost-action-btn">
-                View Details
-              </button>
-            </section>
-          </div>
-          </>
+            </>
           )}
         </div>
       </div>

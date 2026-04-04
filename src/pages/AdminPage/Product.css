@@ -193,8 +193,37 @@
   scrollbar-width: none;
 }
 
+.membership-card-wrapper {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-top: 0.5rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .product-card-wrapper::-webkit-scrollbar {
   display: none;
+}
+
+/* Membership Cards Container - Scrollable */
+.membership-cards-container {
+  background-color: #efefef;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  padding: 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  border-radius: 30px;
+  overflow: hidden;
 }
 
 /* Fixed Daily Rate Card - NOT Scrollable */
