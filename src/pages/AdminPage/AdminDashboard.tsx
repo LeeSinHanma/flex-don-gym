@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBackOutline, menuOutline } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
@@ -57,24 +57,17 @@ const AdminDashboard: React.FC = () => {
 
   const revenueChange = 8.4;
 
-  const [revenueTrendLabels, setRevenueTrendLabels] = useState<string[]>([]);
-  const [revenueTrendData, setRevenueTrendData] = useState<number[]>([]);
-
-  const [revenueSources, setRevenueSources] = useState<{ label: string; amount: number; percent: number; }[]>([]);
+  const [revenueTrend, setRevenueTrend] = useState<{ labels: string[]; data: number[] } | null>(null);
+  const [revenueSources, setRevenueSources] = useState<{ label: string; amount: number; percent: number; }[] | null>(null);
   const sourceColors = ["#0f766e", "#34d399", "#3b82f6", "#f59e0b", "#8b5cf6"];
 
   const [latestPayments, setLatestPayments] = useState<
-    { date: string; type: string; amount: number }[]
-  >([]);
+    { date: string; type: string; amount: number }[] | null
+  >(null);
 
   const [membershipPlans, setMembershipPlans] = useState<
-    { label: string; count: number }[]
-  >([
-    { label: "Prepaid", count: 0 },
-    { label: "Monthly", count: 0 },
-    { label: "Yearly", count: 0 },
-    { label: "Student", count: 0 },
-  ]);
+    { label: string; count: number }[] | null
+  >(null);
 
   const membershipColors = ["#14b8a6", "#22c55e", "#38bdf8", "#f59e0b"];
 
@@ -94,16 +87,16 @@ const AdminDashboard: React.FC = () => {
     { name: "Lifting Straps", stock: 1 },
   ];
 
-  const membershipTotal = membershipPlans.reduce(
-    (total, plan) => total + plan.count,
-    0,
+  const membershipTotal = useMemo(() => 
+    membershipPlans?.reduce((total, plan) => total + plan.count, 0) ?? 0,
+    [membershipPlans]
   );
 
   const lineChartData = {
-    labels: revenueTrendLabels,
+    labels: revenueTrend?.labels || [],
     datasets: [
       {
-        data: revenueTrendData,
+        data: revenueTrend?.data || [],
         borderColor: "#18a65a",
         backgroundColor: "rgba(24, 166, 90, 0.12)",
         borderWidth: 3,
@@ -146,7 +139,7 @@ const AdminDashboard: React.FC = () => {
 
   const stackedSourceData = {
     labels: ["Revenue Sources"],
-    datasets: revenueSources.map((source, index) => ({
+    datasets: (revenueSources || []).map((source, index) => ({
       label: source.label,
       data: [source.amount],
       backgroundColor: sourceColors[index % sourceColors.length],
@@ -189,10 +182,10 @@ const AdminDashboard: React.FC = () => {
   };
 
   const donutData = {
-    labels: membershipPlans.map((plan) => plan.label),
+    labels: (membershipPlans || []).map((plan) => plan.label),
     datasets: [
       {
-        data: membershipPlans.map((plan) => plan.count),
+        data: (membershipPlans || []).map((plan) => plan.count),
         backgroundColor: membershipColors,
         borderColor: "#ffffff",
         borderWidth: 3,
@@ -228,6 +221,10 @@ const AdminDashboard: React.FC = () => {
     try {
       const platform = Capacitor.getPlatform();
 
+      // Reset for loading
+      setMembershipPlans(null);
+      setLatestPayments(null);
+
       if (platform === "web") {
         // Fetch from API on web
         const [members, types, transactions] = await Promise.all([
@@ -255,18 +252,21 @@ const AdminDashboard: React.FC = () => {
           amount: t.total_price,
         }));
         setLatestPayments(formattedTransactions);
-
-        // Note: For checkInsToday on web, we would need a visits API that returns all visits.
-        // For now, we'll leave it at 0 or fetch if available.
       } else {
         // Fetch from SQLite on native
         const distribution = await getMembershipDistribution();
         if (distribution && distribution.length > 0) {
           setMembershipPlans(distribution);
+        } else {
+          setMembershipPlans([]);
         }
+        // Latest payments for native? Assuming handled or just set to [] for now
+        setLatestPayments([]);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
+      setMembershipPlans([]);
+      setLatestPayments([]);
     }
   }, [isReady]);
 
@@ -292,6 +292,11 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const range = selectedPeriod === "Weekly" ? "7d" : selectedPeriod === "Monthly" ? "30d" : "365d";
     
+    // Reset states for loading
+    setRevenueTrend(null);
+    setCurrentRevenue(0);
+    setRevenueSources(null);
+
     getRevenueLastDays(range)
       .then((res) => {
         setRevenueSubtitle(`Total revenue for the last ${res.period_days} days`);
@@ -301,8 +306,10 @@ const AdminDashboard: React.FC = () => {
 
     getRevenueLine(range)
       .then((res) => {
-        setRevenueTrendLabels(res.points.map((p) => p.label));
-        setRevenueTrendData(res.points.map((p) => p.revenue));
+        setRevenueTrend({
+          labels: res.points.map((p) => p.label),
+          data: res.points.map((p) => p.revenue)
+        });
       })
       .catch(console.error);
 
@@ -436,7 +443,14 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="ad-chart-container ad-revenue-chart">
-              <Line data={lineChartData} options={lineChartOptions} />
+              {revenueTrend === null ? (
+                <IonSkeletonText 
+                  animated={true} 
+                  style={{ width: '100%', height: '220px', borderRadius: '8px' }} 
+                />
+              ) : (
+                <Line data={lineChartData} options={lineChartOptions} />
+              )}
             </div>
           </section>
 
@@ -446,21 +460,38 @@ const AdminDashboard: React.FC = () => {
             </div>
 
             <div className="ad-chart-container ad-source-chart">
-              <Bar data={stackedSourceData} options={stackedSourceOptions} />
+              {revenueSources === null ? (
+                <IonSkeletonText 
+                  animated={true} 
+                  style={{ width: '100%', height: '100px', borderRadius: '8px' }} 
+                />
+              ) : (
+                <Bar data={stackedSourceData} options={stackedSourceOptions} />
+              )}
             </div>
 
             <ul className="ad-source-list">
-              {revenueSources.map((source, index) => (
-                <li key={`${source.label}-${index}`} className="ad-source-item">
-                  <span className="ad-source-name">{source.label}</span>
-                  <span className="ad-source-amount">
-                    {formatPeso(source.amount)}
-                  </span>
-                  <span className="ad-change-badge ad-neutral">
-                    {source.percent}%
-                  </span>
-                </li>
-              ))}
+              {revenueSources === null ? (
+                [1, 2, 3].map((i) => (
+                  <li key={`source-skeleton-${i}`} className="ad-source-item">
+                    <IonSkeletonText animated={true} style={{ width: '40%', height: '14px' }} />
+                    <IonSkeletonText animated={true} style={{ width: '25%', height: '14px' }} />
+                    <IonSkeletonText animated={true} style={{ width: '15%', height: '14px' }} />
+                  </li>
+                ))
+              ) : (
+                revenueSources.map((source, index) => (
+                  <li key={`${source.label}-${index}`} className="ad-source-item">
+                    <span className="ad-source-name">{source.label}</span>
+                    <span className="ad-source-amount">
+                      {formatPeso(source.amount)}
+                    </span>
+                    <span className="ad-change-badge ad-neutral">
+                      {source.percent}%
+                    </span>
+                  </li>
+                ))
+              )}
             </ul>
           </section>
 
@@ -480,13 +511,23 @@ const AdminDashboard: React.FC = () => {
                     </thead>
 
                     <tbody>
-                      {latestPayments.map((payment, index) => (
-                        <tr key={`${payment.date}-${payment.type}-${index}`}>
-                          <td>{payment.date}</td>
-                          <td>{payment.type}</td>
-                          <td>{formatPeso(payment.amount)}</td>
-                        </tr>
-                      ))}
+                      {latestPayments === null ? (
+                        [1, 2, 3, 4, 5].map((i) => (
+                          <tr key={`payment-skeleton-${i}`}>
+                            <td><IonSkeletonText animated={true} style={{ width: '80px' }} /></td>
+                            <td><IonSkeletonText animated={true} style={{ width: '60px' }} /></td>
+                            <td><IonSkeletonText animated={true} style={{ width: '70px' }} /></td>
+                          </tr>
+                        ))
+                      ) : (
+                        latestPayments.map((payment, index) => (
+                          <tr key={`${payment.date}-${payment.type}-${index}`}>
+                            <td>{payment.date}</td>
+                            <td>{payment.type}</td>
+                            <td>{formatPeso(payment.amount)}</td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -504,43 +545,65 @@ const AdminDashboard: React.FC = () => {
 
                   <div className="ad-membership-layout">
                     <ul className="ad-membership-legend">
-                      {membershipPlans.map((plan, index) => {
-                        const percentage =
-                          membershipTotal > 0
-                            ? Math.round((plan.count / membershipTotal) * 100)
-                            : 0;
-                        return (
-                          <li
-                            key={plan.label}
-                            className="ad-membership-legend-item"
-                          >
+                      {membershipPlans === null ? (
+                        [1, 2, 3, 4].map((i) => (
+                          <li key={`plan-skeleton-${i}`} className="ad-membership-legend-item">
                             <div className="ad-legend-title-wrap">
-                              <span
-                                className="ad-legend-dot"
-                                aria-hidden="true"
-                                style={{
-                                  backgroundColor: membershipColors[index],
-                                }}
-                              />
-                              <span>{plan.label}</span>
+                              <span className="ad-legend-dot" style={{ backgroundColor: '#e0e0e0' }} />
+                              <IonSkeletonText animated={true} style={{ width: '60px' }} />
                             </div>
-                            <span className="ad-legend-count">
-                              {plan.count}
-                            </span>
-                            <span className="ad-change-badge ad-neutral">
-                              {percentage}%
-                            </span>
+                            <IonSkeletonText animated={true} style={{ width: '30px' }} />
+                            <IonSkeletonText animated={true} style={{ width: '40px' }} />
                           </li>
-                        );
-                      })}
+                        ))
+                      ) : (
+                        membershipPlans.map((plan, index) => {
+                          const percentage =
+                            membershipTotal > 0
+                              ? Math.round((plan.count / membershipTotal) * 100)
+                              : 0;
+                          return (
+                            <li
+                              key={plan.label}
+                              className="ad-membership-legend-item"
+                            >
+                              <div className="ad-legend-title-wrap">
+                                <span
+                                  className="ad-legend-dot"
+                                  aria-hidden="true"
+                                  style={{
+                                    backgroundColor: membershipColors[index % membershipColors.length],
+                                  }}
+                                />
+                                <span>{plan.label}</span>
+                              </div>
+                              <span className="ad-legend-count">
+                                {plan.count}
+                                </span>
+                              <span className="ad-change-badge ad-neutral">
+                                {percentage}%
+                              </span>
+                            </li>
+                          );
+                        })
+                      )}
                     </ul>
 
                     <div className="ad-chart-container ad-donut-chart">
-                      <Doughnut data={donutData} options={donutOptions} />
+                      {membershipPlans === null ? (
+                        <IonSkeletonText 
+                          animated={true} 
+                          style={{ width: '150px', height: '150px', borderRadius: '50%' }} 
+                        />
+                      ) : (
+                        <Doughnut data={donutData} options={donutOptions} />
+                      )}
                     </div>
                   </div>
 
-                  <button type="button" className="ad-ghost-action-btn">
+                  <button type="button" className="ad-ghost-action-btn"
+                  onClick={() => history.push("/status-member")}
+                  >
                     View Details
                   </button>
                 </section>
