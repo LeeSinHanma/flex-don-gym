@@ -50,7 +50,7 @@ const ProductPage: React.FC = () => {
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [scanTarget, setScanTarget] = useState<"itemId" | "search">("itemId");
   const [sortType, setSortType] = useState<
-    "default" | "name-asc" | "name-desc" | "price-asc" | "price-desc"
+    "default" | "name-asc" | "name-desc" | "price-asc" | "price-desc" | "stock-asc" | "stock-desc"
   >("default");
 
   const [stockFilter, setStockFilter] = useState<
@@ -160,6 +160,12 @@ const ProductPage: React.FC = () => {
         break;
       case "price-desc":
         result.sort((a, b) => b.price - a.price);
+        break;
+      case "stock-asc":
+        result.sort((a, b) => a.quantity - b.quantity);
+        break;
+      case "stock-desc":
+        result.sort((a, b) => b.quantity - a.quantity);
         break;
     }
 
@@ -341,6 +347,24 @@ const ProductPage: React.FC = () => {
                     }}
                   >
                     Price High → Low
+                  </button>
+                  <button
+                    className={sortType === "stock-asc" ? "active" : ""}
+                    onClick={() => {
+                      setSortType("stock-asc");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                    Stock Low → High
+                  </button>
+                  <button
+                    className={sortType === "stock-desc" ? "active" : ""}
+                    onClick={() => {
+                      setSortType("stock-desc");
+                      setShowSortDropdown(false);
+                    }}
+                  >
+                    Stock High → Low
                   </button>
 
                   <hr />

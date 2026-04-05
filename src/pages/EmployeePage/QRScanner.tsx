@@ -453,7 +453,8 @@ const QRScannerHome: React.FC = () => {
               style={{ marginTop: "16px", display: "flex", gap: "10px" }}
             >
               {!visitResult.visit.access_granted &&
-                visitResult.visit.denial_reason === "No remaining credits" && (
+                (visitResult.visit.denial_reason === "No remaining credits" || 
+                 visitResult.visit.denial_reason === "Postpaid membership has expired") && (
                   <Button
                     type="button"
                     className="renew-btn"
@@ -615,7 +616,9 @@ const QRScannerHome: React.FC = () => {
             setVisitResult(result);
             setShowModal(true);
 
-            if (!result.visit.access_granted && result.visit.denial_reason === "No remaining credits") {
+            if (!result.visit.access_granted && 
+                (result.visit.denial_reason === "No remaining credits" || 
+                 result.visit.denial_reason === "Membership expired")) {
               const discounted = await calculateDiscountedAmount(selectedMember.member_id);
               setAmountToPay(discounted);
             }

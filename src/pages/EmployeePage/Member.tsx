@@ -351,8 +351,19 @@ const MemberMenu: React.FC = () => {
               <div 
                 className="input-username" 
                 style={{ position: "relative", display: "flex", alignItems: "center", cursor: "pointer", overflow: "hidden" }}
+                onClick={(e) => {
+                  const input = e.currentTarget.querySelector('input');
+                  if (input) {
+                    try {
+                      (input as any).showPicker();
+                    } catch (err) {
+                      // Fallback for browsers that don't support showPicker
+                      input.click();
+                    }
+                  }
+                }}
               >
-                <span>
+                <span style={{ pointerEvents: "none" }}>
                   {new Date(createdAt).toLocaleDateString("en-US", {
                     month: "long",
                     day: "numeric",

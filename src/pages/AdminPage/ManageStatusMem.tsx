@@ -14,7 +14,10 @@ import {
   Member,
   deleteMember,
   updateMember,
+  addMemberCredit,
+  AddCreditPayload,
 } from "../../logicHandlers/memberCrud";
+import { getCurrentUser } from "../../logicHandlers/userServices";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 import QrCodeModal from "../../components/Reusable/QrCodeModal";
 import StatusModal from "../../components/Reusable/StatusModal";
@@ -42,6 +45,9 @@ const ManageStatusMemPage: React.FC = () => {
   >("info");
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [showRenewConfirmModal, setShowRenewConfirmModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [amountGiven, setAmountGiven] = useState<string>("");
+  const [note, setNote] = useState("");
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -105,30 +111,45 @@ const ManageStatusMemPage: React.FC = () => {
         return;
       }
 
-      const payload = {
-        first_name: member.first_name,
-        last_name: member.last_name,
-        email: member.email,
-        contact_number: member.contact_number,
-        membership_plan_id: member.membership_plan_id,
-        membership_expiry: member.membership_expiry,
-        credits: (member.credits ?? 0) + creditsToAdd,
+      if (amountGiven === "" || Number(amountGiven) < 0) {
+        openStatusModal(
+          "Invalid Amount",
+          "Please enter a valid amount given.",
+          "warning",
+        );
+        return;
+      }
+
+      const user = getCurrentUser();
+      const payload: AddCreditPayload = {
+        credits: creditsToAdd,
+        transacted_by: String(user?.userID || user?.user_id || "unknown"),
+        payment_method: paymentMethod,
+        amount_given: Number(amountGiven),
+        note: note.trim(),
       };
 
-      const updated = await updateMember(member.member_id, payload);
+      await addMemberCredit(member.member_id, payload);
 
+      // Refresh member data
+      const updated = await getMemberById(member.member_id);
       setMember(updated);
+      
+      // Reset form
       setAddCredits("");
+      setAmountGiven("");
+      setNote("");
       setShowRenewModal(false);
 
       openStatusModal(
-        "Credits Updated",
+        "Credits Added",
         `${creditsToAdd} credits added successfully.`,
         "success",
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      openStatusModal("Update Failed", "Failed to update member.", "error");
+      setShowRenewConfirmModal(false);
+      openStatusModal("Update Failed", error.message || "Failed to add credits.", "error");
     }
   };
 
@@ -318,8 +339,13 @@ const ManageStatusMemPage: React.FC = () => {
 
       <Modal
         isOpen={showRenewModal}
-        onClose={() => setShowRenewModal(false)}
-        title="Add Credit / Duration"
+        onClose={() => {
+          setShowRenewModal(false);
+          setAddCredits("");
+          setAmountGiven("");
+          setNote("");
+        }}
+        title="Add Credit"
         showCloseButton={false}
         className="add-credit-modal"
       >
@@ -332,6 +358,41 @@ const ManageStatusMemPage: React.FC = () => {
               value={addCredits}
               onChange={(e) => setAddCredits(e.target.value)}
               placeholder="Enter credits"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Payment Method</label>
+            <select
+              className="employee-input"
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Amount Given</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={amountGiven}
+              onChange={(e) => setAmountGiven(e.target.value)}
+              placeholder="Enter amount given"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Note</label>
+            <input
+              className="employee-input"
+              type="text"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Optional note"
             />
           </div>
 
@@ -351,6 +412,8 @@ const ManageStatusMemPage: React.FC = () => {
                 setShowRenewModal(false);
                 setShowRenewConfirmModal(false);
                 setAddCredits("");
+                setAmountGiven("");
+                setNote("");
               }}
             >
               Cancel

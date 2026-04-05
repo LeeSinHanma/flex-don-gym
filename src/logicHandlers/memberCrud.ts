@@ -119,3 +119,27 @@ export async function updateMember(
     throw new Error(getErrorMessage(err));
   }
 }
+
+export type AddCreditPayload = {
+  credits: number;
+  transacted_by: string;
+  payment_method: string;
+  amount_given: number;
+  note: string;
+};
+
+// ✅ POST /members/{member_id}/add-credit
+export async function addMemberCredit(
+  memberId: string,
+  payload: AddCreditPayload,
+): Promise<APIResponse> {
+  try {
+    const res = await api.post<APIResponse>(
+      `/members/${encodeURIComponent(memberId)}/add-credit`,
+      payload,
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
