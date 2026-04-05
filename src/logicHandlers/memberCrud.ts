@@ -119,3 +119,49 @@ export async function updateMember(
     throw new Error(getErrorMessage(err));
   }
 }
+
+export type AddCreditPayload = {
+  credits: number;
+  transacted_by: string;
+  payment_method: string;
+  amount_given: number;
+  note: string;
+};
+
+// ✅ POST /members/{member_id}/add-credit
+export async function addMemberCredit(
+  memberId: string,
+  payload: AddCreditPayload,
+): Promise<APIResponse> {
+  try {
+    const res = await api.post<APIResponse>(
+      `/members/${encodeURIComponent(memberId)}/add-credit`,
+      payload,
+    );
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+export type RenewMemberPayload = {
+  member_id: string;
+  membership_plan_id: number;
+  credits: number | null;
+  transacted_by: string;
+  payment_method: string;
+  amount_given: number;
+  note: string;
+};
+
+// ✅ POST /members/renew
+export async function renewMember(
+  payload: RenewMemberPayload,
+): Promise<APIResponse> {
+  try {
+    const res = await api.post<APIResponse>("/members/renew", payload);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}

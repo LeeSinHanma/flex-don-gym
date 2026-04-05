@@ -292,8 +292,18 @@ const StatusMemberPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="client-status">
-                  {m.is_active ? "active" : "inactive"}
+                <div className={`client-status ${(() => {
+                  if (!m.membership_expiry) return "status-valid";
+                  const expiryDate = new Date(m.membership_expiry);
+                  const now = new Date();
+                  return expiryDate >= now ? "status-valid" : "status-expired";
+                })()}`}>
+                  {(() => {
+                    if (!m.membership_expiry) return "Valid";
+                    const expiryDate = new Date(m.membership_expiry);
+                    const now = new Date();
+                    return expiryDate >= now ? "Valid" : "Expired";
+                  })()}
                 </div>
               </div>
             ))

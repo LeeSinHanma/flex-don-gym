@@ -5,11 +5,13 @@ import { syncMembersFromServer } from '../logicHandlers/syncMembers';
 import { syncMembershipTypesFromServer } from '../logicHandlers/syncMembershipTypes';
 import { syncGymPricingFromServer } from '../logicHandlers/syncGymPricing';
 import { syncInventoryFromServer } from '../logicHandlers/syncInventory';
+import { healthCheck } from '../logicHandlers/healthCheck';
 
 interface InitializationContextType {
   isInitializing: boolean;
   isSyncing: boolean;
   isBackgroundSyncing: boolean;
+  isApiConnecting: boolean;
   isReady: boolean;
   error: string | null;
   initApp: (forceSync?: boolean, silent?: boolean) => Promise<void>;
@@ -27,6 +29,7 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
   const [isInitializing, setIsInitializing] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
+  const [isApiConnecting, setIsApiConnecting] = useState(false);
   const [isReady, setIsReady] = useState(hasSyncedInSession);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,13 +95,46 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
       setIsSyncing(false);
       setIsBackgroundSyncing(false);
     }
-  }, []); // Empty deps — stable reference prevents useEffect re-triggers
+  }, []);
+
+  // 3. Periodic Health Check (Every 5 minutes)
+  React.useEffect(() => {
+    const HEALTH_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
+    const checkHealth = async () => {
+      // Don't check health if already initializing/syncing
+      if (isRunning || isInitializing || isSyncing) return;
+
+      try {
+        setIsApiConnecting(true);
+        await healthCheck();
+        // If successful, we're good
+      } catch (err) {
+        console.warn('Backend Health Check failed:', err);
+        // If it fails, isApiConnecting remains true until the next successful check
+        // or a manual sync attempt succeeds.
+      } finally {
+         // Keep it true if it failed to show "Connecting"
+         // Actually, let's toggle it off only on success for better feedback
+         // Wait, if it's always true, the banner stays. Let's toggle it on 
+         // call and off on response.
+         setIsApiConnecting(false);
+      }
+    };
+
+    const interval = setInterval(checkHealth, HEALTH_CHECK_INTERVAL);
+    // Initial check on mount
+    checkHealth();
+
+    return () => clearInterval(interval);
+  }, [isInitializing, isSyncing]);
 
   return (
     <InitializationContext.Provider value={{
       isInitializing,
       isSyncing,
       isBackgroundSyncing,
+      isApiConnecting,
       isReady,
       error,
       initApp,

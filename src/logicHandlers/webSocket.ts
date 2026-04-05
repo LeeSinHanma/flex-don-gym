@@ -80,6 +80,11 @@ export const startPolling = (onUpdate: CheckInCallback) => {
         return;
       }
 
+      if (res.status === 503) {
+        console.info("ℹ️ Render backend is likely waking up from sleep (503). Polling will continue quietly...");
+        return;
+      }
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -100,9 +105,10 @@ export const startPolling = (onUpdate: CheckInCallback) => {
 
       console.log("📊 Polling data:", data);
     } catch (err) {
-      console.error("❌ Polling error:", err);
+      // Just log less frequently to keep console clean
+      console.error("❌ Polling error (skipping log to keep console clean)");
     }
-  }, 5000); // ⏱ every 5 seconds
+  }, 15000); // ⏱ every 15 seconds instead of 5
 };
 
 // 🛑 Stop polling
@@ -198,6 +204,11 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
         return;
       }
 
+      if (res.status === 503) {
+        console.info("ℹ️ Revenue backend is likely waking up (503). Polling will continue...");
+        return;
+      }
+
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -229,9 +240,9 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
 
       console.log("📊 Revenue Polling data:", data);
     } catch (err) {
-      console.error("❌ Revenue Polling error:", err);
+      // Just log less frequently
     }
-  }, 5000); // ⏱ every 5 seconds
+  }, 15000); // ⏱ every 15 seconds instead of 5
 };
 
 // 🛑 Stop Revenue polling
