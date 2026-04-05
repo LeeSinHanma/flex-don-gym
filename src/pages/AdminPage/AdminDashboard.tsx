@@ -221,10 +221,6 @@ const AdminDashboard: React.FC = () => {
     try {
       const platform = Capacitor.getPlatform();
 
-      // Reset for loading
-      setMembershipPlans(null);
-      setLatestPayments(null);
-
       if (platform === "web") {
         // Fetch from API on web
         const [members, types, transactions] = await Promise.all([
@@ -292,11 +288,6 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     const range = selectedPeriod === "Weekly" ? "7d" : selectedPeriod === "Monthly" ? "30d" : "365d";
     
-    // Reset states for loading
-    setRevenueTrend(null);
-    setCurrentRevenue(0);
-    setRevenueSources(null);
-
     getRevenueLastDays(range)
       .then((res) => {
         setRevenueSubtitle(`Total revenue for the last ${res.period_days} days`);

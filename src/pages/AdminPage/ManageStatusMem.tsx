@@ -16,9 +16,11 @@ import {
   updateMember,
   addMemberCredit,
   AddCreditPayload,
+  renewMember,
+  RenewMemberPayload,
 } from "../../logicHandlers/memberCrud";
 import { getCurrentUser } from "../../logicHandlers/userServices";
-import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
+import { getMembershipTypeById, getMembershipTypes, MembershipTypeResponse } from "../../logicHandlers/membershipCrud";
 import QrCodeModal from "../../components/Reusable/QrCodeModal";
 import StatusModal from "../../components/Reusable/StatusModal";
 
@@ -45,9 +47,15 @@ const ManageStatusMemPage: React.FC = () => {
   >("info");
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [showRenewConfirmModal, setShowRenewConfirmModal] = useState(false);
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
+  const [showRenewPlanModal, setShowRenewPlanModal] = useState(false);
+  const [membershipTypes, setMembershipTypes] = useState<MembershipTypeResponse[]>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<number>(0);
+  const [renewCredits, setRenewCredits] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [amountGiven, setAmountGiven] = useState<string>("");
   const [note, setNote] = useState("");
+  const [showPlanConfirmModal, setShowPlanConfirmModal] = useState(false);
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -88,6 +96,9 @@ const ManageStatusMemPage: React.FC = () => {
 
         const visitData = await getVisitsByMemberId(memberId);
         setVisits(visitData);
+
+        const types = await getMembershipTypes();
+        setMembershipTypes(types);
       } catch (err) {
         console.error(err);
       }
@@ -150,6 +161,65 @@ const ManageStatusMemPage: React.FC = () => {
       console.error(error);
       setShowRenewConfirmModal(false);
       openStatusModal("Update Failed", error.message || "Failed to add credits.", "error");
+    }
+  };
+
+  const handleFinalRenew = async () => {
+    if (!member) return;
+
+    try {
+      if (selectedPlanId === 0) {
+        openStatusModal("Selection Required", "Please select a membership plan.", "warning");
+        return;
+      }
+
+      if (amountGiven === "" || Number(amountGiven) < 0) {
+        openStatusModal("Invalid Amount", "Please enter a valid amount given.", "warning");
+        return;
+      }
+
+      const creditsValue = Number(renewCredits) || 0;
+      const user = getCurrentUser();
+      const payload: RenewMemberPayload = {
+        member_id: member.member_id,
+        membership_plan_id: selectedPlanId,
+        credits: creditsValue === 0 ? null : creditsValue,
+        transacted_by: String(user?.userID || user?.user_id || "unknown"),
+        payment_method: paymentMethod,
+        amount_given: Number(amountGiven),
+        note: note.trim(),
+      };
+
+      console.log("Renew Payload:", payload);
+
+      await renewMember(payload);
+
+      // Refresh data
+      const updated = await getMemberById(member.member_id);
+      setMember(updated);
+      
+      if (updated.membership_plan_id) {
+        const membershipData = await getMembershipTypeById(updated.membership_plan_id);
+        setMembershipName(membershipData.name || "Unknown");
+      }
+
+      // Reset form
+      setSelectedPlanId(0);
+      setRenewCredits("");
+      setAmountGiven("");
+      setNote("");
+      setPaymentMethod("Cash");
+      setShowRenewPlanModal(false);
+
+      openStatusModal(
+        "Membership Renewed",
+        "The membership has been successfully renewed.",
+        "success"
+      );
+    } catch (error: any) {
+      console.error(error);
+      setShowPlanConfirmModal(false);
+      openStatusModal("Renewal Failed", error.message || "Failed to renew membership.", "error");
     }
   };
 
@@ -248,9 +318,9 @@ const ManageStatusMemPage: React.FC = () => {
               <Button
                 type="button"
                 className="renew-btn"
-                onClick={() => setShowRenewModal(true)}
+                onClick={() => setShowSelectionModal(true)}
               >
-                Renew
+                Add/Renew
               </Button>
               <Button
                 type="button"
@@ -338,6 +408,170 @@ const ManageStatusMemPage: React.FC = () => {
       />
 
       <Modal
+        isOpen={showSelectionModal}
+        onClose={() => setShowSelectionModal(false)}
+        title="Choose Action"
+        showCloseButton={false}
+        className="selection-modal-v2"
+      >
+        <div className="renew-modal-content">
+          <Button
+            type="button"
+            className="renew-btn"
+            onClick={() => {
+              setShowSelectionModal(false);
+              setShowRenewModal(true); // This opens current Add Credit UI
+            }}
+          >
+            Add Credit
+          </Button>
+
+          <Button
+            type="button"
+            className="renew-btn"
+            onClick={() => {
+              setShowSelectionModal(false);
+              // Pre-fill values for renewal
+              setSelectedPlanId(member?.membership_plan_id || 0);
+              setRenewCredits("0");
+              setAmountGiven("");
+              setNote("");
+              setPaymentMethod("Cash");
+              setShowRenewPlanModal(true);
+            }}
+          >
+            Renew Membership
+          </Button>
+
+          <Button
+            type="button"
+            className="cancel-btn"
+            onClick={() => setShowSelectionModal(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={showRenewPlanModal}
+        onClose={() => {
+          setShowRenewPlanModal(false);
+          setSelectedPlanId(0);
+          setRenewCredits("");
+          setAmountGiven("");
+          setNote("");
+        }}
+        title="Renew Membership"
+        showCloseButton={false}
+        className="renew-membership-modal-v2"
+      >
+        <div className="renew-modal-content">
+          <div className="form-group">
+            <label>Select Plan</label>
+            <select
+              className="employee-input"
+              value={selectedPlanId}
+              onChange={(e) => setSelectedPlanId(Number(e.target.value))}
+            >
+              <option value="0">Select a membership plan</option>
+              {membershipTypes.map((type) => (
+                <option key={type.membership_id} value={type.membership_id}>
+                  {type.name} (₱{type.price})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Additional Credits</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={renewCredits}
+              onChange={(e) => setRenewCredits(e.target.value)}
+              placeholder="Enter credits"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Payment Method</label>
+            <select
+              className="employee-input"
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            >
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Amount Given</label>
+            <input
+              className="employee-input"
+              type="number"
+              value={amountGiven}
+              onChange={(e) => setAmountGiven(e.target.value)}
+              placeholder="Enter amount given"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Note</label>
+            <input
+              className="employee-input"
+              type="text"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Optional note"
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", marginTop: "15px", justifyContent: "center" }}>
+            <Button
+              type="button"
+              className="renew-btn"
+              onClick={() => setShowPlanConfirmModal(true)}
+            >
+              Confirm
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              onClick={() => {
+                setShowRenewPlanModal(false);
+                setShowPlanConfirmModal(false);
+                setSelectedPlanId(0);
+                setRenewCredits("");
+                setAmountGiven("");
+                setNote("");
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <ConfirmModal
+        isOpen={showPlanConfirmModal}
+        title="Confirm Renewal"
+        message={`Are you sure you want to renew the membership for ${
+          member ? `${member.first_name} ${member.last_name}` : "this member"
+        }?`}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        onCancel={() => setShowPlanConfirmModal(false)}
+        onConfirm={async () => {
+          setShowPlanConfirmModal(false);
+          await handleFinalRenew();
+        }}
+      />
+
+      <Modal
         isOpen={showRenewModal}
         onClose={() => {
           setShowRenewModal(false);
@@ -347,7 +581,7 @@ const ManageStatusMemPage: React.FC = () => {
         }}
         title="Add Credit"
         showCloseButton={false}
-        className="add-credit-modal"
+        className="add-credit-modal-v2"
       >
         <div className="renew-modal-content">
           <div className="form-group">
@@ -396,7 +630,7 @@ const ManageStatusMemPage: React.FC = () => {
             />
           </div>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+          <div style={{ display: "flex", gap: "10px", marginTop: "15px", justifyContent: "center" }}>
             <Button
               type="button"
               className="renew-btn"

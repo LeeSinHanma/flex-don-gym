@@ -101,6 +101,7 @@ const QRScannerHome: React.FC = () => {
   const [amountToPay, setAmountToPay] = useState<number | "">(0);
   const [gymPricing, setGymPricing] = useState<GymPricing | null>(null);
   const [membershipTypes, setMembershipTypes] = useState<MembershipTypeResponse[]>([]);
+  const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
 
   const scanAudio = useRef<HTMLAudioElement | null>(null);
   const errorAudio = useRef<HTMLAudioElement | null>(null);
@@ -203,9 +204,32 @@ const QRScannerHome: React.FC = () => {
   }, [processVisit]);
 
   const restartScanner = useCallback(async () => {
+    // restartScanner is mainly for manual triggers if needed,
+    // but the useEffect with isAnyModalOpen handles most cases now.
     await stopQrScanner();
     await startQrScanner("qr-reader", handleDecoded);
   }, [handleDecoded]);
+
+  // Combined modal state watcher
+  useEffect(() => {
+    const isNowOpen =
+      showModal ||
+      showSearchModal ||
+      showEmployeeMenu ||
+      showConfirmModal ||
+      showManualModal ||
+      showManualConfirm ||
+      showReceipt;
+    setIsAnyModalOpen(isNowOpen);
+  }, [
+    showModal,
+    showSearchModal,
+    showEmployeeMenu,
+    showConfirmModal,
+    showManualModal,
+    showManualConfirm,
+    showReceipt,
+  ]);
 
   useEffect(() => {
     const loadPricing = async () => {
@@ -233,13 +257,20 @@ const QRScannerHome: React.FC = () => {
       }
     };
     loadPricing();
+  }, []);
 
-    startQrScanner("qr-reader", handleDecoded);
+  // Dedicated scanner lifecycle effect
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      stopQrScanner();
+    } else {
+      startQrScanner("qr-reader", handleDecoded);
+    }
 
     return () => {
       stopQrScanner();
     };
-  }, [handleDecoded]);
+  }, [isAnyModalOpen, handleDecoded]);
 
   useEffect(() => {
     if (!showSearchModal) return;
@@ -403,7 +434,6 @@ const QRScannerHome: React.FC = () => {
         onClose={async () => {
           setShowModal(false);
           setVisitResult(null);
-          await restartScanner();
         }}
       >
         {visitResult ? (
@@ -478,7 +508,6 @@ const QRScannerHome: React.FC = () => {
                 onClick={async () => {
                   setShowModal(false);
                   setVisitResult(null);
-                  await restartScanner();
                 }}
               >
                 OK
@@ -739,7 +768,6 @@ const QRScannerHome: React.FC = () => {
           setAmountGiven("");
           setPaymentMethod("Cash");
           setReceiptData(null);
-          await restartScanner();
         }}
       >
         {receiptData ? (
@@ -780,7 +808,6 @@ const QRScannerHome: React.FC = () => {
                   setAmountGiven("");
                   setPaymentMethod("Cash");
                   setReceiptData(null);
-                  await restartScanner();
                 }}
               >
                 OK
