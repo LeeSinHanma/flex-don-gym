@@ -459,53 +459,10 @@ const AdminDashboard: React.FC = () => {
                   <span className="ad-change-badge ad-neutral">
                     {source.percent}%
                   </span>
-                </div>
-
-                <div className="ad-chart-container ad-revenue-chart">
-                  <Line data={lineChartData} options={lineChartOptions} />
-                </div>
-              </section>
-
-              <section className="ad-dashboard-card ad-source-card">
-                <div className="ad-section-head">
-                  <h2>Source</h2>
-                </div>
-
-                <div className="ad-chart-container ad-source-chart">
-                  <Bar
-                    data={stackedSourceData}
-                    options={stackedSourceOptions}
-                  />
-                </div>
-
-              <div className="ad-membership-layout">
-                <ul className="ad-membership-legend">
-                  {membershipPlans.map((plan, index) => {
-                    const percentage = membershipTotal > 0 ? Math.round(
-                      (plan.count / membershipTotal) * 100,
-                    ) : 0;
-                    return (
-                      <li
-                        key={`${plan.label}-${index}`}
-                        className="ad-membership-legend-item"
-                      >
-                        <div className="ad-legend-title-wrap">
-                          <span
-                            className="ad-legend-dot"
-                            aria-hidden="true"
-                            style={{ backgroundColor: membershipColors[index] }}
-                          />
-                          <span>{plan.label}</span>
-                        </div>
-                        <span className="ad-legend-count">{plan.count}</span>
-                        <span className="ad-change-badge ad-neutral">
-                          {percentage}%
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
+                </li>
+              ))}
+            </ul>
+          </section>
 
               <section className="ad-dashboard-card ad-table-card">
                 <div className="ad-section-head">

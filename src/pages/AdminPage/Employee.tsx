@@ -207,6 +207,7 @@ const EmployeeMenu: React.FC = () => {
             type="text"
             placeholder="Search employee"
             value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
