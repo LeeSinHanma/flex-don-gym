@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IonIcon } from "@ionic/react";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory, useLocation } from "react-router-dom";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import "./AdminDashboard.css";
 import "./ItemInfo.css";
 import { UsernameInput } from "../../components/Reusable/Username";
@@ -124,7 +124,7 @@ const ItemInfoPage: React.FC = () => {
             className="btn status-btn-back"
             onClick={() => history.push("/admin-product")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h2>Edit Products</h2>

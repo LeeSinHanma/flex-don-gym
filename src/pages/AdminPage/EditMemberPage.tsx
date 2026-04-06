@@ -4,13 +4,17 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import LoadingScreen from "../LoadingScreen";
 import QRCode from "react-qr-code";
 import "../EmployeePage/Member.css";
 
-import { getMemberById, updateMember, Member } from "../../logicHandlers/memberCrud";
+import {
+  getMemberById,
+  updateMember,
+  Member,
+} from "../../logicHandlers/memberCrud";
 
 interface RouteParams {
   memberId: string;
@@ -43,7 +47,7 @@ const EditMemberPage: React.FC = () => {
   } | null>(null);
 
   // load existing member
-    useEffect(() => {
+  useEffect(() => {
     const load = async () => {
       setIsLoading(true);
       try {
@@ -74,7 +78,12 @@ const EditMemberPage: React.FC = () => {
     const trimmedFirstName = firstName.trim();
     const trimmedLastName = lastName.trim();
 
-    if (!trimmedEmail || !trimmedContact || !trimmedFirstName || !trimmedLastName) {
+    if (
+      !trimmedEmail ||
+      !trimmedContact ||
+      !trimmedFirstName ||
+      !trimmedLastName
+    ) {
       alert("All fields are required.");
       return;
     }
@@ -117,8 +126,11 @@ const EditMemberPage: React.FC = () => {
         <div className="main-container">
           <div className="top-container">
             <div className="top-item-container">
-              <BackButton className="btn btn-back" onClick={() => history.goBack()}>
-                <IonIcon icon={arrowBackOutline} />
+              <BackButton
+                className="btn btn-back"
+                onClick={() => history.goBack()}
+              >
+                <IonIcon icon={arrowBack} />
               </BackButton>
               <h1>Edit Member</h1>
             </div>
@@ -165,7 +177,6 @@ const EditMemberPage: React.FC = () => {
                 onChange={(e: any) => setEmail(e.target.value)}
               />
             </div>
-
           </div>
           <div className="bottom-container">
             <Button className="btn-submit" type="button" onClick={handleUpdate}>
@@ -187,10 +198,18 @@ const EditMemberPage: React.FC = () => {
         >
           {acceptedData ? (
             <div className="accepted-details">
-              <p><b>Email:</b> {acceptedData.email}</p>
-              <p><b>Contact:</b> {acceptedData.contactNumber}</p>
-              <p><b>First Name:</b> {acceptedData.firstName}</p>
-              <p><b>Last Name:</b> {acceptedData.lastName}</p>
+              <p>
+                <b>Email:</b> {acceptedData.email}
+              </p>
+              <p>
+                <b>Contact:</b> {acceptedData.contactNumber}
+              </p>
+              <p>
+                <b>First Name:</b> {acceptedData.firstName}
+              </p>
+              <p>
+                <b>Last Name:</b> {acceptedData.lastName}
+              </p>
 
               <div className="qr-section">
                 <p className="qr-label">QR Code:</p>

@@ -17,7 +17,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
   width: 100%;
   max-width: 440px;
   border-radius: 0.375rem;
@@ -348,6 +347,7 @@
 
   /* ✅ fixed — keep height constrained so cards-container can scroll */
   .main-container {
+    gap: 0;
     height: 100vh;
     height: 100dvh; /* ✅ mobile viewport height */
     min-height: unset; /* ✅ remove min-height fighting against it */

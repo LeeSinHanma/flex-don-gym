@@ -4,7 +4,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import NumberInput from "../../components/Reusable/NumberInput";
 import LoadingScreen from "../LoadingScreen";
@@ -198,7 +198,7 @@ const AdminEditMembership: React.FC = () => {
                 className="btn btn-back"
                 onClick={() => history.goBack()}
               >
-                <IonIcon icon={arrowBackOutline} />
+                <IonIcon icon={arrowBack} />
               </BackButton>
               <h1>Edit Membership</h1>
             </div>

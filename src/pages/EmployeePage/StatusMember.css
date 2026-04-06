@@ -54,14 +54,14 @@
   right: 0;
   background: transparent;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: #04354f;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: background-color 0.2s ease;
 }
 
@@ -70,8 +70,8 @@
 }
 
 .status-header-row .icon-button ion-icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 }
 
 .top-header h2 {

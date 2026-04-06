@@ -4,7 +4,7 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { useHistory } from "react-router-dom";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import { arrowBack, menu, scan, filter } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import Menu from "../../components/Reusable/Menu";
 import "./AdminDashboard.css";
@@ -50,7 +50,13 @@ const ProductPage: React.FC = () => {
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [scanTarget, setScanTarget] = useState<"itemId" | "search">("itemId");
   const [sortType, setSortType] = useState<
-    "default" | "name-asc" | "name-desc" | "price-asc" | "price-desc" | "stock-asc" | "stock-desc"
+    | "default"
+    | "name-asc"
+    | "name-desc"
+    | "price-asc"
+    | "price-desc"
+    | "stock-asc"
+    | "stock-desc"
   >("default");
 
   const [stockFilter, setStockFilter] = useState<
@@ -263,12 +269,12 @@ const ProductPage: React.FC = () => {
             type="button"
             onClick={() => history.push("/admin-dashboard")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h1>Product</h1>
           <IonIcon
-            icon={menuOutline}
+            icon={menu}
             className="menu-icon"
             onClick={handleMenuClick}
           />
@@ -420,14 +426,23 @@ const ProductPage: React.FC = () => {
                       <div className="pos-status-info">
                         <div className="pos-left-info">
                           <h2 className="pos-card-product-name">
-                            <IonSkeletonText animated style={{ width: "150px", display: "block" }} />
+                            <IonSkeletonText
+                              animated
+                              style={{ width: "150px", display: "block" }}
+                            />
                           </h2>
                           <p className="pos-card-product-price">
-                            <IonSkeletonText animated style={{ width: "80px", display: "block" }} />
+                            <IonSkeletonText
+                              animated
+                              style={{ width: "80px", display: "block" }}
+                            />
                           </p>
                         </div>
                         <div className="pos-card-top-right">
-                          <IonSkeletonText animated style={{ width: "60px", display: "block" }} />
+                          <IonSkeletonText
+                            animated
+                            style={{ width: "60px", display: "block" }}
+                          />
                         </div>
                       </div>
                     </div>
@@ -442,7 +457,9 @@ const ProductPage: React.FC = () => {
               filteredItems.map((item) => (
                 <div
                   key={item.item_id}
-                  onClick={() => !isOffline && history.push("/admin-item-info", { item })}
+                  onClick={() =>
+                    !isOffline && history.push("/admin-item-info", { item })
+                  }
                   className={isOffline ? "disabled-card" : ""}
                   style={{ cursor: isOffline ? "not-allowed" : "pointer" }}
                 >

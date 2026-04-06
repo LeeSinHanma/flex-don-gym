@@ -180,7 +180,6 @@
 .product-card-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -441,7 +440,6 @@
   }
 
   .product-card-wrapper {
-    gap: 0.3rem;
     padding-top: 0.3rem;
   }
 

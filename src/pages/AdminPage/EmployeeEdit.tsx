@@ -3,20 +3,23 @@ import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import { Modal } from "../../components/Reusable/Modals";
 import StatusModal from "../../components/Reusable/StatusModal";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import { UsernameInput } from "../../components/Reusable/Username";
 import "./ManageStatusMem.css";
 
-import { getUserById, updateUser, deleteUser, User } from "../../logicHandlers/userServices";
+import {
+  getUserById,
+  updateUser,
+  deleteUser,
+  User,
+} from "../../logicHandlers/userServices";
 
 interface RouteParams {
   userId: string;
 }
-
-
 
 const EmployeeEdit: React.FC = () => {
   const history = useHistory();
@@ -29,7 +32,7 @@ const EmployeeEdit: React.FC = () => {
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmType, setConfirmType] = useState<"update" | "delete" | null>(
-    null
+    null,
   );
 
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -63,7 +66,7 @@ const EmployeeEdit: React.FC = () => {
   const openStatusModal = (
     title: string,
     message: string,
-    type: "success" | "error" | "warning" | "info" = "info"
+    type: "success" | "error" | "warning" | "info" = "info",
   ) => {
     setStatusTitle(title);
     setStatusMessage(message);
@@ -88,7 +91,7 @@ const EmployeeEdit: React.FC = () => {
     setEditAccess((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
-        : [...prev, value]
+        : [...prev, value],
     );
   };
 
@@ -148,15 +151,11 @@ const EmployeeEdit: React.FC = () => {
       openStatusModal(
         "Update Successful",
         "Employee details were updated successfully.",
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Failed to update employee:", error);
-      openStatusModal(
-        "Update Failed",
-        "Failed to update employee.",
-        "error"
-      );
+      openStatusModal("Update Failed", "Failed to update employee.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -176,15 +175,11 @@ const EmployeeEdit: React.FC = () => {
       openStatusModal(
         "Delete Successful",
         "Employee was deleted successfully.",
-        "success"
+        "success",
       );
     } catch (error) {
       console.error("Failed to delete employee:", error);
-      openStatusModal(
-        "Delete Failed",
-        "Failed to delete employee.",
-        "error"
-      );
+      openStatusModal("Delete Failed", "Failed to delete employee.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -212,7 +207,7 @@ const EmployeeEdit: React.FC = () => {
             className="btn status-btn-back"
             onClick={() => history.push("/employee-page")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
           <h2>Edit Employee</h2>
         </div>
@@ -230,20 +225,28 @@ const EmployeeEdit: React.FC = () => {
             <div className="member-details member-details-employee">
               {loading ? (
                 <>
-                  <h4><IonSkeletonText animated style={{ width: "60%" }} /></h4>
-                  <h4><IonSkeletonText animated style={{ width: "50%" }} /></h4>
-                  <h4><IonSkeletonText animated style={{ width: "40%" }} /></h4>
+                  <h4>
+                    <IonSkeletonText animated style={{ width: "60%" }} />
+                  </h4>
+                  <h4>
+                    <IonSkeletonText animated style={{ width: "50%" }} />
+                  </h4>
+                  <h4>
+                    <IonSkeletonText animated style={{ width: "40%" }} />
+                  </h4>
                 </>
               ) : (
                 <>
                   <h4>
-                    <strong>Name:</strong> {employee?.first_name} {employee?.last_name}
+                    <strong>Name:</strong> {employee?.first_name}{" "}
+                    {employee?.last_name}
                   </h4>
                   <h4>
                     <strong>Username:</strong> {employee?.username}
                   </h4>
                   <h4>
-                    <strong>Role:</strong> {employee ? getRoleName(employee.role) : ""}
+                    <strong>Role:</strong>{" "}
+                    {employee ? getRoleName(employee.role) : ""}
                   </h4>
                 </>
               )}
@@ -383,7 +386,7 @@ const EmployeeEdit: React.FC = () => {
                 openStatusModal(
                   "Update Cancelled",
                   "Employee update was cancelled.",
-                  "info"
+                  "info",
                 );
               }}
             >
@@ -410,7 +413,7 @@ const EmployeeEdit: React.FC = () => {
             openStatusModal(
               "Update Cancelled",
               "Employee update was cancelled.",
-              "info"
+              "info",
             );
           }
 
@@ -418,7 +421,7 @@ const EmployeeEdit: React.FC = () => {
             openStatusModal(
               "Delete Cancelled",
               "Employee deletion was cancelled.",
-              "info"
+              "info",
             );
           }
 

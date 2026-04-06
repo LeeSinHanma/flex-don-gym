@@ -42,7 +42,7 @@
 
 .admin-dashboard-container .admin-top-header .btn {
   position: absolute;
-  left: 1rem;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -50,11 +50,18 @@
 .admin-dashboard-container .admin-top-header .menu-icon {
   position: absolute;
   right: 1.2rem;
+  right: 0;
   top: 50%;
+  height: 32px;
+  width: 32px;
   transform: translateY(-50%);
+  border-radius: 8px;
   font-size: 1.3rem;
   cursor: pointer;
-  color: #0f172a;
+  color: #04354f;
+}
+.admin-dashboard-container .admin-top-header .menu-icon:hover {
+  background-color: rgba(4, 53, 79, 0.1);
 }
 
 .admin-dashboard-container .admin-main-content {
@@ -64,7 +71,6 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.7rem;
   padding: 0.8rem;
   overflow-y: auto;
   -ms-overflow-style: none;
@@ -312,6 +318,13 @@
   gap: 0.7rem;
 }
 
+.admin-dashboard-container .ad-top-grid {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
 .admin-dashboard-container .ad-membership-layout {
   display: grid;
   grid-template-columns: 1fr 130px;
@@ -398,6 +411,10 @@
   }
 
   .admin-dashboard-container .ad-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-container .ad-top-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -553,6 +570,11 @@
   }
 
   .admin-dashboard-container .ad-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .admin-dashboard-container .ad-top-grid {
     grid-template-columns: 1fr;
     gap: 0.6rem;
   }
