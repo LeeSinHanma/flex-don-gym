@@ -68,44 +68,120 @@ const App: React.FC = () => {
         <IonReactRouter>
           <IonRouterOutlet>
             <Switch>
-            {/* Default Redirect */}
-            <Route exact path="/">
-              <Redirect to="/get-started" />
-            </Route>
+              {/* Default Redirect */}
+              <Route exact path="/">
+                <Redirect to="/get-started" />
+              </Route>
 
-            {/* Public routes */}
-            <Route exact path="/get-started" component={GetStarted} />
-            <Route exact path="/login" component={LoginRegister} />
+              {/* Public routes */}
+              <Route exact path="/get-started" component={GetStarted} />
+              <Route exact path="/login" component={LoginRegister} />
 
-            {/* Employee Routes */}
-            <PrivateRoute exact path="/member" requiredAccess="status" component={MemberMenu} />
-            <PrivateRoute exact path="/walkin" component={WalkInMenu} />
-            <PrivateRoute exact path="/prepaid" component={PrepaidMenu} />
-            <PrivateRoute path="/qr" requiredAccess="qr-scanner" component={QRScannerHome} />
-            <PrivateRoute exact path="/status-member" requiredAccess="status" component={StatusMemberPage} />
-            <PrivateRoute exact path="/pos" requiredAccess="pos" component={PosPage} />
-            <PrivateRoute exact path="/pos-item" requiredAccess="pos" component={PosItemPage} />
-            <PrivateRoute exact path="/pos-checkout" requiredAccess="pos" component={PosCheckout} />
-            <PrivateRoute exact path="/get-started" component={GetStarted} />
-            {/* Admin Routes */}
-            <PrivateRoute exact path="/admin-page" requiredAccess="dashboard" component={StartingPageAdmin} />
-            <PrivateRoute exact path="/employee-page" requiredAccess="employees" component={EmployeeMenu} />
-            <PrivateRoute exact path="/admin-product" requiredAccess="products" component={ProductPage} />
-            <PrivateRoute exact path="/admin-membership" requiredAccess="membership-plans" component={MembershipPage} />
-            <PrivateRoute path="/manage-status/:memberId" requiredAccess="status" component={ManageStatusMemPage} />
-            <PrivateRoute path="/admin-edit-membership/:membershipId" requiredAccess="membership-plans" component={AdminEditMembership} />
-            <PrivateRoute path="/employee/edit/:userId" requiredAccess="employees" component={EmployeeEdit} exact />
-            <PrivateRoute path="/members/edit/:memberId" requiredAccess="status" component={EditMemberPage} />
-            <PrivateRoute exact path="/admin-dashboard" requiredAccess="dashboard" component={AdminDashboard} />
-            <PrivateRoute exact path="/admin-item-info" requiredAccess="products" component={ItemInfoPage} />
-            {/* Folder Route (keep last) */}
-            <Route exact path="/folder/:name" component={Page} />
-          </Switch>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </IonApp>
-  </InitializationProvider>
-);
+              {/* Employee Routes */}
+              <PrivateRoute
+                exact
+                path="/member"
+                requiredAccess="status"
+                component={MemberMenu}
+              />
+              <PrivateRoute exact path="/walkin" component={WalkInMenu} />
+              <PrivateRoute exact path="/prepaid" component={PrepaidMenu} />
+              <PrivateRoute
+                path="/qr"
+                requiredAccess="qr-scanner"
+                component={QRScannerHome}
+              />
+              <PrivateRoute
+                exact
+                path="/status-member"
+                requiredAccess="status"
+                component={StatusMemberPage}
+              />
+              <PrivateRoute
+                exact
+                path="/pos"
+                requiredAccess="pos"
+                component={PosPage}
+              />
+              <PrivateRoute
+                exact
+                path="/pos-item"
+                requiredAccess="pos"
+                component={PosItemPage}
+              />
+              <PrivateRoute
+                exact
+                path="/pos-checkout"
+                requiredAccess="pos"
+                component={PosCheckout}
+              />
+              <PrivateRoute exact path="/get-started" component={GetStarted} />
+              {/* Admin Routes */}
+              <PrivateRoute
+                exact
+                path="/admin-page"
+                requiredAccess="dashboard"
+                component={StartingPageAdmin}
+              />
+              <PrivateRoute
+                exact
+                path="/employee-page"
+                requiredAccess="employees"
+                component={EmployeeMenu}
+              />
+              <PrivateRoute
+                exact
+                path="/admin-product"
+                requiredAccess="products"
+                component={ProductPage}
+              />
+              <PrivateRoute
+                exact
+                path="/admin-membership"
+                requiredAccess="membership-plans"
+                component={MembershipPage}
+              />
+              <PrivateRoute
+                path="/manage-status/:memberId"
+                requiredAccess="status"
+                component={ManageStatusMemPage}
+              />
+              <PrivateRoute
+                path="/admin-edit-membership/:membershipId"
+                requiredAccess="membership-plans"
+                component={AdminEditMembership}
+              />
+              <PrivateRoute
+                path="/employee/edit/:userId"
+                requiredAccess="employees"
+                component={EmployeeEdit}
+                exact
+              />
+              <PrivateRoute
+                path="/members/edit/:memberId"
+                requiredAccess="status"
+                component={EditMemberPage}
+              />
+              <PrivateRoute
+                exact
+                path="/admin-dashboard"
+                requiredAccess="dashboard"
+                component={AdminDashboard}
+              />
+              <PrivateRoute
+                exact
+                path="/admin-item-info"
+                requiredAccess="products"
+                component={ItemInfoPage}
+              />
+              {/* Folder Route (keep last) */}
+              <Route exact path="/folder/:name" component={Page} />
+            </Switch>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </IonApp>
+    </InitializationProvider>
+  );
 };
 
 export default App;

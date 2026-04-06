@@ -187,18 +187,6 @@ const ItemInfoPage: React.FC = () => {
           <div className="status-button">
             <Button
               type="button"
-              className="cancel-btn"
-              disabled={!passedItem}
-              onClick={() => {
-                setConfirmType("delete");
-                setShowConfirmModal(true);
-              }}
-            >
-              Delete
-            </Button>
-
-            <Button
-              type="button"
               className="renew-btn"
               disabled={!passedItem || isSaving}
               onClick={() => {
@@ -207,6 +195,18 @@ const ItemInfoPage: React.FC = () => {
               }}
             >
               {isSaving ? "Saving..." : "Save"}
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              disabled={!passedItem}
+              onClick={() => {
+                setConfirmType("delete");
+                setShowConfirmModal(true);
+              }}
+            >
+              Delete
             </Button>
           </div>
         </div>
