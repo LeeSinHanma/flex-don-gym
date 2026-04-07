@@ -278,7 +278,7 @@ const EmployeeMenu: React.FC = () => {
                       {u.first_name} {u.last_name}
                     </h2>
                     <div className="client-details">
-                      <p className="client-type">{u.username}</p>
+                      <p className="client-type">{u.id}</p>
                     </div>
                   </div>
                 </div>

@@ -229,6 +229,9 @@ const EmployeeEdit: React.FC = () => {
                     <IonSkeletonText animated style={{ width: "60%" }} />
                   </h4>
                   <h4>
+                    <IonSkeletonText animated style={{ width: "60%" }} />
+                  </h4>
+                  <h4>
                     <IonSkeletonText animated style={{ width: "50%" }} />
                   </h4>
                   <h4>
@@ -237,6 +240,9 @@ const EmployeeEdit: React.FC = () => {
                 </>
               ) : (
                 <>
+                  <h4>
+                    <strong>ID:</strong> {employee?.id}
+                  </h4>
                   <h4>
                     <strong>Name:</strong> {employee?.first_name}{" "}
                     {employee?.last_name}
