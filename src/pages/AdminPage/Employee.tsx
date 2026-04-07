@@ -6,7 +6,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
 import Menu from "../../components/Reusable/Menu";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import StatusModal from "../../components/Reusable/StatusModal";
@@ -14,7 +14,12 @@ import "./AdminDashboard.css";
 import "./Employee.css";
 import { useNetworkStatus } from "../../hooks/useNetworkStatus";
 
-import { createUser, getUsers, getCurrentUser, User } from "../../logicHandlers/userServices";
+import {
+  createUser,
+  getUsers,
+  getCurrentUser,
+  User,
+} from "../../logicHandlers/userServices";
 
 const EmployeeMenu: React.FC = () => {
   const history = useHistory();
@@ -40,7 +45,9 @@ const EmployeeMenu: React.FC = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  const [statusType, setStatusType] = useState<"success" | "error" | "warning" | "info">("info");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const accessOptions = [
@@ -61,7 +68,7 @@ const EmployeeMenu: React.FC = () => {
     setAccess((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
-        : [...prev, value]
+        : [...prev, value],
     );
   };
 
@@ -133,7 +140,7 @@ const EmployeeMenu: React.FC = () => {
   const openStatusModal = (
     title: string,
     message: string,
-    type: "success" | "error" | "warning" | "info" = "info"
+    type: "success" | "error" | "warning" | "info" = "info",
   ) => {
     setStatusTitle(title);
     setStatusMessage(message);
@@ -143,12 +150,20 @@ const EmployeeMenu: React.FC = () => {
 
   const handleSubmit = () => {
     if (!username || !email || !password || !firstName || !lastName) {
-      openStatusModal("Missing Fields", "Please fill in all fields.", "warning");
+      openStatusModal(
+        "Missing Fields",
+        "Please fill in all fields.",
+        "warning",
+      );
       return;
     }
 
     if (role === 1 && access.length === 0) {
-      openStatusModal("Missing Access", "Please select at least one access.", "warning");
+      openStatusModal(
+        "Missing Access",
+        "Please select at least one access.",
+        "warning",
+      );
       return;
     }
 
@@ -167,7 +182,7 @@ const EmployeeMenu: React.FC = () => {
         lastName,
         role,
         access,
-        isActive
+        isActive,
       );
 
       await loadUsers();
@@ -175,7 +190,11 @@ const EmployeeMenu: React.FC = () => {
       openStatusModal("Success", "Employee created successfully.", "success");
     } catch (error: any) {
       console.error("Failed to create user:", error);
-      openStatusModal("Error", error.message || "Failed to create user.", "error");
+      openStatusModal(
+        "Error",
+        error.message || "Failed to create user.",
+        "error",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -190,12 +209,12 @@ const EmployeeMenu: React.FC = () => {
             type="button"
             onClick={() => history.push("/admin-dashboard")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h1>Employee</h1>
           <IonIcon
-            icon={menuOutline}
+            icon={menu}
             className="menu-icon"
             onClick={handleMenuClick}
           />
@@ -249,7 +268,9 @@ const EmployeeMenu: React.FC = () => {
               <div
                 key={u.id}
                 className={`status-card ${isOffline ? "disabled-card" : ""}`}
-                onClick={() => !isOffline && history.push(`/employee/edit/${u.id}`)}
+                onClick={() =>
+                  !isOffline && history.push(`/employee/edit/${u.id}`)
+                }
               >
                 <div className="status-info">
                   <div className="left-info">

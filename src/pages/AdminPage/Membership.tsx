@@ -6,7 +6,7 @@ import { Modal } from "../../components/Reusable/Modals";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import { useHistory } from "react-router-dom";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
 import StatusModal from "../../components/Reusable/StatusModal";
 import NumberInput from "../../components/Reusable/NumberInput";
 import POSCard from "../../components/Reusable/PosCard";
@@ -213,7 +213,7 @@ const MembershipPage: React.FC = () => {
             type="button"
             onClick={() => history.push("/admin-dashboard")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h1>
@@ -222,7 +222,7 @@ const MembershipPage: React.FC = () => {
           </h1>
 
           <IonIcon
-            icon={menuOutline}
+            icon={menu}
             className="menu-icon"
             onClick={handleMenuClick}
           />

@@ -36,14 +36,30 @@
 }
 .menu-top-container .btn-back {
   position: absolute;
-  left: 0;
+  left: 1rem;
+  top: 0.5rem;
 }
 
 .btn-back {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 1rem;
+  left: 1rem;
   z-index: 10;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: #04354f;
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-back:hover {
+  background-color: rgba(4, 53, 79, 0.1);
 }
 
 @media (max-width: 480px) {
@@ -66,8 +82,10 @@
   }
 
   .btn-back {
-    top: 12px;
-    left: 12px;
+    top: 0.75rem;
+    left: 0.75rem;
+    width: 40px;
+    height: 40px;
     font-size: 24px;
   }
 
