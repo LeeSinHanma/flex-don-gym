@@ -6,6 +6,8 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import Menu from "../../components/Reusable/Menu";
 import { Modal } from "../../components/Reusable/Modals";
 import { getAllTransactions, TransactionResponse, getTransactionById } from "../../logicHandlers/transactionHandler";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import "./AdminDashboard.css";
 
 const Transactions: React.FC = () => {
@@ -19,6 +21,105 @@ const Transactions: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("All");
   const itemsPerPage = 10;
+
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportStartDate, setExportStartDate] = useState("");
+  const [exportEndDate, setExportEndDate] = useState("");
+  const [exportType, setExportType] = useState("All");
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(18);
+    doc.setTextColor("#04354f");
+    doc.text("Dondon's Fitness Gym Records", 14, 22);
+    
+    // Subtitle
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+    
+    // Filters setup
+    let dateFilterText = "All Time";
+    if (exportStartDate && exportEndDate) {
+      dateFilterText = `${exportStartDate} to ${exportEndDate}`;
+    } else if (exportStartDate) {
+      dateFilterText = `From ${exportStartDate}`;
+    } else if (exportEndDate) {
+      dateFilterText = `Until ${exportEndDate}`;
+    }
+    
+    doc.setFontSize(10);
+    doc.setTextColor(50);
+    doc.text(`Type: ${exportType === "All" ? "All Types" : exportType} | Date limit: ${dateFilterText}`, 14, 36);
+
+    const exportData = transactions.filter(t => {
+      let matchType = exportType === "All" || t.transaction_type === exportType;
+      let matchDate = true;
+      const txDate = new Date(t.created_at);
+      if (exportStartDate) {
+         matchDate = matchDate && txDate >= new Date(exportStartDate);
+      }
+      if (exportEndDate) {
+         const end = new Date(exportEndDate);
+         end.setHours(23, 59, 59, 999);
+         matchDate = matchDate && txDate <= end;
+      }
+      return matchType && matchDate;
+    });
+
+    let totalAmount = 0;
+    const summary: Record<string, number> = {};
+    
+    const tableColumn = ["ID", "Date", "Type", "Handled By", "Amount"];
+    const tableRows = exportData.map(t => {
+      totalAmount += t.total_price;
+      const type = t.transaction_type;
+      summary[type] = (summary[type] || 0) + t.total_price;
+      
+      return [
+        t.transaction_id,
+        new Date(t.created_at).toLocaleDateString(),
+        t.transaction_type,
+        t.transacted_by || "N/A",
+        "PHP " + t.total_price.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      ];
+    });
+
+    // Write the summary section
+    doc.setFontSize(10);
+    doc.setTextColor(0);
+    doc.text("Summary Breakdown:", 14, 44);
+    
+    let summaryY = 50;
+    Object.entries(summary).forEach(([type, amount]) => {
+        doc.text(`${type}: PHP ${amount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, 14, summaryY);
+        summaryY += 5;
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      foot: [
+        ["", "", "", "TOTAL:", "PHP " + totalAmount.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })]
+      ],
+      showFoot: "lastPage",
+      startY: summaryY + 4,
+      headStyles: { fillColor: "#04354f" },
+      footStyles: { fillColor: "#e2e8f0", textColor: "#0f172a", fontStyle: "bold" },
+      columnStyles: {
+        0: { cellWidth: 55 }, // ID
+        1: { cellWidth: 28 }, // Date
+        2: { cellWidth: 35 }, // Type
+        3: { cellWidth: 40 }, // Handled By
+        4: { cellWidth: 32, halign: "right" } // Amount
+      }
+    });
+    
+    doc.save("transactions_report.pdf");
+    setIsExportModalOpen(false);
+  };
 
   useEffect(() => {
     const loadTransactions = async () => {
@@ -253,11 +354,93 @@ const Transactions: React.FC = () => {
                 </button>
               </div>
             )}
+            
+            <div style={{ display: "flex", justifyContent: "flex-end", padding: "0.5rem 0" }}>
+              <button
+                type="button"
+                onClick={() => setIsExportModalOpen(true)}
+                style={{
+                  padding: "0.6rem 1rem",
+                  borderRadius: "8px",
+                  border: "none",
+                  backgroundColor: "#04354f",
+                  color: "white",
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                Export PDF
+              </button>
+            </div>
           </section>
         </div>
       </div>
 
       <Menu isOpen={isMenuOpen} onClose={handleCloseMenu} />
+
+      {/* Export Settings Modal */}
+      <Modal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        title="Export PDF Settings"
+        showCloseButton={true}
+      >
+        <div style={{ padding: "1rem", color: "#0f172a", display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div>
+            <label style={{ display: "block", marginBottom: "0.4rem", fontSize: "0.9rem", fontWeight: "bold" }}>Transaction Type</label>
+            <select
+              value={exportType}
+              onChange={(e) => setExportType(e.target.value)}
+              style={{
+                width: "100%", padding: "0.6rem", borderRadius: "6px", border: "1px solid #cbd5e1"
+              }}
+            >
+              {transactionTypes.map(type => (
+                <option key={type} value={type}>
+                  {type === "All" ? "All Types" : type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label style={{ display: "block", marginBottom: "0.4rem", fontSize: "0.9rem", fontWeight: "bold" }}>Start Date (Optional)</label>
+            <input
+              type="date"
+              value={exportStartDate}
+              onChange={(e) => setExportStartDate(e.target.value)}
+              style={{ width: "100%", padding: "0.6rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: "block", marginBottom: "0.4rem", fontSize: "0.9rem", fontWeight: "bold" }}>End Date (Optional)</label>
+            <input
+              type="date"
+              value={exportEndDate}
+              onChange={(e) => setExportEndDate(e.target.value)}
+              style={{ width: "100%", padding: "0.6rem", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+            />
+          </div>
+          
+          <button
+            onClick={handleExportPDF}
+            style={{
+              padding: "0.8rem",
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: "#04354f",
+              color: "white",
+              fontSize: "1rem",
+              cursor: "pointer",
+              marginTop: "0.5rem"
+            }}
+          >
+            Generate & Download
+          </button>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={isModalOpen}

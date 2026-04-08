@@ -34,6 +34,8 @@
     "html5-qrcode": "^2.3.8",
     "ionic": "^5.4.16",
     "ionicons": "^7.4.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",
