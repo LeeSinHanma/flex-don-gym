@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
+import { Network } from '@capacitor/network';
 import { sqliteService } from '../localdb/sqliteService';
 import { syncMembersFromServer } from '../logicHandlers/syncMembers';
 import { syncMembershipTypesFromServer } from '../logicHandlers/syncMembershipTypes';
 import { syncGymPricingFromServer } from '../logicHandlers/syncGymPricing';
 import { syncInventoryFromServer } from '../logicHandlers/syncInventory';
 import { healthCheck } from '../logicHandlers/healthCheck';
+import { syncOfflineSales } from '../logicHandlers/syncSales';
 
 interface InitializationContextType {
   isInitializing: boolean;
@@ -83,6 +85,10 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
       const inventoryCount = await syncInventoryFromServer();
       console.log(`Synced ${inventoryCount} inventory items`);
 
+      // 3. Sync local sales TO server (Offline first upload)
+      const syncedSalesCount = await syncOfflineSales();
+      console.log(`Completed sync of ${syncedSalesCount} offline sales to server`);
+
       hasSyncedInSession = true;
       lastSyncTimestamp = Date.now();
       setIsReady(true);
@@ -127,7 +133,33 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
     checkHealth();
 
     return () => clearInterval(interval);
-  }, [isInitializing, isSyncing]);
+  }, [isInitializing, isSyncing, initApp]);
+
+  // 4. Real-time Network Listener (Sync on Reconnection)
+  React.useEffect(() => {
+    let listenerHandle: any = null;
+
+    const setupListener = async () => {
+      listenerHandle = await Network.addListener('networkStatusChange', (status) => {
+        console.log('📡 Network status changed:', status);
+        
+        if (status.connected) {
+          console.log('🌐 Connection restored! Triggering real-time synchronization...');
+          initApp(true, true).catch(err => {
+              console.warn('Real-time sync on reconnection failed:', err);
+          });
+        }
+      });
+    };
+
+    setupListener();
+
+    return () => {
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
+    };
+  }, [initApp]);
 
   return (
     <InitializationContext.Provider value={{

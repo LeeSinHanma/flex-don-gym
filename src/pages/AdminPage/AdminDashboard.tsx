@@ -621,8 +621,8 @@ const AdminDashboard: React.FC = () => {
                     </table>
                   </div>
 
-                  <button type="button" className="ad-ghost-action-btn">
-                    View All
+                  <button type="button" className="ad-ghost-action-btn" onClick={() => history.push("/admin-transactions")}>
+                    View All Transactions
                   </button>
                 </section>
               </div>
