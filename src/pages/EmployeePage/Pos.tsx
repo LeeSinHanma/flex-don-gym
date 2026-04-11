@@ -3,7 +3,7 @@ import { Button } from "../../components/Reusable/Button";
 import { useHistory, useLocation } from "react-router-dom";
 import "./Pos.css";
 import { IonIcon } from "@ionic/react";
-import { filter, menu } from "ionicons/icons";
+import { storefront, menu } from "ionicons/icons";
 import POSCard from "../../components/Reusable/PosCard";
 import Menu from "../../components/Reusable/Menu";
 import scanSound from "../../resource/scanSound.mp3";
@@ -103,7 +103,9 @@ const PosPage: React.FC = () => {
           try {
             item = await getInventoryItemById(itemId);
           } catch (err) {
-            console.warn("API inventory check failed, trying local fallback...");
+            console.warn(
+              "API inventory check failed, trying local fallback...",
+            );
             const local = await getLocalInventoryItemById(itemId);
             if (local) {
               item = {
@@ -266,18 +268,17 @@ const PosPage: React.FC = () => {
     <div className="pos-main-container">
       <div className="pos-container">
         <div className="pos-header">
-          <button
+          <Button
+            className="btn-more-items"
             type="button"
-            className="icon-button"
             onClick={() =>
               history.push("/pos-item", {
                 cartItems,
               })
             }
-            aria-label="Filter items"
           >
-            <IonIcon icon={filter} />
-          </button>
+            More Items
+          </Button>
           <button
             type="button"
             className="icon-button"
@@ -303,7 +304,9 @@ const PosPage: React.FC = () => {
 
         <div className="pos-card-item">
           {cartItems.length === 0 ? (
-            <p>No items scanned yet.</p>
+            <div className="pos-empty-state">
+              <p>No items scanned yet.</p>
+            </div>
           ) : (
             cartItems.map((item) => (
               <POSCard
@@ -333,7 +336,7 @@ const PosPage: React.FC = () => {
                 openStatusModal(
                   "Empty Cart",
                   "You cannot proceed to checkout because your cart is empty.",
-                  "warning"
+                  "warning",
                 );
                 return;
               }
