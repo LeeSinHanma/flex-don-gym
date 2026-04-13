@@ -11,7 +11,7 @@ export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   if (socket) return;
 
   socket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
+    "https://flexolutions-backend.onrender.com/dashboard/check-ins-today"
   );
 
   socket.onopen = () => {
@@ -71,7 +71,7 @@ export const startPolling = (onUpdate: CheckInCallback) => {
   pollingInterval = setInterval(async () => {
     try {
       const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
+        "https://flexolutions-backend.onrender.com/dashboard/check-ins-today"
       );
       
       if (res.status === 404) {
@@ -125,7 +125,7 @@ export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   if (revenueSocket) return;
 
   revenueSocket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
+    "https://flexolutions-backend.onrender.com/dashboard/revenue-today"
   );
 
   revenueSocket.onopen = () => {
@@ -195,7 +195,7 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
   revenuePollingInterval = setInterval(async () => {
     try {
       const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
+        "https://flexolutions-backend.onrender.com/dashboard/revenue-today"
       );
       
       if (res.status === 404) {

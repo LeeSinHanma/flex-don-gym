@@ -485,7 +485,7 @@ const AdminDashboard: React.FC = () => {
                             : "ad-neutral"
                         }`}
                       >
-                        {revenueChange.trend === "up" ? "+" : ""}{revenueChange.percentage}%
+                        {revenueChange.trend === "up" ? "+" : ""}{Number(revenueChange.percentage).toFixed(2)}%
                       </span>
                     )}
                   </div>
