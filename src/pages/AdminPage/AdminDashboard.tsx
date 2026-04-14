@@ -241,12 +241,27 @@ const AdminDashboard: React.FC = () => {
     try {
       const platform = Capacitor.getPlatform();
 
+      // Fetch transactions for both platforms since it hits the live API
+      try {
+        const transactions = await getAllTransactions({ limit: 5 });
+        const formattedTransactions = transactions.map((t) => ({
+          date: new Date(t.created_at)
+            .toLocaleDateString("en-GB")
+            .replace(/\//g, "-"),
+          type: t.transaction_type,
+          amount: t.total_price,
+        }));
+        setLatestPayments(formattedTransactions);
+      } catch (err) {
+        console.error("Failed to fetch latest payments:", err);
+        setLatestPayments([]);
+      }
+
       if (platform === "web") {
         // Fetch from API on web
-        const [members, types, transactions] = await Promise.all([
+        const [members, types] = await Promise.all([
           getMembers(),
           getMembershipTypes(),
-          getAllTransactions({ limit: 5 }),
         ]);
 
         // Calculate distribution
@@ -258,16 +273,6 @@ const AdminDashboard: React.FC = () => {
         });
 
         setMembershipPlans(distribution);
-
-        // Map transactions to table format
-        const formattedTransactions = transactions.map((t) => ({
-          date: new Date(t.created_at)
-            .toLocaleDateString("en-GB")
-            .replace(/\//g, "-"),
-          type: t.transaction_type,
-          amount: t.total_price,
-        }));
-        setLatestPayments(formattedTransactions);
       } else {
         // Fetch from SQLite on native
         const distribution = await getMembershipDistribution();
@@ -276,8 +281,6 @@ const AdminDashboard: React.FC = () => {
         } else {
           setMembershipPlans([]);
         }
-        // Latest payments for native? Assuming handled or just set to [] for now
-        setLatestPayments([]);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);

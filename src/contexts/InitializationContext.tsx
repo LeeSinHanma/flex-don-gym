@@ -47,6 +47,13 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
       return;
     }
 
+    // Debounce to prevent multiple immediate syncs triggering back-to-back (e.g. from network glitches)
+    if (forceSync && Date.now() - lastSyncTimestamp < 10000) {
+      console.log('Skipping sync: a synchronization just happened recently (debounce)');
+      setIsReady(true);
+      return;
+    }
+
     // Synchronous mutex — prevents concurrent calls regardless of React state timing
     if (isRunning) return;
     isRunning = true;
@@ -138,17 +145,28 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
   // 4. Real-time Network Listener (Sync on Reconnection)
   React.useEffect(() => {
     let listenerHandle: any = null;
+    let wasOffline = false;
 
     const setupListener = async () => {
+      const initialStatus = await Network.getStatus();
+      wasOffline = !initialStatus.connected;
+
       listenerHandle = await Network.addListener('networkStatusChange', (status) => {
         console.log('📡 Network status changed:', status);
         
-        if (status.connected) {
+        if (status.connected && wasOffline) {
           console.log('🌐 Connection restored! Triggering real-time synchronization...');
-          initApp(true, true).catch(err => {
-              console.warn('Real-time sync on reconnection failed:', err);
-          });
+          
+          // Prevent multiple immediate syncs if the network flickers
+          const now = Date.now();
+          if (now - lastSyncTimestamp > 10000) { // Only sync if at least 10s have passed
+            initApp(true, true).catch(err => {
+                console.warn('Real-time sync on reconnection failed:', err);
+            });
+          }
         }
+        
+        wasOffline = !status.connected;
       });
     };
 
