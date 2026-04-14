@@ -10,15 +10,11 @@ let revenuePollingInterval: any = null;
 export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   if (socket) return;
 
-  // Note: Standard browser WebSockets cannot send custom headers natively.
-  // We pass the API key as a subprotocol (Sec-WebSocket-Protocol header) and as a query parameter,
-  // which your FastAPI backend can potentially accept as an alternative to the X-API-Key header.
-  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "";
   const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
   
   socket = new WebSocket(
-    `${wsBaseURL}/dashboard/check-ins-today?api_key=${apiKey}`
+    `${wsBaseURL}/dashboard/check-ins-today`
   );
 
   socket.onopen = () => {
@@ -83,7 +79,6 @@ export const startPolling = (onUpdate: CheckInCallback) => {
         {
           headers: {
             "Content-Type": "application/json",
-            "X-API-Key": (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "",
           },
         }
       );
@@ -138,15 +133,11 @@ export const stopPolling = () => {
 export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   if (revenueSocket) return;
 
-  // Note: Standard browser WebSockets cannot send custom headers natively.
-  // We pass the API key as a subprotocol (Sec-WebSocket-Protocol header) and as a query parameter,
-  // which your FastAPI backend can potentially accept as an alternative to the X-API-Key header.
-  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "";
   const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
   
   revenueSocket = new WebSocket(
-    `${wsBaseURL}/dashboard/revenue-today?api_key=${apiKey}`
+    `${wsBaseURL}/dashboard/revenue-today`
   );
 
   revenueSocket.onopen = () => {
@@ -221,7 +212,6 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
         {
           headers: {
             "Content-Type": "application/json",
-            "X-API-Key": (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "",
           },
         }
       );
