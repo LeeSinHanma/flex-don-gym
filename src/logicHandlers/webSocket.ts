@@ -14,7 +14,7 @@ export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   // We pass the API key as a subprotocol (Sec-WebSocket-Protocol header) and as a query parameter,
   // which your FastAPI backend can potentially accept as an alternative to the X-API-Key header.
   const apiKey = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "";
-  const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
+  const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL;
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
   
   socket = new WebSocket(
@@ -215,7 +215,7 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
 
   revenuePollingInterval = setInterval(async () => {
     try {
-      const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
+      const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL;
       const res = await fetch(
         `${baseURL}/dashboard/revenue-today`,
         {
