@@ -162,6 +162,16 @@ const StatusMemberPage: React.FC = () => {
         filtered = filtered.filter((m) => m.is_active);
       } else if (selectedFilter === "Inactive") {
         filtered = filtered.filter((m) => !m.is_active);
+      } else if (selectedFilter === "Valid") {
+        filtered = filtered.filter((m) => {
+          if (!m.membership_expiry) return true;
+          return new Date(m.membership_expiry) >= new Date();
+        });
+      } else if (selectedFilter === "Expired") {
+        filtered = filtered.filter((m) => {
+          if (!m.membership_expiry) return false;
+          return new Date(m.membership_expiry) < new Date();
+        });
       } else {
         // Assume selectedFilter is a membership plan ID (number)
         filtered = filtered.filter((m) => m.membership_plan_id === selectedFilter);
@@ -227,6 +237,18 @@ const StatusMemberPage: React.FC = () => {
               onClick={() => setSelectedFilter("All")}
             >
               All
+            </div>
+            <div
+              className={`nav-item ${selectedFilter === "Valid" ? "active" : ""}`}
+              onClick={() => setSelectedFilter("Valid")}
+            >
+              Valid
+            </div>
+            <div
+              className={`nav-item ${selectedFilter === "Expired" ? "active" : ""}`}
+              onClick={() => setSelectedFilter("Expired")}
+            >
+              Expired
             </div>
             {Object.entries(membershipNames).map(([id, name]) => (
               <div

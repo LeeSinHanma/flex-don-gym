@@ -23,6 +23,7 @@ import {
   getRevenueLastDays,
   getRevenueLine,
   getRevenueSource,
+  getRevenueGrowth,
 } from "../../logicHandlers/graphHandler";
 import Menu from "../../components/Reusable/Menu";
 import {
@@ -66,7 +67,10 @@ const AdminDashboard: React.FC = () => {
   const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
   const [revenueToday, setRevenueToday] = useState<number | null>(null);
 
-  const revenueChange = 8.4;
+  const [revenueChange, setRevenueChange] = useState<{
+    percentage: number;
+    trend: string;
+  } | null>(null);
 
   const [revenueTrend, setRevenueTrend] = useState<{
     labels: string[];
@@ -302,6 +306,7 @@ const AdminDashboard: React.FC = () => {
   }, [isReady, fetchDashboardData]);
 
   useEffect(() => {
+    setRevenueChange(null);
     const range =
       selectedPeriod === "Weekly"
         ? "7d"
@@ -336,6 +341,15 @@ const AdminDashboard: React.FC = () => {
             percent: s.share,
           })),
         );
+      })
+      .catch(console.error);
+
+    getRevenueGrowth(range)
+      .then((res) => {
+        setRevenueChange({
+          percentage: res.change.percentage,
+          trend: res.change.trend,
+        });
       })
       .catch(console.error);
   }, [selectedPeriod]);
@@ -456,9 +470,24 @@ const AdminDashboard: React.FC = () => {
                     <strong className="ad-revenue-total">
                       {formatPeso(currentRevenue)}
                     </strong>
-                    <span className="ad-change-badge ad-positive">
-                      +{revenueChange}%
-                    </span>
+                    {revenueChange === null ? (
+                      <IonSkeletonText
+                        animated={true}
+                        style={{ width: "45px", height: "20px", borderRadius: "12px" }}
+                      />
+                    ) : (
+                      <span
+                        className={`ad-change-badge ${
+                          revenueChange.trend === "up"
+                            ? "ad-positive"
+                            : revenueChange.trend === "down"
+                            ? "ad-negative"
+                            : "ad-neutral"
+                        }`}
+                      >
+                        {revenueChange.trend === "up" ? "+" : ""}{Number(revenueChange.percentage).toFixed(2)}%
+                      </span>
+                    )}
                   </div>
 
                   <div className="ad-chart-container ad-revenue-chart">
@@ -592,8 +621,8 @@ const AdminDashboard: React.FC = () => {
                     </table>
                   </div>
 
-                  <button type="button" className="ad-ghost-action-btn">
-                    View All
+                  <button type="button" className="ad-ghost-action-btn" onClick={() => history.push("/admin-transactions")}>
+                    View All Transactions
                   </button>
                 </section>
               </div>

@@ -54,3 +54,17 @@ export async function saveOfflineSale(payload: CreateSalePayload, temporaryId: s
 export async function getOfflineSales() {
     return sqliteService.query<any>(`SELECT * FROM offline_sales WHERE synced = 0`);
 }
+
+export async function getOfflineSaleItems(saleId: string) {
+    return sqliteService.query<any>(
+        `SELECT * FROM offline_sale_items WHERE sale_id = ?`,
+        [saleId]
+    );
+}
+
+export async function markSaleAsSynced(saleId: string) {
+    return sqliteService.run(
+        `UPDATE offline_sales SET synced = 1 WHERE sale_id = ?`,
+        [saleId]
+    );
+}

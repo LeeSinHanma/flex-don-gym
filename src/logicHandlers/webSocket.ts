@@ -10,8 +10,15 @@ let revenuePollingInterval: any = null;
 export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   if (socket) return;
 
+  // Note: Standard browser WebSockets cannot send custom headers natively.
+  // We pass the API key as a subprotocol (Sec-WebSocket-Protocol header) and as a query parameter,
+  // which your FastAPI backend can potentially accept as an alternative to the X-API-Key header.
+  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "";
+  const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
+  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+  
   socket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
+    `${wsBaseURL}/dashboard/check-ins-today?api_key=${apiKey}`
   );
 
   socket.onopen = () => {
@@ -70,8 +77,15 @@ export const startPolling = (onUpdate: CheckInCallback) => {
 
   pollingInterval = setInterval(async () => {
     try {
+      const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
       const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
+        `${baseURL}/dashboard/check-ins-today`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "",
+          },
+        }
       );
       
       if (res.status === 404) {
@@ -124,8 +138,15 @@ export const stopPolling = () => {
 export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   if (revenueSocket) return;
 
+  // Note: Standard browser WebSockets cannot send custom headers natively.
+  // We pass the API key as a subprotocol (Sec-WebSocket-Protocol header) and as a query parameter,
+  // which your FastAPI backend can potentially accept as an alternative to the X-API-Key header.
+  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "";
+  const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
+  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+  
   revenueSocket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
+    `${wsBaseURL}/dashboard/revenue-today?api_key=${apiKey}`
   );
 
   revenueSocket.onopen = () => {
@@ -194,8 +215,15 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
 
   revenuePollingInterval = setInterval(async () => {
     try {
+      const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
       const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
+        `${baseURL}/dashboard/revenue-today`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-Key": (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_KEY : undefined) || process.env.REACT_APP_API_KEY || "",
+          },
+        }
       );
       
       if (res.status === 404) {
