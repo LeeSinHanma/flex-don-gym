@@ -159,7 +159,7 @@ const AdminDashboard: React.FC = () => {
       label: source.label,
       data: [source.amount],
       backgroundColor: sourceColors[index % sourceColors.length],
-      borderRadius: 10,
+      borderRadius: 0,
       borderSkipped: false,
       barThickness: 22,
     })),
