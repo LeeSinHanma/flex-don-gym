@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
@@ -20,7 +20,11 @@ import {
   RenewMemberPayload,
 } from "../../logicHandlers/memberCrud";
 import { getCurrentUser } from "../../logicHandlers/userServices";
-import { getMembershipTypeById, getMembershipTypes, MembershipTypeResponse } from "../../logicHandlers/membershipCrud";
+import {
+  getMembershipTypeById,
+  getMembershipTypes,
+  MembershipTypeResponse,
+} from "../../logicHandlers/membershipCrud";
 import QrCodeModal from "../../components/Reusable/QrCodeModal";
 import StatusModal from "../../components/Reusable/StatusModal";
 
@@ -49,7 +53,9 @@ const ManageStatusMemPage: React.FC = () => {
   const [showRenewConfirmModal, setShowRenewConfirmModal] = useState(false);
   const [showSelectionModal, setShowSelectionModal] = useState(false);
   const [showRenewPlanModal, setShowRenewPlanModal] = useState(false);
-  const [membershipTypes, setMembershipTypes] = useState<MembershipTypeResponse[]>([]);
+  const [membershipTypes, setMembershipTypes] = useState<
+    MembershipTypeResponse[]
+  >([]);
   const [selectedPlanId, setSelectedPlanId] = useState<number>(0);
   const [renewCredits, setRenewCredits] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
@@ -145,7 +151,7 @@ const ManageStatusMemPage: React.FC = () => {
       // Refresh member data
       const updated = await getMemberById(member.member_id);
       setMember(updated);
-      
+
       // Reset form
       setAddCredits("");
       setAmountGiven("");
@@ -160,7 +166,11 @@ const ManageStatusMemPage: React.FC = () => {
     } catch (error: any) {
       console.error(error);
       setShowRenewConfirmModal(false);
-      openStatusModal("Update Failed", error.message || "Failed to add credits.", "error");
+      openStatusModal(
+        "Update Failed",
+        error.message || "Failed to add credits.",
+        "error",
+      );
     }
   };
 
@@ -169,12 +179,20 @@ const ManageStatusMemPage: React.FC = () => {
 
     try {
       if (selectedPlanId === 0) {
-        openStatusModal("Selection Required", "Please select a membership plan.", "warning");
+        openStatusModal(
+          "Selection Required",
+          "Please select a membership plan.",
+          "warning",
+        );
         return;
       }
 
       if (amountGiven === "" || Number(amountGiven) < 0) {
-        openStatusModal("Invalid Amount", "Please enter a valid amount given.", "warning");
+        openStatusModal(
+          "Invalid Amount",
+          "Please enter a valid amount given.",
+          "warning",
+        );
         return;
       }
 
@@ -197,9 +215,11 @@ const ManageStatusMemPage: React.FC = () => {
       // Refresh data
       const updated = await getMemberById(member.member_id);
       setMember(updated);
-      
+
       if (updated.membership_plan_id) {
-        const membershipData = await getMembershipTypeById(updated.membership_plan_id);
+        const membershipData = await getMembershipTypeById(
+          updated.membership_plan_id,
+        );
         setMembershipName(membershipData.name || "Unknown");
       }
 
@@ -214,12 +234,16 @@ const ManageStatusMemPage: React.FC = () => {
       openStatusModal(
         "Membership Renewed",
         "The membership has been successfully renewed.",
-        "success"
+        "success",
       );
     } catch (error: any) {
       console.error(error);
       setShowPlanConfirmModal(false);
-      openStatusModal("Renewal Failed", error.message || "Failed to renew membership.", "error");
+      openStatusModal(
+        "Renewal Failed",
+        error.message || "Failed to renew membership.",
+        "error",
+      );
     }
   };
 
@@ -231,7 +255,7 @@ const ManageStatusMemPage: React.FC = () => {
             className="btn status-btn-back"
             onClick={() => history.push("/status-member")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
           <h2>Manage Member</h2>
         </div>
@@ -529,7 +553,14 @@ const ManageStatusMemPage: React.FC = () => {
             />
           </div>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "15px", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              marginTop: "15px",
+              justifyContent: "center",
+            }}
+          >
             <Button
               type="button"
               className="renew-btn"
@@ -630,7 +661,14 @@ const ManageStatusMemPage: React.FC = () => {
             />
           </div>
 
-          <div style={{ display: "flex", gap: "10px", marginTop: "15px", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              marginTop: "15px",
+              justifyContent: "center",
+            }}
+          >
             <Button
               type="button"
               className="renew-btn"

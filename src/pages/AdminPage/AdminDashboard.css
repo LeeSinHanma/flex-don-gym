@@ -1,23 +1,23 @@
 .admin-dashboard-container {
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: #eef1f6;
+  background-color: #d1d5db;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: 0.8rem;
   font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 .admin-dashboard-container .admin-main-container {
-  background-color: #f7f8fb;
+  background-color: #d9d9d9;
   color: #111827;
   width: 100%;
   max-width: 1100px;
   height: 95vh;
   height: 95dvh;
-  border-radius: 16px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -25,7 +25,7 @@
 }
 
 .admin-dashboard-container .admin-top-header {
-  padding: 1rem 1.5rem;
+  padding: 0.8rem 1rem;
   position: relative;
   display: flex;
   align-items: center;
@@ -37,24 +37,31 @@
   margin: 0;
   color: #0f172a;
   text-align: center;
-  font-size: 1.35rem;
+  font-size: 1.2rem;
 }
 
 .admin-dashboard-container .admin-top-header .btn {
   position: absolute;
-  left: 1rem;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .admin-dashboard-container .admin-top-header .menu-icon {
   position: absolute;
-  right: 1.5rem;
+  right: 1.2rem;
+  right: 0;
   top: 50%;
+  height: 32px;
+  width: 32px;
   transform: translateY(-50%);
-  font-size: 1.6rem;
+  border-radius: 8px;
+  font-size: 1.3rem;
   cursor: pointer;
-  color: #0f172a;
+  color: #04354f;
+}
+.admin-dashboard-container .admin-top-header .menu-icon:hover {
+  background-color: rgba(4, 53, 79, 0.1);
 }
 
 .admin-dashboard-container .admin-main-content {
@@ -64,8 +71,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.9rem;
-  padding: 1rem;
+  padding: 0.8rem;
   overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -78,15 +84,15 @@
 .admin-dashboard-container .ad-stats-row {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.9rem;
+  gap: 0.7rem;
 }
 
 .admin-dashboard-container .ad-stat-card {
-  border-radius: 14px;
-  padding: 0.95rem 1rem;
+  border-radius: 12px;
+  padding: 0.75rem 0.8rem;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .admin-dashboard-container .ad-stat-card-dark {
@@ -96,19 +102,20 @@
 }
 
 .admin-dashboard-container .ad-card-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   opacity: 0.9;
 }
 
 .admin-dashboard-container .ad-stat-value {
-  font-size: 1.65rem;
+  font-size: 1.35rem;
   line-height: 1;
 }
 
 .admin-dashboard-container .ad-dashboard-card {
   background-color: #ffffff;
-  border-radius: 14px;
-  padding: 0.95rem;
+
+  border-radius: 12px;
+  padding: 0.75rem;
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
   border: 1px solid #eef2f7;
 }
@@ -163,50 +170,50 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.7rem;
-  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+  gap: 0.6rem;
 }
 
 .admin-dashboard-container .ad-section-head h2 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #0f172a;
 }
 
 .admin-dashboard-container .ad-section-subtitle {
-  margin: 0.25rem 0 0;
+  margin: 0.2rem 0 0;
   color: #64748b;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 .admin-dashboard-container .ad-period-select {
   border: 1px solid #d6dce7;
-  border-radius: 10px;
-  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
   background-color: #ffffff;
   color: #334155;
-  font-size: 0.82rem;
+  font-size: 0.7rem;
 }
 
 .admin-dashboard-container .ad-revenue-summary-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .admin-dashboard-container .ad-revenue-total {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #111827;
 }
 
 .admin-dashboard-container .ad-change-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   border-radius: 999px;
-  padding: 0.2rem 0.55rem;
-  font-size: 0.74rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.65rem;
   font-weight: 600;
 }
 
@@ -216,7 +223,6 @@
 }
 
 .admin-dashboard-container .ad-change-badge.ad-neutral {
-  background-color: #ecfeff;
   color: #0f766e;
 }
 
@@ -226,12 +232,12 @@
 }
 
 .admin-dashboard-container .ad-revenue-chart {
-  height: 170px;
+  height: 140px;
 }
 
 .admin-dashboard-container .ad-source-chart {
-  height: 65px;
-  margin-bottom: 0.35rem;
+  height: 50px;
+  margin-bottom: 0.25rem;
   width: 100%;
 }
 
@@ -241,29 +247,29 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .admin-dashboard-container .ad-source-item {
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .admin-dashboard-container .ad-source-name {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #0f172a;
 }
 
 .admin-dashboard-container .ad-source-amount {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   color: #334155;
 }
 
 .admin-dashboard-container .ad-table-wrapper {
-  overflow-x: auto;
-  margin-bottom: 0.75rem;
+  overflow-x: hidden;
+  margin-bottom: 0.6rem;
 }
 
 .admin-dashboard-container .ad-table-card table {
@@ -275,9 +281,9 @@
 .admin-dashboard-container .ad-table-card th,
 .admin-dashboard-container .ad-table-card td {
   text-align: left;
-  padding: 0.65rem 0.4rem;
+  padding: 0.5rem 0.3rem;
   border-bottom: 1px solid #edf1f7;
-  font-size: 0.82rem;
+  font-size: 0.72rem;
 }
 
 .admin-dashboard-container .ad-table-card th {
@@ -289,13 +295,25 @@
   color: #0f172a;
 }
 
+.admin-dashboard-container .ad-table-card th:nth-child(1),
+.admin-dashboard-container .ad-table-card td:nth-child(1) {
+  width: 120px;
+  margin-right: 0.5rem;
+}
+
+.admin-dashboard-container .ad-table-card th:nth-child(2),
+.admin-dashboard-container .ad-table-card td:nth-child(2) {
+  width: 120px;
+  margin-right: 0.5rem;
+}
+
 .admin-dashboard-container .ad-ghost-action-btn {
   border: 1px solid #cdd5e3;
   background-color: #ffffff;
   color: #1e293b;
-  border-radius: 10px;
-  padding: 0.48rem 0.82rem;
-  font-size: 0.82rem;
+  border-radius: 8px;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -307,17 +325,25 @@
 }
 
 .admin-dashboard-container .ad-bottom-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.9rem;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.admin-dashboard-container .ad-top-grid {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 .admin-dashboard-container .ad-membership-layout {
   display: grid;
-  grid-template-columns: 1fr 155px;
-  gap: 0.9rem;
+  grid-template-columns: 1fr 130px;
+  gap: 0.7rem;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
 }
 
 .admin-dashboard-container .ad-membership-legend {
@@ -326,53 +352,63 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0;
 }
 
 .admin-dashboard-container .ad-membership-legend-item {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(auto, 80px) auto auto;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
+  gap: 0.2rem;
+  padding: 0.08rem 0;
+  border-bottom: 1px solid #edf1f7;
+  font-size: 0.72rem;
 }
 
 .admin-dashboard-container .ad-legend-title-wrap {
-  display: inline-flex;
+  flex: 0 0 auto;
+  display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  font-size: 0.85rem;
 }
 
 .admin-dashboard-container .ad-legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background-color: #94a3b8;
+  flex-shrink: 0;
 }
 
 .admin-dashboard-container .ad-legend-count {
   color: #334155;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: center;
 }
 
 .admin-dashboard-container .ad-donut-chart {
-  height: 160px;
+  height: 130px;
 }
 
 .admin-dashboard-container .ad-best-sellers-list {
   list-style: none;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.6rem;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 
 .admin-dashboard-container .ad-best-seller-item {
   display: grid;
-  grid-template-columns: 24px 1fr auto;
+  grid-template-columns: 20px 1fr auto;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.42rem 0;
+  gap: 0.35rem;
+  padding: 0.3rem 0;
   border-bottom: 1px solid #edf1f7;
 }
 
@@ -382,12 +418,12 @@
 }
 
 .admin-dashboard-container .ad-seller-name {
-  font-size: 0.84rem;
+  font-size: 0.74rem;
   color: #0f172a;
 }
 
 .admin-dashboard-container .ad-seller-sales {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   color: #1e293b;
   font-weight: 600;
 }
@@ -398,6 +434,10 @@
   }
 
   .admin-dashboard-container .ad-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-container .ad-top-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -429,8 +469,47 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-dashboard-container .ad-membership-legend-item {
+    gap: 0.25rem;
+    padding: 0.08rem 0;
+  }
+
+  .admin-dashboard-container .ad-legend-dot {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
   .admin-dashboard-container .ad-donut-chart {
     height: 220px;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-dashboard-container .ad-membership-legend-item {
+    gap: 0.22rem;
+    padding: 0.08rem 0;
+    font-size: 0.7rem;
+  }
+
+  .admin-dashboard-container .ad-legend-title-wrap {
+    gap: 0.22rem;
+  }
+
+  .admin-dashboard-container .ad-legend-dot {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
+  }
+
+  .admin-dashboard-container .ad-legend-count {
+    min-width: 30px;
+    font-size: 0.7rem;
+  }
+
+  .admin-dashboard-container .ad-change-badge {
+    font-size: 0.63rem;
+    padding: 0.13rem 0.35rem;
   }
 }
 
@@ -444,7 +523,7 @@
     height: 100dvh;
     min-height: 100vh;
     min-height: 100dvh;
-    border-radius: 8px;
+    border-radius: 16px;
   }
 
   .admin-dashboard-container .admin-top-header {
@@ -452,7 +531,7 @@
   }
 
   .admin-dashboard-container .admin-top-header h1 {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
   }
 
   .admin-dashboard-container .admin-top-header .menu-icon {
@@ -494,7 +573,7 @@
   }
 
   .admin-dashboard-container .ad-section-head h2 {
-    font-size: 0.9rem;
+    font-size: 1rem;
   }
 
   .admin-dashboard-container .ad-section-subtitle {
@@ -552,7 +631,39 @@
     font-size: 0.7rem;
   }
 
+  .admin-dashboard-container .ad-membership-legend-item {
+    gap: 0.2rem;
+    padding: 0.08rem 0;
+    font-size: 0.68rem;
+  }
+
+  .admin-dashboard-container .ad-legend-title-wrap {
+    gap: 0.2rem;
+  }
+
+  .admin-dashboard-container .ad-legend-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+  }
+
+  .admin-dashboard-container .ad-legend-count {
+    min-width: 28px;
+    font-size: 0.68rem;
+  }
+
+  .admin-dashboard-container .ad-change-badge {
+    font-size: 0.6rem;
+    padding: 0.12rem 0.3rem;
+  }
+
   .admin-dashboard-container .ad-bottom-grid {
+    margin-top: 0;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .admin-dashboard-container .ad-top-grid {
     grid-template-columns: 1fr;
     gap: 0.6rem;
   }
@@ -579,6 +690,118 @@
 
   .menu-buttons::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .admin-dashboard-container .ad-membership-legend-item {
+    gap: 0.15rem;
+    padding: 0.08rem 0;
+    font-size: 0.65rem;
+  }
+
+  .admin-dashboard-container .ad-legend-title-wrap {
+    gap: 0.15rem;
+    min-width: 0;
+    overflow: hidden;
+    padding-left: none;
+  }
+
+  .admin-dashboard-container .ad-legend-dot {
+    width: 9px;
+    height: 9px;
+    flex-shrink: 0;
+  }
+
+  .admin-dashboard-container .ad-legend-count {
+    min-width: 24px;
+    font-size: 0.65rem;
+  }
+
+  .admin-dashboard-container .ad-change-badge {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.25rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .admin-dashboard-container .ad-membership-legend-item {
+    gap: 0.1rem;
+    padding: 0.05rem 0;
+    font-size: 0.62rem;
+    grid-template-columns: 1fr auto auto;
+  }
+
+  .admin-dashboard-container .ad-legend-title-wrap {
+    gap: 0.1rem;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .admin-dashboard-container .ad-legend-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+
+  .admin-dashboard-container .ad-legend-count {
+    min-width: 20px;
+    font-size: 0.62rem;
+    padding: 0 0.2rem;
+  }
+
+  .admin-dashboard-container .ad-change-badge {
+    font-size: 0.52rem;
+    padding: 0.08rem 0.2rem;
+  }
+}
+
+@media (max-width: 280px) {
+  .admin-dashboard-container .ad-membership-legend-item {
+    gap: 0.08rem;
+    padding: 0.03rem 0;
+    font-size: 0.6rem;
+  }
+
+  .admin-dashboard-container .ad-legend-title-wrap {
+    gap: 0.08rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-dashboard-container .ad-legend-title-wrap span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-dashboard-container .ad-legend-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+  }
+
+  .admin-dashboard-container .ad-legend-count {
+    min-width: 18px;
+    font-size: 0.6rem;
+    padding: 0 0.15rem;
+  }
+
+  .admin-dashboard-container .ad-change-badge {
+    font-size: 0.5rem;
+    padding: 0.06rem 0.18rem;
+  }
+
+  .admin-dashboard-container .ad-donut-chart {
+    display: none;
+  }
+
+  .admin-dashboard-container .ad-membership-layout {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 }
 
@@ -678,4 +901,46 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Pagination controls */
+.pagination-btn {
+  padding: 5px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #f8fafc;
+  color: #333;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  background-color: #053a56;
+  color: white;
+  border-color: #053a56;
+}
+
+.pagination-btn.active {
+  background-color: #04354f;
+  color: white;
+  border-color: #04354f;
+  transform: scale(1.05);
+}
+
+.pagination-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.95);
+}
+
+.pagination-btn:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: #f1f5f9;
 }

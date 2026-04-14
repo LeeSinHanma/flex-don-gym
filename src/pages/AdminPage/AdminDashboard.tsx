@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { getMembershipDistribution } from "../../repositories/memberRepository";
 import { getMembers } from "../../logicHandlers/memberCrud";
@@ -13,8 +13,18 @@ import { Capacitor } from "@capacitor/core";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
 import { BackButton } from "../../components/Reusable/BackButton";
-import { connectCheckInsWS, disconnectCheckInsWS, connectRevenueWS, disconnectRevenueWS } from "../../logicHandlers/webSocket";
-import { getRevenueLastDays, getRevenueLine, getRevenueSource } from "../../logicHandlers/graphHandler";
+import {
+  connectCheckInsWS,
+  disconnectCheckInsWS,
+  connectRevenueWS,
+  disconnectRevenueWS,
+} from "../../logicHandlers/webSocket";
+import {
+  getRevenueLastDays,
+  getRevenueLine,
+  getRevenueSource,
+  getRevenueGrowth,
+} from "../../logicHandlers/graphHandler";
 import Menu from "../../components/Reusable/Menu";
 import {
   ArcElement,
@@ -48,17 +58,27 @@ ChartJS.register(
 const AdminDashboard: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
-  const [revenueSubtitle, setRevenueSubtitle] = useState("Total monthly revenue");
+  const [revenueSubtitle, setRevenueSubtitle] = useState(
+    "Total monthly revenue",
+  );
   const [currentRevenue, setCurrentRevenue] = useState(184950);
   const history = useHistory();
 
   const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
   const [revenueToday, setRevenueToday] = useState<number | null>(null);
 
-  const revenueChange = 8.4;
+  const [revenueChange, setRevenueChange] = useState<{
+    percentage: number;
+    trend: string;
+  } | null>(null);
 
-  const [revenueTrend, setRevenueTrend] = useState<{ labels: string[]; data: number[] } | null>(null);
-  const [revenueSources, setRevenueSources] = useState<{ label: string; amount: number; percent: number; }[] | null>(null);
+  const [revenueTrend, setRevenueTrend] = useState<{
+    labels: string[];
+    data: number[];
+  } | null>(null);
+  const [revenueSources, setRevenueSources] = useState<
+    { label: string; amount: number; percent: number }[] | null
+  >(null);
   const sourceColors = ["#0f766e", "#34d399", "#3b82f6", "#f59e0b", "#8b5cf6"];
 
   const [latestPayments, setLatestPayments] = useState<
@@ -87,9 +107,9 @@ const AdminDashboard: React.FC = () => {
     { name: "Lifting Straps", stock: 1 },
   ];
 
-  const membershipTotal = useMemo(() => 
-    membershipPlans?.reduce((total, plan) => total + plan.count, 0) ?? 0,
-    [membershipPlans]
+  const membershipTotal = useMemo(
+    () => membershipPlans?.reduce((total, plan) => total + plan.count, 0) ?? 0,
+    [membershipPlans],
   );
 
   const lineChartData = {
@@ -221,12 +241,27 @@ const AdminDashboard: React.FC = () => {
     try {
       const platform = Capacitor.getPlatform();
 
+      // Fetch transactions for both platforms since it hits the live API
+      try {
+        const transactions = await getAllTransactions({ limit: 5 });
+        const formattedTransactions = transactions.map((t) => ({
+          date: new Date(t.created_at)
+            .toLocaleDateString("en-GB")
+            .replace(/\//g, "-"),
+          type: t.transaction_type,
+          amount: t.total_price,
+        }));
+        setLatestPayments(formattedTransactions);
+      } catch (err) {
+        console.error("Failed to fetch latest payments:", err);
+        setLatestPayments([]);
+      }
+
       if (platform === "web") {
         // Fetch from API on web
-        const [members, types, transactions] = await Promise.all([
+        const [members, types] = await Promise.all([
           getMembers(),
           getMembershipTypes(),
-          getAllTransactions({ limit: 5 }),
         ]);
 
         // Calculate distribution
@@ -238,16 +273,6 @@ const AdminDashboard: React.FC = () => {
         });
 
         setMembershipPlans(distribution);
-
-        // Map transactions to table format
-        const formattedTransactions = transactions.map((t) => ({
-          date: new Date(t.created_at)
-            .toLocaleDateString("en-GB")
-            .replace(/\//g, "-"),
-          type: t.transaction_type,
-          amount: t.total_price,
-        }));
-        setLatestPayments(formattedTransactions);
       } else {
         // Fetch from SQLite on native
         const distribution = await getMembershipDistribution();
@@ -256,8 +281,6 @@ const AdminDashboard: React.FC = () => {
         } else {
           setMembershipPlans([]);
         }
-        // Latest payments for native? Assuming handled or just set to [] for now
-        setLatestPayments([]);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
@@ -286,11 +309,19 @@ const AdminDashboard: React.FC = () => {
   }, [isReady, fetchDashboardData]);
 
   useEffect(() => {
-    const range = selectedPeriod === "Weekly" ? "7d" : selectedPeriod === "Monthly" ? "30d" : "365d";
-    
+    setRevenueChange(null);
+    const range =
+      selectedPeriod === "Weekly"
+        ? "7d"
+        : selectedPeriod === "Monthly"
+        ? "30d"
+        : "365d";
+
     getRevenueLastDays(range)
       .then((res) => {
-        setRevenueSubtitle(`Total revenue for the last ${res.period_days} days`);
+        setRevenueSubtitle(
+          `Total revenue for the last ${res.period_days} days`,
+        );
         setCurrentRevenue(res.total_revenue);
       })
       .catch(console.error);
@@ -299,7 +330,7 @@ const AdminDashboard: React.FC = () => {
       .then((res) => {
         setRevenueTrend({
           labels: res.points.map((p) => p.label),
-          data: res.points.map((p) => p.revenue)
+          data: res.points.map((p) => p.revenue),
         });
       })
       .catch(console.error);
@@ -311,8 +342,17 @@ const AdminDashboard: React.FC = () => {
             label: s.source,
             amount: s.amount,
             percent: s.share,
-          }))
+          })),
         );
+      })
+      .catch(console.error);
+
+    getRevenueGrowth(range)
+      .then((res) => {
+        setRevenueChange({
+          percentage: res.change.percentage,
+          trend: res.change.trend,
+        });
       })
       .catch(console.error);
   }, [selectedPeriod]);
@@ -334,13 +374,13 @@ const AdminDashboard: React.FC = () => {
             type="button"
             onClick={() => history.push("/admin-page")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h1>Dashboard</h1>
 
           <IonIcon
-            icon={menuOutline}
+            icon={menu}
             className="menu-icon"
             onClick={handleMenuClick}
           />
@@ -365,168 +405,230 @@ const AdminDashboard: React.FC = () => {
           ) : (
             <>
               <div className="ad-stats-row">
-            <section className="ad-stat-card ad-stat-card-dark">
-              <span className="ad-card-label">Check-ins Today</span>
-              {checkInsToday === null ? (
-                <IonSkeletonText 
-                  animated={true} 
-                  style={{ 
-                    width: '60px', 
-                    height: '36px', 
-                    marginTop: '8px', 
-                    marginBottom: '4px',
-                    borderRadius: '4px',
-                    '--background': 'rgba(56, 189, 248, 0.1)', 
-                    '--background-rgb': '56, 189, 248' 
-                  }} 
-                />
-              ) : (
-                <strong className="ad-stat-value">{checkInsToday}</strong>
-              )}
-            </section>
-            <section className="ad-stat-card ad-stat-card-dark">
-              <span className="ad-card-label">Revenue Today</span>
-              {revenueToday === null ? (
-                <IonSkeletonText 
-                  animated={true} 
-                  style={{ 
-                    width: '60px', 
-                    height: '36px', 
-                    marginTop: '8px', 
-                    marginBottom: '4px',
-                    borderRadius: '4px',
-                    '--background': 'rgba(56, 189, 248, 0.1)', 
-                    '--background-rgb': '56, 189, 248' 
-                  }} 
-                />
-              ) : (
-                <strong className="ad-stat-value">{formatPeso(revenueToday)}</strong>
-              )}
-            </section>
-          </div>
-
-          <section className="ad-dashboard-card ad-revenue-card">
-            <div className="ad-section-head">
-              <div>
-                <h2>Revenue</h2>
-                <p className="ad-section-subtitle">{revenueSubtitle}</p>
+                <section className="ad-stat-card ad-stat-card-dark">
+                  <span className="ad-card-label">Check-ins Today</span>
+                  {checkInsToday === null ? (
+                    <IonSkeletonText
+                      animated={true}
+                      style={{
+                        width: "60px",
+                        height: "36px",
+                        marginTop: "8px",
+                        marginBottom: "4px",
+                        borderRadius: "4px",
+                        "--background": "rgba(56, 189, 248, 0.1)",
+                        "--background-rgb": "56, 189, 248",
+                      }}
+                    />
+                  ) : (
+                    <strong className="ad-stat-value">{checkInsToday}</strong>
+                  )}
+                </section>
+                <section className="ad-stat-card ad-stat-card-dark">
+                  <span className="ad-card-label">Revenue Today</span>
+                  {revenueToday === null ? (
+                    <IonSkeletonText
+                      animated={true}
+                      style={{
+                        width: "60px",
+                        height: "36px",
+                        marginTop: "8px",
+                        marginBottom: "4px",
+                        borderRadius: "4px",
+                        "--background": "rgba(56, 189, 248, 0.1)",
+                        "--background-rgb": "56, 189, 248",
+                      }}
+                    />
+                  ) : (
+                    <strong className="ad-stat-value">
+                      {formatPeso(revenueToday)}
+                    </strong>
+                  )}
+                </section>
               </div>
 
-              <select
-                className="ad-period-select"
-                value={selectedPeriod}
-                onChange={(event) => setSelectedPeriod(event.target.value)}
-                aria-label="Revenue period selector"
-              >
-                <option value="Weekly">Last 7 days</option>
-                <option value="Monthly">Last 30 days</option>
-                <option value="Quarterly">Last 365 days</option>
-              </select>
-            </div>
+              <div className="ad-top-grid">
+                <section className="ad-dashboard-card ad-revenue-card">
+                  <div className="ad-section-head">
+                    <div>
+                      <h2>Revenue</h2>
+                      <p className="ad-section-subtitle">{revenueSubtitle}</p>
+                    </div>
 
-            <div className="ad-revenue-summary-row">
-              <strong className="ad-revenue-total">
-                {formatPeso(currentRevenue)}
-              </strong>
-              <span className="ad-change-badge ad-positive">
-                +{revenueChange}%
-              </span>
-            </div>
+                    <select
+                      className="ad-period-select"
+                      value={selectedPeriod}
+                      onChange={(event) =>
+                        setSelectedPeriod(event.target.value)
+                      }
+                      aria-label="Revenue period selector"
+                    >
+                      <option value="Weekly">Last 7 days</option>
+                      <option value="Monthly">Last 30 days</option>
+                      <option value="Quarterly">Last 365 days</option>
+                    </select>
+                  </div>
 
-            <div className="ad-chart-container ad-revenue-chart">
-              {revenueTrend === null ? (
-                <IonSkeletonText 
-                  animated={true} 
-                  style={{ width: '100%', height: '220px', borderRadius: '8px' }} 
-                />
-              ) : (
-                <Line data={lineChartData} options={lineChartOptions} />
-              )}
-            </div>
-          </section>
+                  <div className="ad-revenue-summary-row">
+                    <strong className="ad-revenue-total">
+                      {formatPeso(currentRevenue)}
+                    </strong>
+                    {revenueChange === null ? (
+                      <IonSkeletonText
+                        animated={true}
+                        style={{ width: "45px", height: "20px", borderRadius: "12px" }}
+                      />
+                    ) : (
+                      <span
+                        className={`ad-change-badge ${
+                          revenueChange.trend === "up"
+                            ? "ad-positive"
+                            : revenueChange.trend === "down"
+                            ? "ad-negative"
+                            : "ad-neutral"
+                        }`}
+                      >
+                        {revenueChange.trend === "up" ? "+" : ""}{Number(revenueChange.percentage).toFixed(2)}%
+                      </span>
+                    )}
+                  </div>
 
-          <section className="ad-dashboard-card ad-source-card">
-            <div className="ad-section-head">
-              <h2>Source</h2>
-            </div>
+                  <div className="ad-chart-container ad-revenue-chart">
+                    {revenueTrend === null ? (
+                      <IonSkeletonText
+                        animated={true}
+                        style={{
+                          width: "100%",
+                          height: "220px",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    ) : (
+                      <Line data={lineChartData} options={lineChartOptions} />
+                    )}
+                  </div>
+                </section>
 
-            <div className="ad-chart-container ad-source-chart">
-              {revenueSources === null ? (
-                <IonSkeletonText 
-                  animated={true} 
-                  style={{ width: '100%', height: '100px', borderRadius: '8px' }} 
-                />
-              ) : (
-                <Bar data={stackedSourceData} options={stackedSourceOptions} />
-              )}
-            </div>
+                <section className="ad-dashboard-card ad-source-card">
+                  <div className="ad-section-head">
+                    <h2>Source</h2>
+                  </div>
 
-            <ul className="ad-source-list">
-              {revenueSources === null ? (
-                [1, 2, 3].map((i) => (
-                  <li key={`source-skeleton-${i}`} className="ad-source-item">
-                    <IonSkeletonText animated={true} style={{ width: '40%', height: '14px' }} />
-                    <IonSkeletonText animated={true} style={{ width: '25%', height: '14px' }} />
-                    <IonSkeletonText animated={true} style={{ width: '15%', height: '14px' }} />
-                  </li>
-                ))
-              ) : (
-                revenueSources.map((source, index) => (
-                  <li key={`${source.label}-${index}`} className="ad-source-item">
-                    <span className="ad-source-name">{source.label}</span>
-                    <span className="ad-source-amount">
-                      {formatPeso(source.amount)}
-                    </span>
-                    <span className="ad-change-badge ad-neutral">
-                      {source.percent}%
-                    </span>
-                  </li>
-                ))
-              )}
-            </ul>
-          </section>
+                  <div className="ad-chart-container ad-source-chart">
+                    {revenueSources === null ? (
+                      <IonSkeletonText
+                        animated={true}
+                        style={{
+                          width: "100%",
+                          height: "100px",
+                          borderRadius: "8px",
+                        }}
+                      />
+                    ) : (
+                      <Bar
+                        data={stackedSourceData}
+                        options={stackedSourceOptions}
+                      />
+                    )}
+                  </div>
 
-              <section className="ad-dashboard-card ad-table-card">
-                <div className="ad-section-head">
-                  <h2>Latest Payments</h2>
-                </div>
-
-                <div className="ad-table-wrapper">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {latestPayments === null ? (
-                        [1, 2, 3, 4, 5].map((i) => (
-                          <tr key={`payment-skeleton-${i}`}>
-                            <td><IonSkeletonText animated={true} style={{ width: '80px' }} /></td>
-                            <td><IonSkeletonText animated={true} style={{ width: '60px' }} /></td>
-                            <td><IonSkeletonText animated={true} style={{ width: '70px' }} /></td>
-                          </tr>
+                  <ul className="ad-source-list">
+                    {revenueSources === null
+                      ? [1, 2, 3].map((i) => (
+                          <li
+                            key={`source-skeleton-${i}`}
+                            className="ad-source-item"
+                          >
+                            <IonSkeletonText
+                              animated={true}
+                              style={{ width: "40%", height: "14px" }}
+                            />
+                            <IonSkeletonText
+                              animated={true}
+                              style={{ width: "25%", height: "14px" }}
+                            />
+                            <IonSkeletonText
+                              animated={true}
+                              style={{ width: "15%", height: "14px" }}
+                            />
+                          </li>
                         ))
-                      ) : (
-                        latestPayments.map((payment, index) => (
-                          <tr key={`${payment.date}-${payment.type}-${index}`}>
-                            <td>{payment.date}</td>
-                            <td>{payment.type}</td>
-                            <td>{formatPeso(payment.amount)}</td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                      : revenueSources.map((source, index) => (
+                          <li
+                            key={`${source.label}-${index}`}
+                            className="ad-source-item"
+                          >
+                            <span className="ad-source-name">
+                              {source.label}
+                            </span>
+                            <span className="ad-source-amount">
+                              {formatPeso(source.amount)}
+                            </span>
+                            <span className="ad-change-badge ad-neutral">
+                              {source.percent}%
+                            </span>
+                          </li>
+                        ))}
+                  </ul>
+                </section>
 
-                <button type="button" className="ad-ghost-action-btn">
-                  View All
-                </button>
-              </section>
+                <section className="ad-dashboard-card ad-table-card">
+                  <div className="ad-section-head">
+                    <h2>Latest Payments</h2>
+                  </div>
+
+                  <div className="ad-table-wrapper">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Type</th>
+                          <th>Amount</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {latestPayments === null
+                          ? [1, 2, 3, 4, 5].map((i) => (
+                              <tr key={`payment-skeleton-${i}`}>
+                                <td>
+                                  <IonSkeletonText
+                                    animated={true}
+                                    style={{ width: "80px" }}
+                                  />
+                                </td>
+                                <td>
+                                  <IonSkeletonText
+                                    animated={true}
+                                    style={{ width: "60px" }}
+                                  />
+                                </td>
+                                <td>
+                                  <IonSkeletonText
+                                    animated={true}
+                                    style={{ width: "70px" }}
+                                  />
+                                </td>
+                              </tr>
+                            ))
+                          : latestPayments.map((payment, index) => (
+                              <tr
+                                key={`${payment.date}-${payment.type}-${index}`}
+                              >
+                                <td>{payment.date}</td>
+                                <td>{payment.type}</td>
+                                <td>{formatPeso(payment.amount)}</td>
+                              </tr>
+                            ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <button type="button" className="ad-ghost-action-btn" onClick={() => history.push("/admin-transactions")}>
+                    View All Transactions
+                  </button>
+                </section>
+              </div>
 
               <div className="ad-bottom-grid">
                 <section className="ad-dashboard-card ad-membership-card">
@@ -536,55 +638,77 @@ const AdminDashboard: React.FC = () => {
 
                   <div className="ad-membership-layout">
                     <ul className="ad-membership-legend">
-                      {membershipPlans === null ? (
-                        [1, 2, 3, 4].map((i) => (
-                          <li key={`plan-skeleton-${i}`} className="ad-membership-legend-item">
-                            <div className="ad-legend-title-wrap">
-                              <span className="ad-legend-dot" style={{ backgroundColor: '#e0e0e0' }} />
-                              <IonSkeletonText animated={true} style={{ width: '60px' }} />
-                            </div>
-                            <IonSkeletonText animated={true} style={{ width: '30px' }} />
-                            <IonSkeletonText animated={true} style={{ width: '40px' }} />
-                          </li>
-                        ))
-                      ) : (
-                        membershipPlans.map((plan, index) => {
-                          const percentage =
-                            membershipTotal > 0
-                              ? Math.round((plan.count / membershipTotal) * 100)
-                              : 0;
-                          return (
+                      {membershipPlans === null
+                        ? [1, 2, 3, 4].map((i) => (
                             <li
-                              key={plan.label}
+                              key={`plan-skeleton-${i}`}
                               className="ad-membership-legend-item"
                             >
                               <div className="ad-legend-title-wrap">
                                 <span
                                   className="ad-legend-dot"
-                                  aria-hidden="true"
-                                  style={{
-                                    backgroundColor: membershipColors[index % membershipColors.length],
-                                  }}
+                                  style={{ backgroundColor: "#e0e0e0" }}
                                 />
-                                <span>{plan.label}</span>
+                                <IonSkeletonText
+                                  animated={true}
+                                  style={{ width: "60px" }}
+                                />
                               </div>
-                              <span className="ad-legend-count">
-                                {plan.count}
-                                </span>
-                              <span className="ad-change-badge ad-neutral">
-                                {percentage}%
-                              </span>
+                              <IonSkeletonText
+                                animated={true}
+                                style={{ width: "30px" }}
+                              />
+                              <IonSkeletonText
+                                animated={true}
+                                style={{ width: "40px" }}
+                              />
                             </li>
-                          );
-                        })
-                      )}
+                          ))
+                        : membershipPlans.map((plan, index) => {
+                            const percentage =
+                              membershipTotal > 0
+                                ? Math.round(
+                                    (plan.count / membershipTotal) * 100,
+                                  )
+                                : 0;
+                            return (
+                              <li
+                                key={plan.label}
+                                className="ad-membership-legend-item"
+                              >
+                                <div className="ad-legend-title-wrap">
+                                  <span
+                                    className="ad-legend-dot"
+                                    aria-hidden="true"
+                                    style={{
+                                      backgroundColor:
+                                        membershipColors[
+                                          index % membershipColors.length
+                                        ],
+                                    }}
+                                  />
+                                  <span>{plan.label}</span>
+                                </div>
+                                <span className="ad-legend-count">
+                                  {plan.count}
+                                </span>
+                                <span className="ad-change-badge ad-neutral">
+                                  {percentage}%
+                                </span>
+                              </li>
+                            );
+                          })}
                     </ul>
 
                     <div className="ad-chart-container ad-donut-chart">
                       {membershipPlans === null ? (
-                        <IonSkeletonText 
-                          animated={true} 
-                          style={{ width: '150px', height: '150px', borderRadius: '50%' }} 
+                        <IonSkeletonText
+                          animated={true}
+                          style={{
+                            width: "150px",
+                            height: "150px",
+                            borderRadius: "50%",
+                          }}
                         />
                       ) : (
                         <Doughnut data={donutData} options={donutOptions} />
@@ -592,8 +716,10 @@ const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <button type="button" className="ad-ghost-action-btn"
-                  onClick={() => history.push("/status-member")}
+                  <button
+                    type="button"
+                    className="ad-ghost-action-btn"
+                    onClick={() => history.push("/status-member")}
                   >
                     View Details
                   </button>

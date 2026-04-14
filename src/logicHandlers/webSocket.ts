@@ -10,8 +10,11 @@ let revenuePollingInterval: any = null;
 export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   if (socket) return;
 
+  const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
+  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+  
   socket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
+    `${wsBaseURL}/dashboard/check-ins-today`
   );
 
   socket.onopen = () => {
@@ -70,8 +73,14 @@ export const startPolling = (onUpdate: CheckInCallback) => {
 
   pollingInterval = setInterval(async () => {
     try {
+      const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
       const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
+        `${baseURL}/dashboard/check-ins-today`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       
       if (res.status === 404) {
@@ -124,8 +133,11 @@ export const stopPolling = () => {
 export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   if (revenueSocket) return;
 
+  const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
+  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+  
   revenueSocket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
+    `${wsBaseURL}/dashboard/revenue-today`
   );
 
   revenueSocket.onopen = () => {
@@ -194,8 +206,14 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
 
   revenuePollingInterval = setInterval(async () => {
     try {
+      const baseURL = (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_API_BASE_URL : undefined) || process.env.REACT_APP_API_BASE_URL || "https://flexolutions-backend.onrender.com";
       const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
+        `${baseURL}/dashboard/revenue-today`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       
       if (res.status === 404) {

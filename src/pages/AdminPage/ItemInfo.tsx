@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IonIcon } from "@ionic/react";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory, useLocation } from "react-router-dom";
-import { arrowBackOutline } from "ionicons/icons";
+import { arrowBack } from "ionicons/icons";
 import "./AdminDashboard.css";
 import "./ItemInfo.css";
 import { UsernameInput } from "../../components/Reusable/Username";
@@ -124,7 +124,7 @@ const ItemInfoPage: React.FC = () => {
             className="btn status-btn-back"
             onClick={() => history.push("/admin-product")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h2>Edit Products</h2>
@@ -187,18 +187,6 @@ const ItemInfoPage: React.FC = () => {
           <div className="status-button">
             <Button
               type="button"
-              className="cancel-btn"
-              disabled={!passedItem}
-              onClick={() => {
-                setConfirmType("delete");
-                setShowConfirmModal(true);
-              }}
-            >
-              Delete
-            </Button>
-
-            <Button
-              type="button"
               className="renew-btn"
               disabled={!passedItem || isSaving}
               onClick={() => {
@@ -207,6 +195,18 @@ const ItemInfoPage: React.FC = () => {
               }}
             >
               {isSaving ? "Saving..." : "Save"}
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              disabled={!passedItem}
+              onClick={() => {
+                setConfirmType("delete");
+                setShowConfirmModal(true);
+              }}
+            >
+              Delete
             </Button>
           </div>
         </div>

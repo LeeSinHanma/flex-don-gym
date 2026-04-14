@@ -6,7 +6,7 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBackOutline, menuOutline } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
 import Menu from "../../components/Reusable/Menu";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import StatusModal from "../../components/Reusable/StatusModal";
@@ -14,7 +14,12 @@ import "./AdminDashboard.css";
 import "./Employee.css";
 import { useNetworkStatus } from "../../hooks/useNetworkStatus";
 
-import { createUser, getUsers, getCurrentUser, User } from "../../logicHandlers/userServices";
+import {
+  createUser,
+  getUsers,
+  getCurrentUser,
+  User,
+} from "../../logicHandlers/userServices";
 
 const EmployeeMenu: React.FC = () => {
   const history = useHistory();
@@ -28,6 +33,7 @@ const EmployeeMenu: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState<number>(1);
@@ -40,7 +46,9 @@ const EmployeeMenu: React.FC = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  const [statusType, setStatusType] = useState<"success" | "error" | "warning" | "info">("info");
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const accessOptions = [
@@ -61,7 +69,7 @@ const EmployeeMenu: React.FC = () => {
     setAccess((prev) =>
       prev.includes(value)
         ? prev.filter((item) => item !== value)
-        : [...prev, value]
+        : [...prev, value],
     );
   };
 
@@ -123,6 +131,7 @@ const EmployeeMenu: React.FC = () => {
     setUsername("");
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
     setFirstName("");
     setLastName("");
     setRole(1);
@@ -133,7 +142,7 @@ const EmployeeMenu: React.FC = () => {
   const openStatusModal = (
     title: string,
     message: string,
-    type: "success" | "error" | "warning" | "info" = "info"
+    type: "success" | "error" | "warning" | "info" = "info",
   ) => {
     setStatusTitle(title);
     setStatusMessage(message);
@@ -142,13 +151,30 @@ const EmployeeMenu: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    if (!username || !email || !password || !firstName || !lastName) {
-      openStatusModal("Missing Fields", "Please fill in all fields.", "warning");
+    if (!username || !email || !password || !confirmPassword || !firstName || !lastName) {
+      openStatusModal(
+        "Missing Fields",
+        "Please fill in all fields.",
+        "warning",
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      openStatusModal(
+        "Password Mismatch",
+        "Passwords do not match.",
+        "warning",
+      );
       return;
     }
 
     if (role === 1 && access.length === 0) {
-      openStatusModal("Missing Access", "Please select at least one access.", "warning");
+      openStatusModal(
+        "Missing Access",
+        "Please select at least one access.",
+        "warning",
+      );
       return;
     }
 
@@ -167,7 +193,7 @@ const EmployeeMenu: React.FC = () => {
         lastName,
         role,
         access,
-        isActive
+        isActive,
       );
 
       await loadUsers();
@@ -175,7 +201,11 @@ const EmployeeMenu: React.FC = () => {
       openStatusModal("Success", "Employee created successfully.", "success");
     } catch (error: any) {
       console.error("Failed to create user:", error);
-      openStatusModal("Error", error.message || "Failed to create user.", "error");
+      openStatusModal(
+        "Error",
+        error.message || "Failed to create user.",
+        "error",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -190,12 +220,12 @@ const EmployeeMenu: React.FC = () => {
             type="button"
             onClick={() => history.push("/admin-dashboard")}
           >
-            <IonIcon icon={arrowBackOutline} />
+            <IonIcon icon={arrowBack} />
           </BackButton>
 
           <h1>Employee</h1>
           <IonIcon
-            icon={menuOutline}
+            icon={menu}
             className="menu-icon"
             onClick={handleMenuClick}
           />
@@ -249,7 +279,9 @@ const EmployeeMenu: React.FC = () => {
               <div
                 key={u.id}
                 className={`status-card ${isOffline ? "disabled-card" : ""}`}
-                onClick={() => !isOffline && history.push(`/employee/edit/${u.id}`)}
+                onClick={() =>
+                  !isOffline && history.push(`/employee/edit/${u.id}`)
+                }
               >
                 <div className="status-info">
                   <div className="left-info">
@@ -257,7 +289,7 @@ const EmployeeMenu: React.FC = () => {
                       {u.first_name} {u.last_name}
                     </h2>
                     <div className="client-details">
-                      <p className="client-type">{u.username}</p>
+                      <p className="client-type">{u.id}</p>
                     </div>
                   </div>
                 </div>
@@ -341,6 +373,17 @@ const EmployeeMenu: React.FC = () => {
               placeholder="Enter password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirm-password">Confirm Password</label>
+            <PasswordInput
+              id="confirm-password"
+              className="employee-input"
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
 
