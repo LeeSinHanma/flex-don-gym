@@ -7,12 +7,17 @@ import { IonIcon } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import { getCurrentUser } from "../../logicHandlers/userServices";
 import { getGymPricing } from "../../logicHandlers/gymPricing";
-import { walkInVisit } from "../../logicHandlers/visits";
+import { walkInVisit, WalkInInput } from "../../logicHandlers/visits";
 import StatusModal from "../../components/Reusable/StatusModal";
 import LoadingScreen from "../LoadingScreen";
 import { Network } from "@capacitor/network";
 import { processWalkInOffline } from "../../logicHandlers/offlineQr";
 import { getLocalGymPricing } from "../../repositories/pricingRepository";
+import {
+  getMembershipTypes,
+  MembershipTypeResponse,
+} from "../../logicHandlers/membershipCrud";
+import { getAllMembershipTypes } from "../../repositories/membershipRepository";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import "./Member.css";
 
@@ -22,6 +27,13 @@ const WalkInMenu: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "gcash">("cash");
   const [amountGiven, setAmountGiven] = useState<number | "">("");
   const [dayRate, setDayRate] = useState<number>(0);
+  const [membershipTypes, setMembershipTypes] = useState<
+    MembershipTypeResponse[]
+  >([]);
+  const [isStudentDiscount, setIsStudentDiscount] = useState(false);
+  const [selectedMembershipId, setSelectedMembershipId] = useState<number | "">(
+    "",
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   // Status Modal State
@@ -48,8 +60,20 @@ const WalkInMenu: React.FC = () => {
   useEffect(() => {
     const fetchPricing = async () => {
       try {
-        const pricing = await getGymPricing();
-        setDayRate(pricing.base_day_pass_price);
+        const status = await Network.getStatus();
+
+        if (status.connected) {
+          const pricing = await getGymPricing();
+          setDayRate(pricing.base_day_pass_price);
+          return;
+        }
+
+        const localPricing = await getLocalGymPricing();
+        if (localPricing) {
+          setDayRate(localPricing.base_day_pass_price);
+        } else {
+          setDayRate(55);
+        }
       } catch (err) {
         console.warn("Pricing API failed, trying local fallback:", err);
         const localPricing = await getLocalGymPricing();
@@ -63,10 +87,50 @@ const WalkInMenu: React.FC = () => {
     fetchPricing();
   }, []);
 
+  useEffect(() => {
+    const fetchMemberships = async () => {
+      try {
+        const status = await Network.getStatus();
+
+        if (status.connected) {
+          const memberships = await getMembershipTypes();
+          setMembershipTypes(memberships || []);
+          return;
+        }
+
+        const localMemberships = await getAllMembershipTypes();
+        setMembershipTypes(localMemberships || []);
+      } catch (err) {
+        console.warn("Membership API failed, trying local fallback:", err);
+        const localMemberships = await getAllMembershipTypes();
+        setMembershipTypes(localMemberships || []);
+      }
+    };
+
+    fetchMemberships();
+  }, []);
+
+  const selectedMembership = membershipTypes.find(
+    (membership) => membership.membership_id === selectedMembershipId,
+  );
+
+  const discountAmount =
+    isStudentDiscount && selectedMembership
+      ? Number(selectedMembership.discount_amount || 0)
+      : 0;
+
+  const amountToPay = Math.max(0, dayRate - discountAmount);
+
+  useEffect(() => {
+    if (paymentMethod === "gcash") {
+      setAmountGiven(amountToPay);
+    }
+  }, [paymentMethod, amountToPay]);
+
   const handlePaymentMethodChange = (method: "cash" | "gcash") => {
     setPaymentMethod(method);
     if (method === "gcash") {
-      setAmountGiven(dayRate);
+      setAmountGiven(amountToPay);
     }
   };
 
@@ -81,10 +145,19 @@ const WalkInMenu: React.FC = () => {
       return;
     }
 
-    if (amountGiven === "" || Number(amountGiven) < dayRate) {
+    if (isStudentDiscount && !selectedMembershipId) {
       openStatusModal(
         "Validation Error",
-        "Amount given must be at least the day rate.",
+        "Please select a membership discount for the student.",
+        "warning",
+      );
+      return;
+    }
+
+    if (amountGiven === "" || Number(amountGiven) < amountToPay) {
+      openStatusModal(
+        "Validation Error",
+        "Amount given must be at least the amount to pay.",
         "warning",
       );
       return;
@@ -98,11 +171,14 @@ const WalkInMenu: React.FC = () => {
     setIsLoading(true);
     try {
       const user = getCurrentUser();
-      const payload = {
+      const payload: WalkInInput = {
         transacted_by: String(user?.userID || user?.user_id || "unknown"),
         payment_method: paymentMethod,
         amount_given: Number(amountGiven),
         guest_label: guestLabel.trim(),
+        ...(isStudentDiscount && selectedMembership
+          ? { discount: Number(selectedMembership.discount_amount || 0) }
+          : {}),
       };
 
       const status = await Network.getStatus();
@@ -127,13 +203,13 @@ const WalkInMenu: React.FC = () => {
       setGuestLabel("");
       setAmountGiven("");
       setPaymentMethod("cash");
-    } catch (err: any) {
+      setIsStudentDiscount(false);
+      setSelectedMembershipId("");
+    } catch (err: unknown) {
       console.error("Walk-in failed:", err);
-      openStatusModal(
-        "Error",
-        err.message || "Failed to record walk-in visit.",
-        "error",
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to record walk-in visit.";
+      openStatusModal("Error", errorMessage, "error");
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +218,7 @@ const WalkInMenu: React.FC = () => {
   const calculateChange = () => {
     if (paymentMethod === "gcash") return 0;
     const given = Number(amountGiven) || 0;
-    return Math.max(0, given - dayRate);
+    return Math.max(0, given - amountToPay);
   };
 
   return (
@@ -166,7 +242,9 @@ const WalkInMenu: React.FC = () => {
                 className="input-username"
                 placeholder="Enter guest name"
                 value={guestLabel}
-                onChange={(e: any) => setGuestLabel(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setGuestLabel(e.target.value)
+                }
               />
             </div>
 
@@ -201,7 +279,64 @@ const WalkInMenu: React.FC = () => {
             <div className="form-group">
               <label>Amount to Pay</label>
               <div className="accepted-details">
-                <p>₱{dayRate.toFixed(2)}</p>
+                <p>₱{amountToPay.toFixed(2)}</p>
+              </div>
+              {isStudentDiscount && (
+                <div className="discount-summary">
+                  <small className="discount-summary-text">
+                    Base rate: ₱{dayRate.toFixed(2)} | Discount: ₱
+                    {discountAmount.toFixed(2)}
+                  </small>
+                </div>
+              )}
+            </div>
+
+            <div className="form-group">
+              <div className="student-discount-group">
+                <label className="student-checkbox-label">
+                  <input
+                    type="checkbox"
+                    className="student-checkbox"
+                    checked={isStudentDiscount}
+                    onChange={(e) => {
+                      const enabled = e.target.checked;
+                      setIsStudentDiscount(enabled);
+                      if (!enabled) {
+                        setSelectedMembershipId("");
+                      }
+                    }}
+                  />
+                  <span
+                    className="student-checkbox-custom"
+                    aria-hidden="true"
+                  />
+                  <span className="student-checkbox-text">Apply Discount</span>
+                </label>
+
+                {isStudentDiscount && (
+                  <select
+                    className="input-username student-discount-select"
+                    value={selectedMembershipId}
+                    onChange={(e) =>
+                      setSelectedMembershipId(
+                        e.target.value === "" ? "" : Number(e.target.value),
+                      )
+                    }
+                  >
+                    <option value="">Select membership</option>
+                    {membershipTypes.map((membership) => (
+                      <option
+                        key={membership.membership_id}
+                        value={membership.membership_id}
+                      >
+                        {membership.name ||
+                          `Membership ${membership.membership_id}`}{" "}
+                        - Discount ₱
+                        {Number(membership.discount_amount || 0).toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -212,7 +347,7 @@ const WalkInMenu: React.FC = () => {
                 placeholder="0.00"
                 type="number"
                 value={amountGiven}
-                onChange={(e: any) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setAmountGiven(
                     e.target.value === "" ? "" : Number(e.target.value),
                   )
@@ -247,7 +382,15 @@ const WalkInMenu: React.FC = () => {
         onCancel={() => setShowConfirmModal(false)}
         onConfirm={handleConfirm}
         title="Confirm Walk-in"
-        message={`Admit guest "${guestLabel}" with a payment of ₱${(Number(amountGiven) || 0).toFixed(2)} via ${paymentMethod === "cash" ? "Cash" : "GCash"}?`}
+        message={`Admit guest "${guestLabel}" with a payment of ₱${(
+          Number(amountGiven) || 0
+        ).toFixed(2)} via ${paymentMethod === "cash" ? "Cash" : "GCash"}${
+          isStudentDiscount && selectedMembership
+            ? ` (Student discount: ${
+                selectedMembership.name || "Selected Membership"
+              })`
+            : ""
+        }?`}
         confirmText="Confirm"
         cancelText="Cancel"
       />
@@ -269,4 +412,3 @@ const WalkInMenu: React.FC = () => {
 };
 
 export default WalkInMenu;
-
