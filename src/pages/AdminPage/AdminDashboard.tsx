@@ -23,6 +23,7 @@ import {
   getRevenueLastDays,
   getRevenueLine,
   getRevenueSource,
+  getRevenueGrowth,
 } from "../../logicHandlers/graphHandler";
 import Menu from "../../components/Reusable/Menu";
 import {
@@ -66,7 +67,10 @@ const AdminDashboard: React.FC = () => {
   const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
   const [revenueToday, setRevenueToday] = useState<number | null>(null);
 
-  const revenueChange = 8.4;
+  const [revenueChange, setRevenueChange] = useState<{
+    percentage: number;
+    trend: string;
+  } | null>(null);
 
   const [revenueTrend, setRevenueTrend] = useState<{
     labels: string[];
@@ -237,12 +241,27 @@ const AdminDashboard: React.FC = () => {
     try {
       const platform = Capacitor.getPlatform();
 
+      // Fetch transactions for both platforms since it hits the live API
+      try {
+        const transactions = await getAllTransactions({ limit: 5 });
+        const formattedTransactions = transactions.map((t) => ({
+          date: new Date(t.created_at)
+            .toLocaleDateString("en-GB")
+            .replace(/\//g, "-"),
+          type: t.transaction_type,
+          amount: t.total_price,
+        }));
+        setLatestPayments(formattedTransactions);
+      } catch (err) {
+        console.error("Failed to fetch latest payments:", err);
+        setLatestPayments([]);
+      }
+
       if (platform === "web") {
         // Fetch from API on web
-        const [members, types, transactions] = await Promise.all([
+        const [members, types] = await Promise.all([
           getMembers(),
           getMembershipTypes(),
-          getAllTransactions({ limit: 5 }),
         ]);
 
         // Calculate distribution
@@ -254,16 +273,6 @@ const AdminDashboard: React.FC = () => {
         });
 
         setMembershipPlans(distribution);
-
-        // Map transactions to table format
-        const formattedTransactions = transactions.map((t) => ({
-          date: new Date(t.created_at)
-            .toLocaleDateString("en-GB")
-            .replace(/\//g, "-"),
-          type: t.transaction_type,
-          amount: t.total_price,
-        }));
-        setLatestPayments(formattedTransactions);
       } else {
         // Fetch from SQLite on native
         const distribution = await getMembershipDistribution();
@@ -272,8 +281,6 @@ const AdminDashboard: React.FC = () => {
         } else {
           setMembershipPlans([]);
         }
-        // Latest payments for native? Assuming handled or just set to [] for now
-        setLatestPayments([]);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
@@ -302,6 +309,7 @@ const AdminDashboard: React.FC = () => {
   }, [isReady, fetchDashboardData]);
 
   useEffect(() => {
+    setRevenueChange(null);
     const range =
       selectedPeriod === "Weekly"
         ? "7d"
@@ -336,6 +344,15 @@ const AdminDashboard: React.FC = () => {
             percent: s.share,
           })),
         );
+      })
+      .catch(console.error);
+
+    getRevenueGrowth(range)
+      .then((res) => {
+        setRevenueChange({
+          percentage: res.change.percentage,
+          trend: res.change.trend,
+        });
       })
       .catch(console.error);
   }, [selectedPeriod]);
@@ -456,9 +473,24 @@ const AdminDashboard: React.FC = () => {
                     <strong className="ad-revenue-total">
                       {formatPeso(currentRevenue)}
                     </strong>
-                    <span className="ad-change-badge ad-positive">
-                      +{revenueChange}%
-                    </span>
+                    {revenueChange === null ? (
+                      <IonSkeletonText
+                        animated={true}
+                        style={{ width: "45px", height: "20px", borderRadius: "12px" }}
+                      />
+                    ) : (
+                      <span
+                        className={`ad-change-badge ${
+                          revenueChange.trend === "up"
+                            ? "ad-positive"
+                            : revenueChange.trend === "down"
+                            ? "ad-negative"
+                            : "ad-neutral"
+                        }`}
+                      >
+                        {revenueChange.trend === "up" ? "+" : ""}{Number(revenueChange.percentage).toFixed(2)}%
+                      </span>
+                    )}
                   </div>
 
                   <div className="ad-chart-container ad-revenue-chart">
@@ -592,8 +624,8 @@ const AdminDashboard: React.FC = () => {
                     </table>
                   </div>
 
-                  <button type="button" className="ad-ghost-action-btn">
-                    View All
+                  <button type="button" className="ad-ghost-action-btn" onClick={() => history.push("/admin-transactions")}>
+                    View All Transactions
                   </button>
                 </section>
               </div>

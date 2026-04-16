@@ -1,11 +1,20 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { Capacitor } from '@capacitor/core';
-import { sqliteService } from '../localdb/sqliteService';
-import { syncMembersFromServer } from '../logicHandlers/syncMembers';
-import { syncMembershipTypesFromServer } from '../logicHandlers/syncMembershipTypes';
-import { syncGymPricingFromServer } from '../logicHandlers/syncGymPricing';
-import { syncInventoryFromServer } from '../logicHandlers/syncInventory';
-import { healthCheck } from '../logicHandlers/healthCheck';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
+import { Capacitor } from "@capacitor/core";
+import { Network } from "@capacitor/network";
+import { sqliteService } from "../localdb/sqliteService";
+import { syncMembersFromServer } from "../logicHandlers/syncMembers";
+import { syncMembershipTypesFromServer } from "../logicHandlers/syncMembershipTypes";
+import { syncGymPricingFromServer } from "../logicHandlers/syncGymPricing";
+import { syncInventoryFromServer } from "../logicHandlers/syncInventory";
+import { healthCheck } from "../logicHandlers/healthCheck";
+import { syncOfflineSales } from "../logicHandlers/syncSales";
+import { syncPendingQueue } from "../logicHandlers/syncPending";
 
 interface InitializationContextType {
   isInitializing: boolean;
@@ -18,14 +27,18 @@ interface InitializationContextType {
   resetInitialization: () => void;
 }
 
-const InitializationContext = createContext<InitializationContextType | undefined>(undefined);
+const InitializationContext = createContext<
+  InitializationContextType | undefined
+>(undefined);
 
 // Module-level shared state across the entire session
 let hasSyncedInSession = false;
 let lastSyncTimestamp = 0;
 let isRunning = false; // Synchronous mutex to prevent concurrent initApp calls
 
-export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const InitializationProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [isInitializing, setIsInitializing] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isBackgroundSyncing, setIsBackgroundSyncing] = useState(false);
@@ -45,6 +58,15 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
       return;
     }
 
+    // Debounce to prevent multiple immediate syncs triggering back-to-back (e.g. from network glitches)
+    if (forceSync && Date.now() - lastSyncTimestamp < 10000) {
+      console.log(
+        "Skipping sync: a synchronization just happened recently (debounce)",
+      );
+      setIsReady(true);
+      return;
+    }
+
     // Synchronous mutex — prevents concurrent calls regardless of React state timing
     if (isRunning) return;
     isRunning = true;
@@ -58,11 +80,11 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
 
     try {
       // 1. Initialize SQLite
-      if (Capacitor.getPlatform() !== 'web') {
+      if (Capacitor.getPlatform() !== "web") {
         await sqliteService.init();
-        console.log('SQLite initialized via provider');
+        console.log("SQLite initialized via provider");
       } else {
-        console.log('Skipping SQLite init and sync on web (provider)');
+        console.log("Skipping SQLite init and sync on web (provider)");
         setIsReady(true);
         hasSyncedInSession = true; // Mark as "synced" on web too
         return;
@@ -70,7 +92,7 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
 
       // 2. Perform Synchronization
       setIsSyncing(true);
-      
+
       const memberCount = await syncMembersFromServer();
       console.log(`Synced ${memberCount} members`);
 
@@ -78,17 +100,27 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
       console.log(`Synced ${membershipTypeCount} membership types`);
 
       const pricing = await syncGymPricingFromServer();
-      console.log('Synced gym pricing:', pricing);
+      console.log("Synced gym pricing:", pricing);
 
       const inventoryCount = await syncInventoryFromServer();
       console.log(`Synced ${inventoryCount} inventory items`);
+
+      // 3. Sync local sales TO server (Offline first upload)
+      const syncedSalesCount = await syncOfflineSales();
+      console.log(
+        `Completed sync of ${syncedSalesCount} offline sales to server`,
+      );
+
+      // 4. Sync queued offline visit actions (scan/manual_admit/walk_in)
+      await syncPendingQueue();
+      console.log("Completed sync of pending offline visit actions");
 
       hasSyncedInSession = true;
       lastSyncTimestamp = Date.now();
       setIsReady(true);
     } catch (err: any) {
-      console.error('App initialization failed:', err);
-      setError(err.message || 'Unknown initialization error');
+      console.error("App initialization failed:", err);
+      setError(err.message || "Unknown initialization error");
     } finally {
       isRunning = false;
       setIsInitializing(false);
@@ -110,15 +142,15 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
         await healthCheck();
         // If successful, we're good
       } catch (err) {
-        console.warn('Backend Health Check failed:', err);
+        console.warn("Backend Health Check failed:", err);
         // If it fails, isApiConnecting remains true until the next successful check
         // or a manual sync attempt succeeds.
       } finally {
-         // Keep it true if it failed to show "Connecting"
-         // Actually, let's toggle it off only on success for better feedback
-         // Wait, if it's always true, the banner stays. Let's toggle it on 
-         // call and off on response.
-         setIsApiConnecting(false);
+        // Keep it true if it failed to show "Connecting"
+        // Actually, let's toggle it off only on success for better feedback
+        // Wait, if it's always true, the banner stays. Let's toggle it on
+        // call and off on response.
+        setIsApiConnecting(false);
       }
     };
 
@@ -127,19 +159,64 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
     checkHealth();
 
     return () => clearInterval(interval);
-  }, [isInitializing, isSyncing]);
+  }, [isInitializing, isSyncing, initApp]);
+
+  // 4. Real-time Network Listener (Sync on Reconnection)
+  React.useEffect(() => {
+    let listenerHandle: any = null;
+    let wasOffline = false;
+
+    const setupListener = async () => {
+      const initialStatus = await Network.getStatus();
+      wasOffline = !initialStatus.connected;
+
+      listenerHandle = await Network.addListener(
+        "networkStatusChange",
+        (status) => {
+          console.log("📡 Network status changed:", status);
+
+          if (status.connected && wasOffline) {
+            console.log(
+              "🌐 Connection restored! Triggering real-time synchronization...",
+            );
+
+            // Prevent multiple immediate syncs if the network flickers
+            const now = Date.now();
+            if (now - lastSyncTimestamp > 10000) {
+              // Only sync if at least 10s have passed
+              initApp(true, true).catch((err) => {
+                console.warn("Real-time sync on reconnection failed:", err);
+              });
+            }
+          }
+
+          wasOffline = !status.connected;
+        },
+      );
+    };
+
+    setupListener();
+
+    return () => {
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
+    };
+  }, [initApp]);
 
   return (
-    <InitializationContext.Provider value={{
-      isInitializing,
-      isSyncing,
-      isBackgroundSyncing,
-      isApiConnecting,
-      isReady,
-      error,
-      initApp,
-      resetInitialization
-    }}>
+    <InitializationContext.Provider
+      value={{
+        isInitializing,
+        isSyncing,
+        isBackgroundSyncing,
+        isApiConnecting,
+        isReady,
+        error,
+        initApp,
+        resetInitialization,
+      }}
+    >
       {children}
     </InitializationContext.Provider>
   );
@@ -148,7 +225,9 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({ chil
 export const useInitializationContext = () => {
   const context = useContext(InitializationContext);
   if (context === undefined) {
-    throw new Error('useInitializationContext must be used within an InitializationProvider');
+    throw new Error(
+      "useInitializationContext must be used within an InitializationProvider",
+    );
   }
   return context;
 };

@@ -1,30 +1,77 @@
 import {
-    getPendingSyncItems,
-    markPendingSyncDone,
-    markPendingSyncFailed,
+  getPendingSyncItems,
+  markPendingSyncDone,
+  markPendingSyncFailed,
 } from "../repositories/visitRepository";
-import { scanVisit, manualAdmitVisit, walkInVisit } from "./visits";
+import { syncVisits, VisitSyncRequest } from "./apiSyncVisits";
+import { manualAdmitVisit, walkInVisit } from "./visits";
 
 export async function syncPendingQueue() {
-    const items = await getPendingSyncItems();
+  const items = await getPendingSyncItems();
+  const visitSyncRequests: VisitSyncRequest[] = [];
+  const visitScanItemsToSync: any[] = []; // To keep track for marking as done
 
-    for (const item of items) {
-        try {
-            const payload = JSON.parse(item.payload_json);
+  // First pass: group only scan actions for bulk sync endpoint
+  for (const item of items) {
+    if (item.entity_type === "visit") {
+      try {
+        const payload = JSON.parse(item.payload_json);
 
-            if (item.entity_type === "visit") {
-                if (item.action_type === "create" && payload.member_id) {
-                    await scanVisit(payload.member_id);
-                } else if (item.action_type === "manual_admit") {
-                    await manualAdmitVisit(payload);
-                } else if (item.action_type === "walk_in") {
-                    await walkInVisit(payload);
-                }
-            }
-
-            await markPendingSyncDone(item.id);
-        } catch (error: any) {
-            await markPendingSyncFailed(item.id, error?.message ?? "Sync failed");
+        if (item.action_type === "create" && payload.member_id) {
+          visitSyncRequests.push({
+            idempotency_key: item.idempotency_key || `visit_sync_${item.id}`,
+            payload: {
+              operation: "scan",
+              payload: payload,
+            },
+          });
+          visitScanItemsToSync.push(item);
         }
+      } catch (error) {
+        console.error("Failed to parse visit queue item JSON", item);
+      }
     }
-}
+  }
+
+  // Call the bulk scan sync API if there are scans to sync
+  if (visitSyncRequests.length > 0) {
+    try {
+      await syncVisits(visitSyncRequests);
+      // If successful, mark all as done
+      for (const item of visitScanItemsToSync) {
+        await markPendingSyncDone(item.id);
+      }
+    } catch (error: any) {
+      console.error("Failed bulk syncing visits:", error);
+      // Mark all as failed in this batch
+      for (const item of visitScanItemsToSync) {
+        await markPendingSyncFailed(
+          item.id,
+          error?.message ?? "Bulk sync failed",
+        );
+      }
+    }
+  }
+
+  // Second pass: sync manual admits and walk-ins via dedicated endpoints
+  for (const item of items) {
+    if (item.entity_type !== "visit") continue;
+    if (item.action_type !== "manual_admit" && item.action_type !== "walk_in")
+      continue;
+
+    try {
+      const payload = JSON.parse(item.payload_json);
+
+      if (item.action_type === "manual_admit") {
+        await manualAdmitVisit(payload);
+      } else {
+        await walkInVisit(payload);
+      }
+
+      await markPendingSyncDone(item.id);
+    } catch (error: any) {
+      console.error(`Failed syncing ${item.action_type}:`, error);
+      await markPendingSyncFailed(item.id, error?.message ?? "Sync failed");
+    }
+  }
+}

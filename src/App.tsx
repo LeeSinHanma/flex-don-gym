@@ -17,6 +17,7 @@ import EmployeeMenu from "./pages/AdminPage/Employee";
 import AdminDashboard from "./pages/AdminPage/AdminDashboard";
 import ItemInfoPage from "./pages/AdminPage/ItemInfo";
 import AdminEditMembership from "./pages/AdminPage/AdminEditMembership";
+import Transactions from "./pages/AdminPage/Transactions";
 
 import StatusMemberPage from "./pages/EmployeePage/StatusMember";
 import ManageStatusMemPage from "./pages/AdminPage/ManageStatusMem";
@@ -167,6 +168,12 @@ const App: React.FC = () => {
                 path="/admin-dashboard"
                 requiredAccess="dashboard"
                 component={AdminDashboard}
+              />
+              <PrivateRoute
+                exact
+                path="/admin-transactions"
+                requiredAccess="dashboard"
+                component={Transactions}
               />
               <PrivateRoute
                 exact

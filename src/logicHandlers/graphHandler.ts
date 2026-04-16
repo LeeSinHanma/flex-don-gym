@@ -128,3 +128,20 @@ export const getRevenueLastDays = async (
   }
 };
 
+export interface TodayMetricsResponse {
+  total_revenue_today: number;
+  check_ins_today: number;
+  date: string;
+  timezone: string;
+}
+
+export const getTodayMetrics = async (): Promise<TodayMetricsResponse> => {
+  try {
+    const response = await api.get(`/dashboard/today-metrics`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching today metrics:", error);
+    throw error;
+  }
+};
+

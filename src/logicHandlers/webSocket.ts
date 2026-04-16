@@ -10,9 +10,15 @@ let revenuePollingInterval: any = null;
 export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   if (socket) return;
 
-  socket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
-  );
+  const baseURL =
+    (typeof import.meta !== "undefined" && import.meta.env
+      ? import.meta.env.VITE_API_BASE_URL
+      : undefined) ||
+    process.env.REACT_APP_API_BASE_URL ||
+    "https://flexolutions-backend.onrender.com";
+  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+
+  socket = new WebSocket(`${wsBaseURL}/dashboard/check-ins-today`);
 
   socket.onopen = () => {
     console.log("✅ WebSocket connected");
@@ -30,7 +36,11 @@ export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
         onUpdate(Number(data.count));
       } else if (data.check_ins_today !== undefined) {
         onUpdate(Number(data.check_ins_today));
-      } else if (typeof data === "object" && data !== null && Object.keys(data).length === 1) {
+      } else if (
+        typeof data === "object" &&
+        data !== null &&
+        Object.keys(data).length === 1
+      ) {
         // Fallback for single-key objects
         onUpdate(Number(Object.values(data)[0]));
       }
@@ -70,18 +80,30 @@ export const startPolling = (onUpdate: CheckInCallback) => {
 
   pollingInterval = setInterval(async () => {
     try {
-      const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/check-ins-today"
-      );
-      
+      const baseURL =
+        (typeof import.meta !== "undefined" && import.meta.env
+          ? import.meta.env.VITE_API_BASE_URL
+          : undefined) ||
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://flexolutions-backend.onrender.com";
+      const res = await fetch(`${baseURL}/dashboard/check-ins-today`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       if (res.status === 404) {
-        console.warn("⚠️ REST fallback route not found (404). Stopping polling to prevent endless errors.");
+        console.warn(
+          "⚠️ REST fallback route not found (404). Stopping polling to prevent endless errors.",
+        );
         stopPolling();
         return;
       }
 
       if (res.status === 503) {
-        console.info("ℹ️ Render backend is likely waking up from sleep (503). Polling will continue quietly...");
+        console.info(
+          "ℹ️ Render backend is likely waking up from sleep (503). Polling will continue quietly...",
+        );
         return;
       }
 
@@ -99,7 +121,11 @@ export const startPolling = (onUpdate: CheckInCallback) => {
         onUpdate(Number(data.count));
       } else if (data.check_ins_today !== undefined) {
         onUpdate(Number(data.check_ins_today));
-      } else if (typeof data === "object" && data !== null && Object.keys(data).length === 1) {
+      } else if (
+        typeof data === "object" &&
+        data !== null &&
+        Object.keys(data).length === 1
+      ) {
         onUpdate(Number(Object.values(data)[0]));
       }
 
@@ -124,9 +150,15 @@ export const stopPolling = () => {
 export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   if (revenueSocket) return;
 
-  revenueSocket = new WebSocket(
-    "wss://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
-  );
+  const baseURL =
+    (typeof import.meta !== "undefined" && import.meta.env
+      ? import.meta.env.VITE_API_BASE_URL
+      : undefined) ||
+    process.env.REACT_APP_API_BASE_URL ||
+    "https://flexolutions-backend.onrender.com";
+  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+
+  revenueSocket = new WebSocket(`${wsBaseURL}/dashboard/revenue-today`);
 
   revenueSocket.onopen = () => {
     console.log("✅ Revenue WebSocket connected");
@@ -152,9 +184,16 @@ export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
         onUpdate(Number(data.total));
       } else if (data?.total_price !== undefined) {
         onUpdate(Number(data.total_price));
-      } else if (typeof data === "object" && data !== null && Object.keys(data).length > 0) {
+      } else if (
+        typeof data === "object" &&
+        data !== null &&
+        Object.keys(data).length > 0
+      ) {
         const val = Object.values(data)[0];
-        if (typeof val === "number" || (typeof val === "string" && !isNaN(Number(val)))) {
+        if (
+          typeof val === "number" ||
+          (typeof val === "string" && !isNaN(Number(val)))
+        ) {
           onUpdate(Number(val));
         }
       }
@@ -194,18 +233,28 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
 
   revenuePollingInterval = setInterval(async () => {
     try {
-      const res = await fetch(
-        "https://flexolutions-backend-dev.onrender.com/dashboard/revenue-today"
-      );
-      
+      const baseURL =
+        (typeof import.meta !== "undefined" && import.meta.env
+          ? import.meta.env.VITE_API_BASE_URL
+          : undefined) || process.env.REACT_APP_API_BASE_URL;
+      const res = await fetch(`${baseURL}/dashboard/revenue-today`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       if (res.status === 404) {
-        console.warn("⚠️ Revenue REST fallback route not found (404). Stopping polling to prevent endless errors.");
+        console.warn(
+          "⚠️ Revenue REST fallback route not found (404). Stopping polling to prevent endless errors.",
+        );
         stopRevenuePolling();
         return;
       }
 
       if (res.status === 503) {
-        console.info("ℹ️ Revenue backend is likely waking up (503). Polling will continue...");
+        console.info(
+          "ℹ️ Revenue backend is likely waking up (503). Polling will continue...",
+        );
         return;
       }
 
@@ -231,9 +280,16 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
         onUpdate(Number(data.total));
       } else if (data?.total_price !== undefined) {
         onUpdate(Number(data.total_price));
-      } else if (typeof data === "object" && data !== null && Object.keys(data).length > 0) {
+      } else if (
+        typeof data === "object" &&
+        data !== null &&
+        Object.keys(data).length > 0
+      ) {
         const val = Object.values(data)[0];
-        if (typeof val === "number" || (typeof val === "string" && !isNaN(Number(val)))) {
+        if (
+          typeof val === "number" ||
+          (typeof val === "string" && !isNaN(Number(val)))
+        ) {
           onUpdate(Number(val));
         }
       }
