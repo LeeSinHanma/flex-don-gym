@@ -52,6 +52,14 @@ export type WalkInInput = {
   payment_method: string;
   amount_given: number;
   guest_label: string;
+  discount?: number;
+};
+
+export type VisitMutationResponse = {
+  visit_id?: string | number;
+  id?: string | number;
+  success?: boolean;
+  message?: string;
 };
 
 // ✅ GET /visits/member/{member_id}
@@ -63,9 +71,12 @@ export async function getVisitsByMemberId(member_id: string): Promise<Visit[]> {
 // POST /visits/manual-admit
 export async function manualAdmitVisit(
   data: ManualAdmitInput,
-): Promise<any> {
+): Promise<VisitMutationResponse> {
   try {
-    const response = await api.post("/visits/manual-admit", data);
+    const response = await api.post<VisitMutationResponse>(
+      "/visits/manual-admit",
+      data,
+    );
     return response.data;
   } catch (error) {
     console.error("Error manual admit:", error);
@@ -76,9 +87,12 @@ export async function manualAdmitVisit(
 // POST /visits/walk-in
 export async function walkInVisit(
   data: WalkInInput,
-): Promise<any> {
+): Promise<VisitMutationResponse> {
   try {
-    const response = await api.post("/visits/walk-in", data);
+    const response = await api.post<VisitMutationResponse>(
+      "/visits/walk-in",
+      data,
+    );
     return response.data;
   } catch (error) {
     console.error("Error walk-in:", error);

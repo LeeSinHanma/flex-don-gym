@@ -17,10 +17,7 @@ export interface VisitSyncRequest {
 
 export const syncVisits = async (visits: VisitSyncRequest[]) => {
   try {
-    const response = await api.post(
-      "/on-sync/visits",
-      visits
-    );
+    const response = await api.post("/on-sync/visits", visits);
 
     return response.data;
   } catch (error: any) {
