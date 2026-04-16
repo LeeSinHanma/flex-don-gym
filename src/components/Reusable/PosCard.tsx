@@ -124,16 +124,18 @@ const POSCard: React.FC<POSCardProps> = ({
           <div className="pos-status-info">
             <div className="pos-left-info">
               <h2 className="pos-card-product-name">{productName}</h2>
-              <p className="pos-card-product-price">
-                ₱
-                {Number(price).toLocaleString("en-PH", {
-                  minimumFractionDigits: 2,
-                })}
-              </p>
+              <div className="pos-price-stock-row">
+                <p className="pos-card-product-price">
+                  ₱
+                  {Number(price).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                  })}
+                </p>
 
-              {stock !== undefined && (
-                <p className="pos-card-product-stock">Stock: {stock}</p>
-              )}
+                {stock !== undefined && (
+                  <p className="pos-card-product-stock">Stock: {stock}</p>
+                )}
+              </div>
             </div>
 
             <div className="pos-card-top-right">{renderRightSide()}</div>
