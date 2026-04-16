@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { Network } from "@capacitor/network";
-import { processQrOffline, processManualAdmitOffline } from "../../logicHandlers/offlineQr";
+import {
+  processQrOffline,
+  processManualAdmitOffline,
+} from "../../logicHandlers/offlineQr";
 import "./QRScanner.css";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
@@ -21,7 +24,10 @@ import scanError from "../../resource/scanError.mp3";
 import { manualAdmitVisit, ManualAdmitInput } from "../../logicHandlers/visits";
 import { getCurrentUser } from "../../logicHandlers/userServices";
 import { getGymPricing, GymPricing } from "../../logicHandlers/gymPricing";
-import { getMembershipTypes, MembershipTypeResponse } from "../../logicHandlers/membershipCrud";
+import {
+  getMembershipTypes,
+  MembershipTypeResponse,
+} from "../../logicHandlers/membershipCrud";
 import { getMemberById } from "../../logicHandlers/memberCrud";
 
 // Local Repository Fallbacks
@@ -57,7 +63,7 @@ type OfflineQrResult = {
 
 function mapOfflineResultToVisitResult(
   memberId: string,
-  result: OfflineQrResult
+  result: OfflineQrResult,
 ): ScanVisitResult {
   return {
     visit: {
@@ -70,7 +76,9 @@ function mapOfflineResultToVisitResult(
       created_at: new Date().toISOString(),
     },
     member_name: result.member
-      ? `${result.member.first_name ?? ""} ${result.member.last_name ?? ""}`.trim()
+      ? `${result.member.first_name ?? ""} ${
+          result.member.last_name ?? ""
+        }`.trim()
       : "Unknown Member",
     membership_type: result.member?.membership_type ?? -1,
     message: result.message,
@@ -100,7 +108,9 @@ const QRScannerHome: React.FC = () => {
   const [receiptData, setReceiptData] = useState<any>(null);
   const [amountToPay, setAmountToPay] = useState<number | "">(0);
   const [gymPricing, setGymPricing] = useState<GymPricing | null>(null);
-  const [membershipTypes, setMembershipTypes] = useState<MembershipTypeResponse[]>([]);
+  const [membershipTypes, setMembershipTypes] = useState<
+    MembershipTypeResponse[]
+  >([]);
   const [isAnyModalOpen, setIsAnyModalOpen] = useState(false);
 
   const scanAudio = useRef<HTMLAudioElement | null>(null);
@@ -128,14 +138,14 @@ const QRScannerHome: React.FC = () => {
   const playSuccessSound = () => {
     if (scanAudio.current) {
       scanAudio.current.currentTime = 0;
-      scanAudio.current.play().catch(() => { });
+      scanAudio.current.play().catch(() => {});
     }
   };
 
   const playErrorSound = () => {
     if (errorAudio.current) {
       errorAudio.current.currentTime = 0;
-      errorAudio.current.play().catch(() => { });
+      errorAudio.current.play().catch(() => {});
     }
   };
 
@@ -167,7 +177,7 @@ const QRScannerHome: React.FC = () => {
       }
 
       const plan = membershipTypes.find(
-        (t) => t.membership_id === member.membership_plan_id
+        (t) => t.membership_id === member.membership_plan_id,
       );
 
       if (!plan || !plan.discount_amount) {
@@ -182,26 +192,29 @@ const QRScannerHome: React.FC = () => {
     }
   };
 
-  const handleDecoded = useCallback(async (decodedText: string) => {
-    try {
-      const id = decodedText.trim();
-      if (!id) return;
+  const handleDecoded = useCallback(
+    async (decodedText: string) => {
+      try {
+        const id = decodedText.trim();
+        if (!id) return;
 
-      const result = await processVisit(id);
+        const result = await processVisit(id);
 
-      if (result.visit.access_granted) {
-        playSuccessSound();
-      } else {
+        if (result.visit.access_granted) {
+          playSuccessSound();
+        } else {
+          playErrorSound();
+        }
+
+        setVisitResult(result);
+        setShowModal(true);
+      } catch (err: any) {
+        console.error("Failed to scan visit:", err?.message || err);
         playErrorSound();
       }
-
-      setVisitResult(result);
-      setShowModal(true);
-    } catch (err: any) {
-      console.error("Failed to scan visit:", err?.message || err);
-      playErrorSound();
-    }
-  }, [processVisit]);
+    },
+    [processVisit],
+  );
 
   const restartScanner = useCallback(async () => {
     // restartScanner is mainly for manual triggers if needed,
@@ -350,7 +363,7 @@ const QRScannerHome: React.FC = () => {
       let visitId = "";
       try {
         const response = await manualAdmitVisit(payload);
-        visitId = response?.visit_id || response?.id || "N/A";
+        visitId = String(response?.visit_id ?? response?.id ?? "N/A");
       } catch (apiErr) {
         console.warn("Manual admit API failed, saving offline...");
         const offlineResult = await processManualAdmitOffline(payload);
@@ -469,10 +482,11 @@ const QRScannerHome: React.FC = () => {
 
             <div className="form-group">
               <div
-                className={`employee-message ${visitResult.visit.access_granted
-                  ? "employee-message-success"
-                  : "employee-message-error"
-                  }`}
+                className={`employee-message ${
+                  visitResult.visit.access_granted
+                    ? "employee-message-success"
+                    : "employee-message-error"
+                }`}
               >
                 {visitResult.message || "No message available."}
               </div>
@@ -483,18 +497,21 @@ const QRScannerHome: React.FC = () => {
               style={{ marginTop: "16px", display: "flex", gap: "10px" }}
             >
               {!visitResult.visit.access_granted &&
-                (visitResult.visit.denial_reason === "No remaining credits" || 
-                 visitResult.visit.denial_reason === "Postpaid membership has expired") && (
+                (visitResult.visit.denial_reason === "No remaining credits" ||
+                  visitResult.visit.denial_reason ===
+                    "Postpaid membership has expired") && (
                   <Button
                     type="button"
                     className="renew-btn"
                     onClick={async () => {
                       setPaymentMethod("Cash");
                       setAmountGiven("");
-                      
-                      const discounted = await calculateDiscountedAmount(visitResult.visit.member_id);
+
+                      const discounted = await calculateDiscountedAmount(
+                        visitResult.visit.member_id,
+                      );
                       setAmountToPay(discounted);
-                      
+
                       setShowManualModal(true);
                     }}
                   >
@@ -645,10 +662,14 @@ const QRScannerHome: React.FC = () => {
             setVisitResult(result);
             setShowModal(true);
 
-            if (!result.visit.access_granted && 
-                (result.visit.denial_reason === "No remaining credits" || 
-                 result.visit.denial_reason === "Membership expired")) {
-              const discounted = await calculateDiscountedAmount(selectedMember.member_id);
+            if (
+              !result.visit.access_granted &&
+              (result.visit.denial_reason === "No remaining credits" ||
+                result.visit.denial_reason === "Membership expired")
+            ) {
+              const discounted = await calculateDiscountedAmount(
+                selectedMember.member_id,
+              );
               setAmountToPay(discounted);
             }
 
@@ -699,7 +720,9 @@ const QRScannerHome: React.FC = () => {
 
           <div className="form-group">
             <label>Amount to Pay</label>
-            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "2px" }}
+            >
               <p style={{ margin: 0, fontWeight: "bold" }}>₱{amountToPay}</p>
               {gymPricing && amountToPay !== gymPricing.base_day_pass_price && (
                 <small style={{ color: "#d9534f" }}>
@@ -716,14 +739,23 @@ const QRScannerHome: React.FC = () => {
               type="number"
               placeholder="Enter amount given"
               value={amountGiven}
-              onChange={(e) => setAmountGiven(e.target.value === "" ? "" : Number(e.target.value))}
+              onChange={(e) =>
+                setAmountGiven(
+                  e.target.value === "" ? "" : Number(e.target.value),
+                )
+              }
             />
             {paymentMethod === "GCash" && (
-              <small style={{ color: "#666" }}>GCash amount defaults to amount to pay (exact).</small>
+              <small style={{ color: "#666" }}>
+                GCash amount defaults to amount to pay (exact).
+              </small>
             )}
           </div>
 
-          <div className="form-actions" style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+          <div
+            className="form-actions"
+            style={{ display: "flex", gap: "10px", marginTop: "16px" }}
+          >
             <Button
               type="button"
               className="btn-modal"
