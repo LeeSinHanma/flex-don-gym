@@ -525,6 +525,7 @@ const MemberMenu: React.FC = () => {
               ? `${acceptedData.firstName} ${acceptedData.lastName}`
               : ""
           }
+          memberEmail={acceptedData?.email || ""}
           logoSrc={dondonLogo}
           downloadFileName={
             acceptedData

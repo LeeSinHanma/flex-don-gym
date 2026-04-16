@@ -2,16 +2,20 @@ import React, { useRef } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
+import { EmailComposer } from "capacitor-email-composer";
 import * as htmlToImage from "html-to-image";
 import QRCode from "react-qr-code";
 import { Modal } from "./Modals";
 import { Button } from "./Button";
+import "./QrCodeModal.css";
 
 type QrCodeModalProps = {
   isOpen: boolean;
   onClose: () => void;
   qrValue?: string;
   memberName?: string;
+  memberEmail?: string;
+  showEmailButton?: boolean;
   logoSrc: string;
   title?: string;
   downloadFileName?: string;
@@ -22,25 +26,34 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
   onClose,
   qrValue,
   memberName,
+  memberEmail,
+  showEmailButton = true,
   logoSrc,
   title = "DONDON'S FITNESS GYM",
   downloadFileName = "member-qr",
 }) => {
   const qrCardRef = useRef<HTMLDivElement | null>(null);
 
+  const renderQrImage = async () => {
+    if (!qrCardRef.current || !qrValue) return null;
+
+    const node = qrCardRef.current;
+
+    return await htmlToImage.toPng(node, {
+      cacheBust: true,
+      pixelRatio: 3,
+      backgroundColor: "#ffffff",
+      canvasWidth: node.offsetWidth,
+      canvasHeight: node.offsetHeight,
+    });
+  };
+
   const handleDownloadQr = async () => {
     if (!qrCardRef.current || !qrValue) return;
 
     try {
-      const node = qrCardRef.current;
-
-      const dataUrl = await htmlToImage.toPng(node, {
-        cacheBust: true,
-        pixelRatio: 3,
-        backgroundColor: "#ffffff",
-        canvasWidth: 360,
-        canvasHeight: node.offsetHeight,
-      });
+      const dataUrl = await renderQrImage();
+      if (!dataUrl) return;
 
       const fileName = `${downloadFileName}.png`;
       const platform = Capacitor.getPlatform();
@@ -75,6 +88,49 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
     }
   };
 
+  const handleEmailQr = async () => {
+    if (!qrCardRef.current || !qrValue) return;
+
+    try {
+      const dataUrl = await renderQrImage();
+      if (!dataUrl) return;
+
+      const base64Data = dataUrl.split(",")[1];
+      const fileName = `${downloadFileName}.png`;
+      const subject = `${title} QR Code`;
+      const body = [
+        `Hi ${memberName || "Member"},`,
+        "",
+        "Attached is your QR code for gym access.",
+        "",
+        "If the attachment does not open, please save the image and keep it available on your device.",
+      ].join("\n");
+
+      if (Capacitor.getPlatform() === "web") {
+        const toPart = memberEmail ? encodeURIComponent(memberEmail) : "";
+        const mailto = `mailto:${toPart}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailto;
+        return;
+      }
+
+      await EmailComposer.open({
+        to: memberEmail ? [memberEmail] : undefined,
+        subject,
+        body,
+        attachments: [
+          {
+            type: "base64",
+            path: base64Data,
+            name: fileName,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Failed to open email composer:", error);
+      alert("Failed to open email composer.");
+    }
+  };
+
   return (
     <Modal
       className="modal-box"
@@ -84,21 +140,27 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
     >
       {qrValue ? (
         <>
-          <div ref={qrCardRef} className="qr-download-card">
-            <div className="qr-header">
-              <img src={logoSrc} alt="Logo" className="qr-logo" />
+          <div ref={qrCardRef} className="qrm-card">
+            <div className="qrm-header">
+              <img src={logoSrc} alt="Logo" className="qrm-logo" />
               <h2>{title}</h2>
-              <div className="qr-divider" />
+              <div className="qrm-divider" />
             </div>
 
-            <div className="qr-wrapper">
-              <QRCode value={qrValue} size={220} />
+            <div className="qrm-code-wrapper">
+              <QRCode value={qrValue} size={250} />
             </div>
 
-            <p className="qr-member-name">{memberName || "No Name"}</p>
+            <p className="qrm-member-name">{memberName || "No Name"}</p>
           </div>
 
           <div className="form-actions">
+            {showEmailButton && (
+              <Button type="button" onClick={handleEmailQr}>
+                Email QR
+              </Button>
+            )}
+
             <Button type="button" onClick={handleDownloadQr}>
               Download
             </Button>
