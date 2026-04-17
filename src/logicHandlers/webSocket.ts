@@ -18,7 +18,8 @@ export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
     "https://flexolutions-backend.onrender.com";
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
-  socket = new WebSocket(`${wsBaseURL}/dashboard/check-ins-today`);
+  const token = localStorage.getItem("access_token");
+  socket = new WebSocket(`${wsBaseURL}/dashboard/check-ins-today?token=${encodeURIComponent(token ?? "")}`);
 
   socket.onopen = () => {
     console.log("✅ WebSocket connected");
@@ -86,9 +87,11 @@ export const startPolling = (onUpdate: CheckInCallback) => {
           : undefined) ||
         process.env.REACT_APP_API_BASE_URL ||
         "https://flexolutions-backend.onrender.com";
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${baseURL}/dashboard/check-ins-today`, {
         headers: {
           "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
       });
 
@@ -158,7 +161,8 @@ export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
     "https://flexolutions-backend.onrender.com";
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
-  revenueSocket = new WebSocket(`${wsBaseURL}/dashboard/revenue-today`);
+  const token = localStorage.getItem("access_token");
+  revenueSocket = new WebSocket(`${wsBaseURL}/dashboard/revenue-today?token=${encodeURIComponent(token ?? "")}`);
 
   revenueSocket.onopen = () => {
     console.log("✅ Revenue WebSocket connected");
@@ -237,9 +241,11 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
         (typeof import.meta !== "undefined" && import.meta.env
           ? import.meta.env.VITE_API_BASE_URL
           : undefined) || process.env.REACT_APP_API_BASE_URL;
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${baseURL}/dashboard/revenue-today`, {
         headers: {
           "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
       });
 
