@@ -176,6 +176,31 @@
   display: none;
 }
 
+.pos-card-container {
+  background-color: #efefef;
+  flex: 1;
+  min-height: 0;
+  border-radius: 8px;
+  padding: 8px;
+  width: 95%;
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pos-card-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pos-card-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pos-card-container::-webkit-scrollbar-thumb {
+  background-color: #c5c5c5;
+  border-radius: 10px;
+}
+
 .pos-empty-state {
   display: flex;
   align-items: center;
