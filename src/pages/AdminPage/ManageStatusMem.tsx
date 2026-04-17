@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
+import { Capacitor } from "@capacitor/core";
 import { arrowBack } from "ionicons/icons";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import dondonLogo from "../../resource/dondon-logo.png";
+import QRCode from "react-qr-code";
+import * as htmlToImage from "html-to-image";
+import { EmailComposer } from "capacitor-email-composer";
 import { getVisitsByMemberId, Visit } from "../../logicHandlers/visits";
 import {
   getMemberById,
@@ -62,6 +66,7 @@ const ManageStatusMemPage: React.FC = () => {
   const [amountGiven, setAmountGiven] = useState<string>("");
   const [note, setNote] = useState("");
   const [showPlanConfirmModal, setShowPlanConfirmModal] = useState(false);
+  const emailQrCardRef = useRef<HTMLDivElement | null>(null);
 
   const formatDateDash = (dateString: string) => {
     const date = new Date(dateString);
@@ -247,6 +252,78 @@ const ManageStatusMemPage: React.FC = () => {
     }
   };
 
+  const handleSendQrViaEmail = async () => {
+    if (!member) return;
+
+    const recipient = (member.email || "").trim();
+    if (!recipient) {
+      openStatusModal(
+        "No Email",
+        "This member does not have an email address.",
+        "warning",
+      );
+      return;
+    }
+
+    if (!emailQrCardRef.current) {
+      openStatusModal(
+        "QR Not Ready",
+        "Please try again in a moment.",
+        "warning",
+      );
+      return;
+    }
+
+    try {
+      const node = emailQrCardRef.current;
+      const dataUrl = await htmlToImage.toPng(node, {
+        cacheBust: true,
+        pixelRatio: 3,
+        backgroundColor: "#ffffff",
+        canvasWidth: node.offsetWidth,
+        canvasHeight: node.offsetHeight,
+      });
+
+      const subject = "DONDON'S FITNESS GYM QR Code";
+      const body = [
+        `Hi ${member.first_name || "Member"},`,
+        "",
+        "Attached is your QR code for gym access.",
+        "",
+        "If the attachment does not open, please save the image and keep it available on your device.",
+      ].join("\n");
+
+      if (Capacitor.getPlatform() === "web") {
+        const mailto = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = mailto;
+        return;
+      }
+
+      const fileName = `${member.first_name || "member"}-${member.last_name || "qr"}-qr.png`;
+      const base64Data = dataUrl.split(",")[1];
+
+      await EmailComposer.open({
+        to: [recipient],
+        subject,
+        body,
+        attachments: [
+          {
+            type: "base64",
+            path: base64Data,
+            name: fileName,
+          },
+        ],
+      });
+    } catch (error) {
+      console.error("Failed to open email composer:", error);
+      openStatusModal(
+        "Email Failed",
+        "Failed to open email composer.",
+        "error",
+      );
+    }
+  };
+
   return (
     <div className="manage-member-container">
       <div className="main-container">
@@ -328,6 +405,35 @@ const ManageStatusMemPage: React.FC = () => {
             >
               Show QR Code
             </Button>
+
+            <Button
+              className="btn-qr btn-email-qr"
+              type="button"
+              onClick={handleSendQrViaEmail}
+            >
+              Send QR via Email
+            </Button>
+
+            {/* Off-screen QR card for consistent email attachment rendering */}
+            <div className="qr-email-render-host" aria-hidden="true">
+              {member && (
+                <div ref={emailQrCardRef} className="qrm-card">
+                  <div className="qrm-header">
+                    <img src={dondonLogo} alt="Logo" className="qrm-logo" />
+                    <h2>DONDON'S FITNESS GYM</h2>
+                    <div className="qrm-divider" />
+                  </div>
+
+                  <div className="qrm-code-wrapper">
+                    <QRCode value={member.member_id} size={250} />
+                  </div>
+
+                  <p className="qrm-member-name">
+                    {member.first_name} {member.last_name}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="status-button-container">
@@ -363,6 +469,8 @@ const ManageStatusMemPage: React.FC = () => {
         onClose={() => setShowModal(false)}
         qrValue={member?.member_id}
         memberName={member ? `${member.first_name} ${member.last_name}` : ""}
+        memberEmail={member?.email || ""}
+        showEmailButton={false}
         logoSrc={dondonLogo}
         downloadFileName={
           member ? `${member.first_name}-${member.last_name}-qr` : "member-qr"

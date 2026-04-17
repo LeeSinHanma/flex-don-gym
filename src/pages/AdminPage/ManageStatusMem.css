@@ -79,7 +79,7 @@
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  padding: 16px 18px;
+  padding: 12px 14px;
   border-radius: 16px;
   background: linear-gradient(145deg, #ffffff, #f3f6f9);
   border: 1px solid #d7e0e8;
@@ -94,13 +94,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 4px;
 }
 
 .member-name {
   margin: 0;
   font-family: "Inter", sans-serif;
-  font-size: 30px;
+  font-size: 22px;
   font-weight: bold;
   color: #04354f;
   line-height: 1.2;
@@ -109,8 +109,8 @@
 .member-details {
   display: flex;
   flex-direction: column;
-  margin-top: 14px;
-  gap: 10px;
+  margin-top: 8px;
+  gap: 6px;
 }
 
 .member-details-employee {
@@ -120,23 +120,24 @@
 
 .member-details h4 {
   margin: 0;
-  padding: 10px 12px;
+  padding: 6px 8px;
   border-radius: 10px;
 
   color: #0a4666;
   font-weight: 600;
+  font-size: 13px;
 }
 
 .member-type {
   font-family: "Inter", sans-serif;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: bold;
   color: #0a4666;
 }
 
 .member-duration {
   font-family: "Inter", sans-serif;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 600;
   color: #0a4666;
 }
@@ -144,7 +145,6 @@
 .middle-container {
   width: 100%;
   max-width: 420px;
-  padding: 16px;
   border-radius: 12px;
 
   display: flex;
@@ -317,6 +317,18 @@
   margin-top: 12px;
 }
 
+.btn-email-qr {
+  margin-top: 10px;
+}
+
+.qr-email-render-host {
+  position: fixed;
+  left: -99999px;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (max-width: 480px) {
   .qr-wrapper {
     width: min(85vw, 260px);
@@ -365,6 +377,18 @@
     flex-direction: column;
     padding: 10px 12px;
     border-radius: 10px;
+  }
+
+  .member-name {
+    font-size: 18px;
+  }
+
+  .member-type {
+    font-size: 12px;
+  }
+
+  .member-duration {
+    font-size: 11px;
   }
 
   .middle-container {

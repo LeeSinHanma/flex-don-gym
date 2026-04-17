@@ -78,10 +78,17 @@
   gap: 2px;
 }
 
+/* Price and Stock Row - Side by Side */
+.pos-price-stock-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .pos-left-info h2,
 .pos-card-product-name {
-  font-size: 16px;
-  font-weight: normal;
+  font-size: 17px;
+  font-weight: 600;
   color: #04354f;
   margin: 0;
   white-space: nowrap;
@@ -92,9 +99,16 @@
 
 .pos-left-info p,
 .pos-card-product-price {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 700;
   color: #04354f;
+  margin: 0;
+}
+
+.pos-card-product-stock {
+  font-size: 12px;
+  font-weight: 400;
+  color: #666;
   margin: 0;
 }
 
@@ -202,13 +216,19 @@
 
   .pos-left-info h2,
   .pos-card-product-name {
-    font-size: 14px;
+    font-size: 17px;
     max-width: 150px;
   }
 
   .pos-left-info p,
   .pos-card-product-price {
-    font-size: 16px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .pos-card-product-stock {
+    font-size: 11px;
+    font-weight: 400;
   }
 
   .pos-counter-btn {

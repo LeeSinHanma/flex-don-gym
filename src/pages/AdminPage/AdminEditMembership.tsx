@@ -269,19 +269,18 @@ const AdminEditMembership: React.FC = () => {
 
           <div className="bottom-container">
             <Button
-              className="btn-cancel"
-              type="button"
-              onClick={() => setShowDeleteModal(true)}
-            >
-              Delete
-            </Button>
-
-            <Button
               className="btn-submit"
               type="button"
               onClick={() => setShowSaveConfirmModal(true)}
             >
               Save
+            </Button>
+            <Button
+              className="btn-cancel"
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              Delete
             </Button>
           </div>
         </div>
