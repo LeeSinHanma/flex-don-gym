@@ -36,16 +36,27 @@ function getErrorMessage(err: unknown): string {
   return "Unknown error";
 }
 
-// ✅ POST /users/login?username=...&password=...
 export async function loginUser(
   username: string,
   password: string
 ): Promise<APIResponse> {
   try {
-    const res = await api.post<APIResponse>("/users/login", null, {
-      params: { username, password },
+    const form = new URLSearchParams();
+    form.append("username", username);
+    form.append("password", password);
+
+    const res = await api.post<APIResponse>("/users/login", form, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
     });
-    return res.data;
+
+    const data = res.data;
+    localStorage.setItem("access_token", data.access_token);
+    localStorage.setItem("token_type", data.token_type); // bearer
+    localStorage.setItem("access_list", JSON.stringify(data.access_list ?? []));
+
+    return data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
   }
