@@ -302,26 +302,28 @@ const PosPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="pos-card-item">
-          {cartItems.length === 0 ? (
-            <div className="pos-empty-state">
-              <p>No items scanned yet.</p>
-            </div>
-          ) : (
-            cartItems.map((item) => (
-              <POSCard
-                key={item.item_id}
-                productName={item.item_name}
-                price={item.price}
-                initialCount={item.cartQuantity}
-                minCount={0}
-                maxCount={item.quantity}
-                onCountChange={(count) =>
-                  updateCartQuantity(item.item_id, count)
-                }
-              />
-            ))
-          )}
+        <div className="pos-card-container">
+          <div className="pos-card-item">
+            {cartItems.length === 0 ? (
+              <div className="pos-empty-state">
+                <p>No items scanned yet.</p>
+              </div>
+            ) : (
+              cartItems.map((item) => (
+                <POSCard
+                  key={item.item_id}
+                  productName={item.item_name}
+                  price={item.price}
+                  initialCount={item.cartQuantity}
+                  minCount={0}
+                  maxCount={item.quantity}
+                  onCountChange={(count) =>
+                    updateCartQuantity(item.item_id, count)
+                  }
+                />
+              ))
+            )}
+          </div>
         </div>
 
         <div className="pos-checkout-footer">
