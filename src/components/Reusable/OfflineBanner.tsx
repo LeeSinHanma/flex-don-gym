@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNetworkStatus, BannerStatus } from "../../hooks/useNetworkStatus";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
+import { isWebPlatform } from "../../util/platformAware";
 import "./OfflineBanner.css";
 
 interface OfflineBannerProps {
@@ -65,7 +66,7 @@ export function OfflineBanner({
       case "syncing":
         return "Syncing";
       case "complete":
-        return "Syncing Complete";
+        return isWebPlatform() ? "Connected to Server" : "Syncing Complete";
       default:
         return "Currently Offline";
     }

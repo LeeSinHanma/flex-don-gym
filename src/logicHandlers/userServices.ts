@@ -153,9 +153,9 @@ export async function changePassword(
   newPassword: string
 ): Promise<APIResponse> {
   try {
-    const res = await api.patch<APIResponse>(`/users/change-password/${userId}`, {
-      new_password: newPassword,
-    });
+    const payload = { new_password: newPassword };
+    console.log(`📤 POST /users/change-password/${userId} payload:`, payload);
+    const res = await api.post<APIResponse>(`/users/change-password/${userId}`, payload);
     return res.data;
   } catch (err) {
     throw new Error(getErrorMessage(err));
