@@ -13,15 +13,18 @@ export function OfflineBanner({
   visible: propVisible,
 }: OfflineBannerProps) {
   const { status: networkStatus, isOffline } = useNetworkStatus();
-  const { isInitializing, isSyncing, isApiConnecting } = useAppInitialization();
+  const { isInitializing, isSyncing, isApiConnecting, error } = useAppInitialization();
   const [internalVisible, setInternalVisible] = useState(false);
 
   const isConnectingState = isInitializing || isSyncing || isApiConnecting;
+  
+  const isActuallyOffline = isOffline;
+  const isServerUnreachable = !isOffline && error !== null;
 
   useEffect(() => {
     let timer: any;
 
-    if (isOffline || isConnectingState) {
+    if (isActuallyOffline || isServerUnreachable || isConnectingState) {
       if (timer) clearTimeout(timer);
       setInternalVisible(true);
     } else {
@@ -34,14 +37,17 @@ export function OfflineBanner({
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [isOffline, isConnectingState]);
+  }, [isActuallyOffline, isServerUnreachable, isConnectingState]);
 
   // Determine actual status priority
   let currentStatus: BannerStatus | "connecting" = networkStatus;
-  if (isOffline) {
+  if (isActuallyOffline) {
     currentStatus = "offline";
-  } else if (isConnectingState) {
+  } else if (isConnectingState || isServerUnreachable) {
     currentStatus = "connecting";
+  } else {
+    // Falls back to networkStatus ("complete") if we're online and no errors
+    currentStatus = networkStatus;
   }
 
   // Use props if provided, otherwise use calculated state

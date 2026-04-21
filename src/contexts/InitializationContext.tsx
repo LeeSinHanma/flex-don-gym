@@ -129,36 +129,47 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  // 3. Periodic Health Check (Every 5 minutes)
+  // 3. Periodic Health Check (Adaptive Interval)
   React.useEffect(() => {
-    const HEALTH_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    let timeoutId: any;
+    let isMounted = true;
+
+    const scheduleNextCheck = (delay: number) => {
+      if (!isMounted) return;
+      timeoutId = setTimeout(checkHealth, delay);
+    };
 
     const checkHealth = async () => {
       // Don't check health if already initializing/syncing
-      if (isRunning || isInitializing || isSyncing) return;
+      if (isRunning || isInitializing || isSyncing) {
+        scheduleNextCheck(5000); // Check again shortly if busy
+        return;
+      }
+
+      let checkFailed = false;
 
       try {
         setIsApiConnecting(true);
         await healthCheck();
-        // If successful, we're good
-      } catch (err) {
+        setError(null);
+      } catch (err: any) {
         console.warn("Backend Health Check failed:", err);
-        // If it fails, isApiConnecting remains true until the next successful check
-        // or a manual sync attempt succeeds.
+        setError("Backend health check failed");
+        checkFailed = true;
       } finally {
-        // Keep it true if it failed to show "Connecting"
-        // Actually, let's toggle it off only on success for better feedback
-        // Wait, if it's always true, the banner stays. Let's toggle it on
-        // call and off on response.
-        setIsApiConnecting(false);
+        if (isMounted) {
+          setIsApiConnecting(false);
+          scheduleNextCheck(checkFailed ? 5000 : 5 * 60 * 1000); // Retry in 5s if failed, else 5m
+        }
       }
     };
 
-    const interval = setInterval(checkHealth, HEALTH_CHECK_INTERVAL);
-    // Initial check on mount
     checkHealth();
 
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isInitializing, isSyncing, initApp]);
 
   // 4. Real-time Network Listener (Sync on Reconnection)
