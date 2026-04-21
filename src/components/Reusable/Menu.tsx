@@ -94,9 +94,14 @@ const Menu: React.FC<MenuProps> = ({
             </Button>
           )}
 
+          <Button className="menu-btn" onClick={() => goTo("/account")}>
+            ACCOUNT
+          </Button>
+
           <Button className="menu-btn" onClick={handleLogoutClick}>
             LOGOUT
           </Button>
+
 
           <Button className="menu-btn menu-btn-close" onClick={onClose}>
             Close

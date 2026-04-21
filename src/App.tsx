@@ -11,6 +11,7 @@ import MemberMenu from "./pages/EmployeePage/Member";
 import WalkInMenu from "./pages/EmployeePage/WalkIn";
 import PrepaidMenu from "./pages/EmployeePage/Prepaid";
 import QRScannerHome from "./pages/EmployeePage/QRScanner";
+import AccountPage from "./pages/EmployeePage/Account";
 
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
@@ -180,6 +181,11 @@ const App: React.FC = () => {
                 path="/admin-item-info"
                 requiredAccess="products"
                 component={ItemInfoPage}
+              />
+              <PrivateRoute
+                exact
+                path="/account"
+                component={AccountPage}
               />
               {/* Folder Route (keep last) */}
               <Route exact path="/folder/:name" component={Page} />
