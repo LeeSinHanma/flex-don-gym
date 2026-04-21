@@ -180,6 +180,7 @@ const PosCheckout: React.FC = () => {
             className="btn-checkout"
             type="button"
             onClick={() => setShowTransacModal(true)}
+            disabled={isLoading}
           >
             Place order
           </Button>
@@ -209,6 +210,7 @@ const PosCheckout: React.FC = () => {
         setPaymentMethod={setPaymentMethod}
         amountGiven={amountGiven}
         setAmountGiven={setAmountGiven}
+        isLoading={isLoading}
       />
 
       <StatusModal

@@ -247,9 +247,14 @@ const QRScannerHome: React.FC = () => {
   useEffect(() => {
     const loadPricing = async () => {
       try {
-        const data = await getGymPricing().catch(async () => {
-          console.warn("Pricing API failed, using local...");
-          return await getLocalGymPricing();
+        const data = await getGymPricing().catch(async (e) => {
+          console.warn("Pricing API failed, using local fallback...", e);
+          try {
+            return await getLocalGymPricing();
+          } catch (localErr) {
+            console.warn("Local gym pricing fallback failed:", localErr);
+            return null;
+          }
         });
 
         if (data) {
@@ -257,9 +262,14 @@ const QRScannerHome: React.FC = () => {
           setAmountToPay(data.base_day_pass_price);
         }
 
-        const mTypes = await getMembershipTypes().catch(async () => {
-          console.warn("Membership API failed, using local...");
-          return await getAllMembershipTypes();
+        const mTypes = await getMembershipTypes().catch(async (e) => {
+          console.warn("Membership API failed, using local fallback...", e);
+          try {
+            return await getAllMembershipTypes();
+          } catch (localErr) {
+            console.warn("Local membership types fallback failed:", localErr);
+            return [];
+          }
         });
 
         if (mTypes) {

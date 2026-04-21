@@ -148,6 +148,21 @@ export async function deleteUser(userId: string): Promise<void> {
   }
 }
 
+export async function changePassword(
+  userId: string,
+  newPassword: string
+): Promise<APIResponse> {
+  try {
+    const payload = { new_password: newPassword };
+    console.log(`📤 POST /users/change-password/${userId} payload:`, payload);
+    const res = await api.post<APIResponse>(`/users/change-password/${userId}`, payload);
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
+
 export async function getUserByUsername(username: string): Promise<User> {
   try {
     const res = await api.get<User>(

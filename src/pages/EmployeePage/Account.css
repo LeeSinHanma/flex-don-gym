@@ -1,0 +1,165 @@
+/* Extends existing container styles from StatusMember.css if needed */
+
+.account-page-wrapper {
+  display: flex !important;
+  flex-direction: column;
+  height: 100vh;
+  background: #e0ecef;
+}
+
+.account-main-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.account-header {
+  margin-bottom: 20px;
+}
+
+/* Rely on status-header-row from StatusMember.css for layout */
+.account-header-row {
+  /* No layout overrides needed, base classes center text magically */
+}
+
+.account-back-btn {
+  position: absolute;
+  left: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.account-title {
+  margin: 0;
+  margin-bottom: 8px;
+  font-family: "Inter", sans-serif;
+  color: #04354f;
+  font-weight: bold;
+  font-size: 18px; /* Match StatusMember reference */
+  text-align: center;
+}
+
+.account-menu-btn {
+  position: absolute;
+  right: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #04354f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 480px) {
+  .account-title {
+    font-size: 24px;
+  }
+}
+
+.account-cards {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.account-details-title {
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.account-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.account-info-label {
+  color: #04354f;
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.account-info-value {
+  margin: 0;
+  color: #04354f;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 2px 0 0 0;
+}
+
+.account-access-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.account-access-tag {
+  background: #04354f;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.account-bottom {
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.account-change-pwd-btn {
+  width: 100%;
+  padding: 15px;
+}
+
+/* Modal specific styles */
+.account-modal-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.account-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.account-form-label {
+  font-weight: bold;
+}
+
+.account-form-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.account-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.account-btn-cancel {
+  background: #ccc !important;
+  color: #333 !important;
+  flex: 1;
+}
+
+.account-btn-submit {
+  flex: 1;
+}
