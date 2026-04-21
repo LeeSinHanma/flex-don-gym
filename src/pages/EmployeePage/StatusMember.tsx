@@ -84,6 +84,37 @@ const StatusMemberPage: React.FC = () => {
             }
           } catch (apiErr) {
             console.warn("API member fetch failed, falling back to local...");
+            try {
+              const localMembers = await getAllMembers();
+              membersData = localMembers.map(m => ({
+                ...m,
+                is_active: m.is_active === 1,
+                email: m.email || "",
+                contact_number: m.contact_number || "",
+                first_name: m.first_name || "",
+                last_name: m.last_name || "",
+                membership_type: m.membership_type || 0,
+                membership_plan_id: m.membership_plan_id || 0,
+                credits: m.credits || 0,
+                registered_by: m.registered_by || "unknown",
+                created_at: m.created_at || "",
+                updated_at: m.updated_at || "",
+              }));
+            } catch (err) {
+              console.warn("Local members fallback failed:", err);
+            }
+
+            try {
+              const localPlans = await getAllMembershipTypes();
+              localPlans.forEach(p => {
+                mNamesMap[p.membership_id] = p.name || "Unknown";
+              });
+            } catch (err) {
+              console.warn("Local plans fallback failed:", err);
+            }
+          }
+        } else {
+          try {
             const localMembers = await getAllMembers();
             membersData = localMembers.map(m => ({
               ...m,
@@ -99,33 +130,18 @@ const StatusMemberPage: React.FC = () => {
               created_at: m.created_at || "",
               updated_at: m.updated_at || "",
             }));
+          } catch (err) {
+            console.warn("Offline members fetch failed:", err);
+          }
 
+          try {
             const localPlans = await getAllMembershipTypes();
             localPlans.forEach(p => {
               mNamesMap[p.membership_id] = p.name || "Unknown";
             });
+          } catch (err) {
+            console.warn("Offline plans fetch failed:", err);
           }
-        } else {
-          const localMembers = await getAllMembers();
-          membersData = localMembers.map(m => ({
-            ...m,
-            is_active: m.is_active === 1,
-            email: m.email || "",
-            contact_number: m.contact_number || "",
-            first_name: m.first_name || "",
-            last_name: m.last_name || "",
-            membership_type: m.membership_type || 0,
-            membership_plan_id: m.membership_plan_id || 0,
-            credits: m.credits || 0,
-            registered_by: m.registered_by || "unknown",
-            created_at: m.created_at || "",
-            updated_at: m.updated_at || "",
-          }));
-
-          const localPlans = await getAllMembershipTypes();
-          localPlans.forEach(p => {
-            mNamesMap[p.membership_id] = p.name || "Unknown";
-          });
         }
 
         setAllMembers(membersData);
