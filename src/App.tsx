@@ -172,7 +172,7 @@ const App: React.FC = () => {
               <PrivateRoute
                 exact
                 path="/admin-transactions"
-                requiredAccess="dashboard"
+                requiredAccess="transactions"
                 component={Transactions}
               />
               <PrivateRoute

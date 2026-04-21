@@ -58,6 +58,12 @@ const Menu: React.FC<MenuProps> = ({
             </Button>
           )}
 
+          {hasAccess("transactions") && (
+            <Button className="menu-btn" onClick={() => goTo("/admin-transactions")}>
+              TRANSACTIONS
+            </Button>
+          )}
+
           {hasAccess("products") && (
             <Button className="menu-btn" onClick={() => goTo("/admin-product")}>
               PRODUCTS
