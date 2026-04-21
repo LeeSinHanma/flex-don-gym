@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { IonIcon } from "@ionic/react";
 import { arrowBack, menu } from "ionicons/icons";
-import { getCurrentUser } from "../../logicHandlers/userServices";
+import { getCurrentUser, changePassword, loginUser } from "../../logicHandlers/userServices";
+import StatusModal from "../../components/Reusable/StatusModal";
 import { BackButton } from "../../components/Reusable/BackButton";
 import Menu from "../../components/Reusable/Menu";
 import { Button } from "../../components/Reusable/Button";
@@ -15,6 +16,15 @@ const AccountPage: React.FC = () => {
   const history = useHistory();
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Status Modal State
+  const [statusModal, setStatusModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info" as "success" | "error" | "warning" | "info",
+  });
 
   // Password fields
   const [currentPassword, setCurrentPassword] = useState("");
@@ -38,24 +48,56 @@ const AccountPage: React.FC = () => {
     return accessNames[key] || key;
   };
 
-  const handlePasswordSubmit = () => {
-    console.log("Password Change Request:", {
-      currentPassword,
-      newPassword,
-      confirmPassword,
+  const showStatus = (title: string, message: string, type: "success" | "error" | "warning" | "info") => {
+    setStatusModal({
+      isOpen: true,
+      title,
+      message,
+      type,
     });
-    
-    if (newPassword !== confirmPassword) {
-      alert("Passwords do not match!");
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showStatus("Input Required", "Please fill in all fields.", "warning");
       return;
     }
 
-    alert("Password change recorded in console!");
+    if (newPassword !== confirmPassword) {
+      showStatus("Match Error", "New passwords do not match!", "error");
+      return;
+    }
 
-    setShowPasswordModal(false);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    setLoading(true);
+    try {
+      const userId = user.userID || user.user_id || user.id;
+      const username = user.username;
+      
+      if (!userId || !username) {
+        throw new Error("User information is incomplete.");
+      }
+
+      // 1. Validate current password by attempting to login
+      try {
+        await loginUser(username, currentPassword);
+      } catch (loginErr: any) {
+        throw new Error("Current password verification failed. Please check your credentials.");
+      }
+
+      // 2. If login successful, proceed to change password
+      await changePassword(userId, newPassword);
+      
+      showStatus("Success", "Password changed successfully!", "success");
+      setShowPasswordModal(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      console.error("Password Change Error:", err);
+      showStatus("Error", err.message || "Failed to change password.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -176,6 +218,7 @@ const AccountPage: React.FC = () => {
               placeholder="Enter current password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -187,6 +230,7 @@ const AccountPage: React.FC = () => {
               placeholder="Enter new password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -198,6 +242,7 @@ const AccountPage: React.FC = () => {
               placeholder="Confirm new password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={loading}
             />
           </div>
 
@@ -211,6 +256,7 @@ const AccountPage: React.FC = () => {
                 setNewPassword("");
                 setConfirmPassword("");
               }}
+              disabled={loading}
             >
               Cancel
             </Button>
@@ -218,12 +264,20 @@ const AccountPage: React.FC = () => {
               type="button"
               className="btn-modal btn-submit-modal account-btn-submit"
               onClick={handlePasswordSubmit}
+              disabled={loading}
             >
-              Submit
+              {loading ? "Updating..." : "Submit"}
             </Button>
           </div>
         </div>
       </Modal>
+      <StatusModal
+        isOpen={statusModal.isOpen}
+        title={statusModal.title}
+        message={statusModal.message}
+        type={statusModal.type}
+        onClose={() => setStatusModal({ ...statusModal, isOpen: false })}
+      />
     </div>
   );
 };
