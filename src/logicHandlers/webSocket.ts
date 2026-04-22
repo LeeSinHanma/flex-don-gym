@@ -2,9 +2,11 @@ type CheckInCallback = (count: number) => void;
 
 let socket: WebSocket | null = null;
 let pollingInterval: any = null;
+let isCheckInsDisconnecting = false; // Prevents polling on intentional disconnect
 
 let revenueSocket: WebSocket | null = null;
 let revenuePollingInterval: any = null;
+let isRevenueDisconnecting = false; // Prevents polling on intentional disconnect
 
 // ✅ WebSocket (real-time)
 export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
@@ -19,6 +21,7 @@ export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
   const token = localStorage.getItem("access_token");
+  isCheckInsDisconnecting = false;
   socket = new WebSocket(`${wsBaseURL}/dashboard/check-ins-today?token=${encodeURIComponent(token ?? "")}`);
 
   socket.onopen = () => {
@@ -52,20 +55,24 @@ export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
     }
   };
 
+  // onerror fires BEFORE onclose — do NOT start polling here to avoid double-start
   socket.onerror = () => {
-    console.log("⚠️ WS error → fallback to polling");
-    startPolling(onUpdate);
+    console.log("⚠️ WS error (onclose will handle fallback)");
   };
 
   socket.onclose = () => {
-    console.log("🔌 WebSocket closed → fallback to polling");
+    console.log("🔌 WebSocket closed");
     socket = null;
-    startPolling(onUpdate);
+    // Only fallback to polling if this wasn't an intentional disconnect
+    if (!isCheckInsDisconnecting) {
+      startPolling(onUpdate);
+    }
   };
 };
 
 // ❌ Disconnect WS
 export const disconnectCheckInsWS = () => {
+  isCheckInsDisconnecting = true; // Signal: don't start polling on close
   if (socket) {
     socket.close();
     socket = null;
@@ -73,11 +80,11 @@ export const disconnectCheckInsWS = () => {
   stopPolling();
 };
 
-// ✅ Polling (fallback)
+// ✅ Polling (fallback) — 60s interval to reduce backend load
 export const startPolling = (onUpdate: CheckInCallback) => {
   if (pollingInterval) return; // prevent duplicates
 
-  console.log("🔄 Polling started");
+  console.log("🔄 Polling started (60s interval)");
 
   pollingInterval = setInterval(async () => {
     try {
@@ -134,10 +141,9 @@ export const startPolling = (onUpdate: CheckInCallback) => {
 
       console.log("📊 Polling data:", data);
     } catch (err) {
-      // Just log less frequently to keep console clean
-      console.error("❌ Polling error (skipping log to keep console clean)");
+      console.error("❌ Polling error");
     }
-  }, 15000); // ⏱ every 15 seconds instead of 5
+  }, 60000); // ⏱ every 60 seconds
 };
 
 // 🛑 Stop polling
@@ -162,6 +168,7 @@ export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
   const token = localStorage.getItem("access_token");
+  isRevenueDisconnecting = false;
   revenueSocket = new WebSocket(`${wsBaseURL}/dashboard/revenue-today?token=${encodeURIComponent(token ?? "")}`);
 
   revenueSocket.onopen = () => {
@@ -208,20 +215,24 @@ export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
     }
   };
 
+  // onerror fires BEFORE onclose — do NOT start polling here to avoid double-start
   revenueSocket.onerror = () => {
-    console.log("⚠️ Revenue WS error → fallback to polling");
-    startRevenuePolling(onUpdate);
+    console.log("⚠️ Revenue WS error (onclose will handle fallback)");
   };
 
   revenueSocket.onclose = () => {
-    console.log("🔌 Revenue WebSocket closed → fallback to polling");
+    console.log("🔌 Revenue WebSocket closed");
     revenueSocket = null;
-    startRevenuePolling(onUpdate);
+    // Only fallback to polling if this wasn't an intentional disconnect
+    if (!isRevenueDisconnecting) {
+      startRevenuePolling(onUpdate);
+    }
   };
 };
 
 // ❌ Disconnect Revenue WS
 export const disconnectRevenueWS = () => {
+  isRevenueDisconnecting = true; // Signal: don't start polling on close
   if (revenueSocket) {
     revenueSocket.close();
     revenueSocket = null;
@@ -229,11 +240,11 @@ export const disconnectRevenueWS = () => {
   stopRevenuePolling();
 };
 
-// ✅ Polling (fallback) for Revenue
+// ✅ Polling (fallback) for Revenue — 60s interval to reduce backend load
 export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
   if (revenuePollingInterval) return; // prevent duplicates
 
-  console.log("🔄 Revenue Polling started");
+  console.log("🔄 Revenue Polling started (60s interval)");
 
   revenuePollingInterval = setInterval(async () => {
     try {
@@ -304,7 +315,7 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
     } catch (err) {
       // Just log less frequently
     }
-  }, 15000); // ⏱ every 15 seconds instead of 5
+  }, 60000); // ⏱ every 60 seconds
 };
 
 // 🛑 Stop Revenue polling
