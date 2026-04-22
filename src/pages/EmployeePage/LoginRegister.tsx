@@ -60,7 +60,37 @@ const LoginRegister: React.FC = () => {
 
     try {
       const userRes = await loginUser(username, password);
-      const fullUser = await getUserByUsername(username);
+      
+      let fullUser: any;
+      try {
+        fullUser = await getUserByUsername(username);
+      } catch (err: any) {
+        console.warn("Could not fetch user by username (possibly 403 Forbidden). Falling back to token payload.", err);
+        
+        let tokenPayload: any = {};
+        if (userRes.access_token) {
+          try {
+            const base64Url = userRes.access_token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            tokenPayload = JSON.parse(jsonPayload);
+            console.log("Extracted token payload:", tokenPayload);
+          } catch (e) {
+            console.error("Failed to parse JWT", e);
+          }
+        }
+
+        fullUser = {
+          id: userRes.id || userRes.user_id || tokenPayload.id || tokenPayload.sub || "unknown-id",
+          username: username,
+          first_name: userRes.first_name || tokenPayload.first_name || "Employee",
+          last_name: userRes.last_name || tokenPayload.last_name || "",
+          role: userRes.role ?? tokenPayload.role ?? 1,
+          access_list: userRes.access_list || tokenPayload.access_list || []
+        };
+      }
 
       const loggedUser = {
         userID: fullUser.id,

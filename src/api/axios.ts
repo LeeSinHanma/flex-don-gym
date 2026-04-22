@@ -23,11 +23,18 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token missing/invalid/expired
+      
+      // Don't redirect if we're already trying to login, otherwise it refreshes the page on wrong password
+      const isLoginRequest = error.config?.url?.includes("/users/login");
+      
       localStorage.removeItem("access_token");
       localStorage.removeItem("token_type");
       localStorage.removeItem("access_list");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      
+      if (!isLoginRequest) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

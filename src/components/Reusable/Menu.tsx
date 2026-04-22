@@ -58,6 +58,12 @@ const Menu: React.FC<MenuProps> = ({
             </Button>
           )}
 
+          {hasAccess("transactions") && (
+            <Button className="menu-btn" onClick={() => goTo("/admin-transactions")}>
+              TRANSACTIONS
+            </Button>
+          )}
+
           {hasAccess("products") && (
             <Button className="menu-btn" onClick={() => goTo("/admin-product")}>
               PRODUCTS
@@ -88,9 +94,14 @@ const Menu: React.FC<MenuProps> = ({
             </Button>
           )}
 
+          <Button className="menu-btn" onClick={() => goTo("/account")}>
+            ACCOUNT
+          </Button>
+
           <Button className="menu-btn" onClick={handleLogoutClick}>
             LOGOUT
           </Button>
+
 
           <Button className="menu-btn menu-btn-close" onClick={onClose}>
             Close

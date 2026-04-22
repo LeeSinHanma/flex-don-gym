@@ -56,6 +56,7 @@ const EmployeeMenu: React.FC = () => {
     { label: "Employee Edit", value: "employees" },
     { label: "Products Edit", value: "products" },
     { label: "Membership Plan", value: "membership-plans" },
+    { label: "Transactions", value: "transactions" },
     { label: "QR Scanner", value: "qr-scanner" },
     { label: "POS", value: "pos" },
     { label: "Members Page", value: "status" },
