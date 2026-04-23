@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { IonIcon } from "@ionic/react";
-import { search, arrowBack } from "ionicons/icons";
+import { search, arrowBack, menu } from "ionicons/icons";
 import "./PosItem.css";
 import { useHistory, useLocation } from "react-router-dom";
 import POSCard from "../../components/Reusable/PosCard";
 import { BackButton } from "../../components/Reusable/BackButton";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import {
   getInventoryItems,
   InventoryItem,
@@ -24,6 +26,8 @@ import { getAllInventoryItems } from "../../repositories/inventoryRepository";
 const PosItemPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<PosItemLocationState>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -121,6 +125,10 @@ const PosItemPage: React.FC = () => {
 
   return (
     <div className="pos-item-container">
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
       <div className="item-main-container">
         <div className="top-header">
           <div className="top-top-header">
@@ -136,6 +144,16 @@ const PosItemPage: React.FC = () => {
               <IonIcon icon={arrowBack} />
             </BackButton>
             <h2>All items</h2>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
+              >
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
 
           <div className="pos-search-bar">

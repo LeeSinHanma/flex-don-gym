@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBack, menu } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import { getMembershipDistribution } from "../../repositories/memberRepository";
 import { getMembers } from "../../logicHandlers/memberCrud";
 import { getMembershipTypes } from "../../logicHandlers/membershipCrud";
@@ -56,13 +57,14 @@ ChartJS.register(
 );
 
 const AdminDashboard: React.FC = () => {
+  const history = useHistory();
+  const isMobileView = useResponsiveView();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
   const [revenueSubtitle, setRevenueSubtitle] = useState(
     "Total monthly revenue",
   );
   const [currentRevenue, setCurrentRevenue] = useState(184950);
-  const history = useHistory();
 
   const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
   const [revenueToday, setRevenueToday] = useState<number | null>(null);
@@ -379,11 +381,13 @@ const AdminDashboard: React.FC = () => {
 
           <h1>Dashboard</h1>
 
-          <IonIcon
-            icon={menu}
-            className="menu-icon"
-            onClick={handleMenuClick}
-          />
+          {isMobileView && (
+            <IonIcon
+              icon={menu}
+              className="menu-icon"
+              onClick={handleMenuClick}
+            />
+          )}
         </div>
 
         <div className="admin-main-content">

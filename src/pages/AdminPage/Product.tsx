@@ -11,6 +11,7 @@ import "./AdminDashboard.css";
 import "./Product.css";
 import { useNetworkStatus } from "../../hooks/useNetworkStatus";
 import BarcodeScanModal from "../../components/Reusable/BarcodeScanModal";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import {
   createInventoryItem,
   getInventoryItems,
@@ -25,6 +26,7 @@ import { getCurrentUser } from "../../logicHandlers/userServices";
 
 const ProductPage: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -271,13 +273,14 @@ const ProductPage: React.FC = () => {
           >
             <IonIcon icon={arrowBack} />
           </BackButton>
-
-          <h1>Product</h1>
-          <IonIcon
-            icon={menu}
-            className="menu-icon"
-            onClick={handleMenuClick}
-          />
+          <h1>Products</h1>
+          {isMobileView && (
+            <IonIcon
+              icon={menu}
+              className="menu-icon"
+              onClick={handleMenuClick}
+            />
+          )}
         </div>
 
         <div className="admin-main-content">

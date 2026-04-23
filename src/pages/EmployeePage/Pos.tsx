@@ -9,6 +9,7 @@ import Menu from "../../components/Reusable/Menu";
 import scanSound from "../../resource/scanSound.mp3";
 import scanError from "../../resource/scanError.mp3";
 import StatusModal from "../../components/Reusable/StatusModal";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 import {
   startBarcodeScanner,
@@ -37,6 +38,7 @@ const PosPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<PosLocationState>();
   const isProcessingScan = useRef(false);
+  const isMobileView = useResponsiveView();
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);

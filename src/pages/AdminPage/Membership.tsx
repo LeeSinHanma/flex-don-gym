@@ -13,6 +13,7 @@ import POSCard from "../../components/Reusable/PosCard";
 import "./AdminDashboard.css";
 import "./Product.css";
 import { useNetworkStatus } from "../../hooks/useNetworkStatus";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import {
   createMembershipType,
   getMembershipTypes,
@@ -27,6 +28,7 @@ import Menu from "../../components/Reusable/Menu";
 
 const MembershipPage: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [memberships, setMemberships] = useState<MembershipTypeResponse[]>([]);
@@ -221,11 +223,13 @@ const MembershipPage: React.FC = () => {
             Plans
           </h1>
 
-          <IonIcon
-            icon={menu}
-            className="menu-icon"
-            onClick={handleMenuClick}
-          />
+          {isMobileView && (
+            <IonIcon
+              icon={menu}
+              className="menu-icon"
+              onClick={handleMenuClick}
+            />
+          )}
         </div>
 
         <div className="membership-top-card">
