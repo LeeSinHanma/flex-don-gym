@@ -1,3 +1,5 @@
+import { baseURL } from "../api/axios";
+
 type CheckInCallback = (count: number) => void;
 
 let socket: WebSocket | null = null;
@@ -8,17 +10,12 @@ let revenueSocket: WebSocket | null = null;
 let revenuePollingInterval: any = null;
 let isRevenueDisconnecting = false; // Prevents polling on intentional disconnect
 
+// Derive WebSocket base URL from the shared HTTP base URL
+const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
+
 // ✅ WebSocket (real-time)
 export const connectCheckInsWS = (onUpdate: CheckInCallback) => {
   if (socket) return;
-
-  const baseURL =
-    (typeof import.meta !== "undefined" && import.meta.env
-      ? import.meta.env.VITE_API_BASE_URL
-      : undefined) ||
-    process.env.REACT_APP_API_BASE_URL ||
-    "https://flexolutions-backend.onrender.com";
-  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
   const token = localStorage.getItem("access_token");
   isCheckInsDisconnecting = false;
@@ -88,12 +85,6 @@ export const startPolling = (onUpdate: CheckInCallback) => {
 
   pollingInterval = setInterval(async () => {
     try {
-      const baseURL =
-        (typeof import.meta !== "undefined" && import.meta.env
-          ? import.meta.env.VITE_API_BASE_URL
-          : undefined) ||
-        process.env.REACT_APP_API_BASE_URL ||
-        "https://flexolutions-backend.onrender.com";
       const token = localStorage.getItem("access_token");
       const res = await fetch(`${baseURL}/dashboard/check-ins-today`, {
         headers: {
@@ -158,14 +149,6 @@ export const stopPolling = () => {
 // ✅ WebSocket (real-time) for Revenue
 export const connectRevenueWS = (onUpdate: (amount: number) => void) => {
   if (revenueSocket) return;
-
-  const baseURL =
-    (typeof import.meta !== "undefined" && import.meta.env
-      ? import.meta.env.VITE_API_BASE_URL
-      : undefined) ||
-    process.env.REACT_APP_API_BASE_URL ||
-    "https://flexolutions-backend.onrender.com";
-  const wsBaseURL = baseURL.replace(/^http(s?):\/\//, "ws$1://");
 
   const token = localStorage.getItem("access_token");
   isRevenueDisconnecting = false;
@@ -248,10 +231,6 @@ export const startRevenuePolling = (onUpdate: (amount: number) => void) => {
 
   revenuePollingInterval = setInterval(async () => {
     try {
-      const baseURL =
-        (typeof import.meta !== "undefined" && import.meta.env
-          ? import.meta.env.VITE_API_BASE_URL
-          : undefined) || process.env.REACT_APP_API_BASE_URL;
       const token = localStorage.getItem("access_token");
       const res = await fetch(`${baseURL}/dashboard/revenue-today`, {
         headers: {
@@ -326,3 +305,4 @@ export const stopRevenuePolling = () => {
     console.log("⛔ Revenue Polling stopped");
   }
 };
+
