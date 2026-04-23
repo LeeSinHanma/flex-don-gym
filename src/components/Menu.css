@@ -2,6 +2,58 @@ ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
 
+/* Web view - fixed sidebar */
+@media (min-width: 769px) {
+  ion-menu {
+    width: 250px;
+  }
+
+  ion-menu.web-menu {
+    --width: 250px;
+  }
+
+  ion-menu.web-menu ion-content {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 16px;
+    --padding-bottom: 16px;
+  }
+
+  ion-menu.web-menu ion-list {
+    padding: 16px 0;
+  }
+
+  ion-menu.web-menu ion-list-header,
+  ion-menu.web-menu ion-note {
+    padding-left: 10px;
+  }
+
+  ion-menu.web-menu ion-item {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    border-radius: 3px;
+  }
+
+  ion-menu.web-menu ion-item.selected {
+    --background: rgba(var(--ion-color-primary-rgb), 0.14);
+  }
+
+  ion-menu.web-menu ion-item.selected ion-icon {
+    color: var(--ion-color-primary);
+  }
+
+  ion-menu.web-menu ion-item ion-icon {
+    color: #616e7e;
+  }
+}
+
+/* Mobile view - overlay menu */
+@media (max-width: 768px) {
+  ion-menu.mobile-menu {
+    --width: 250px;
+  }
+}
+
 ion-menu.md ion-content {
   --padding-start: 6px;
   --padding-end: 6px;
@@ -97,6 +149,13 @@ ion-menu.ios ion-list-header,
 ion-menu.ios ion-note {
   padding-left: 12px;
   padding-right: 12px;
+}
+
+/* Smooth transition for web/mobile layout */
+@media (max-width: 768px) {
+  ion-menu {
+    --width: 250px;
+  }
 }
 
 ion-menu.ios ion-note {

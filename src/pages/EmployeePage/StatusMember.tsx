@@ -9,6 +9,7 @@ import { getMembers, Member } from "../../logicHandlers/memberCrud";
 import { getMembershipTypeById } from "../../logicHandlers/membershipCrud";
 import Menu from "../../components/Reusable/Menu";
 import { Button } from "../../components/Reusable/Button";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 import { Network } from "@capacitor/network";
 import { getAllMembers } from "../../repositories/memberRepository";
@@ -17,6 +18,7 @@ import StatusModal from "../../components/Reusable/StatusModal";
 
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
 
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
@@ -227,14 +229,16 @@ const StatusMemberPage: React.FC = () => {
 
             <h2>Manage Member</h2>
 
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setShowEmployeeMenu(true)}
-              aria-label="Open menu"
-            >
-              <IonIcon icon={menu} />
-            </button>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
+              >
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
 
           <div className="search-bar">

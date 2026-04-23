@@ -4,7 +4,9 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import { Modal } from "../../components/Reusable/Modals";
 import LoadingScreen from "../LoadingScreen";
 import QRCode from "react-qr-code";
@@ -23,6 +25,8 @@ interface RouteParams {
 const EditMemberPage: React.FC = () => {
   const history = useHistory();
   const { memberId } = useParams<RouteParams>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,6 +126,10 @@ const EditMemberPage: React.FC = () => {
     <>
       {isLoading && <LoadingScreen />}
 
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
       <div className="member-menu-container">
         <div className="main-container">
           <div className="top-container">
@@ -133,6 +141,16 @@ const EditMemberPage: React.FC = () => {
                 <IonIcon icon={arrowBack} />
               </BackButton>
               <h1>Edit Member</h1>
+              {isMobileView && (
+                <button
+                  type="button"
+                  className="icon-button"
+                  onClick={() => setShowEmployeeMenu(true)}
+                  aria-label="Open menu"
+                >
+                  <IonIcon icon={menu} />
+                </button>
+              )}
             </div>
           </div>
 

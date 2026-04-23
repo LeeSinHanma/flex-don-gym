@@ -39,6 +39,12 @@
   display: none;
 }
 
+@media (min-width: 769px) {
+  .admin-dashboard-container .main-container {
+    max-width: 600px;
+  }
+}
+
 .admin-main-content h3 {
   margin: 0;
   font-size: 1.2rem;

@@ -11,6 +11,7 @@ interface ModalProps {
   headerImage?: React.ReactNode;
   showCloseButton?: boolean;
   closeText?: string;
+  alignLeft?: boolean;
 }
 
 export function Modal({
@@ -22,11 +23,12 @@ export function Modal({
   headerImage,
   showCloseButton = true,
   closeText = "Close",
+  alignLeft = false,
 }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className={`modal-overlay ${alignLeft ? "modal-overlay-left" : ""}`} onClick={onClose}>
       <div
         className={`modal-content ${className ?? ""}`}
         onClick={(e) => e.stopPropagation()}

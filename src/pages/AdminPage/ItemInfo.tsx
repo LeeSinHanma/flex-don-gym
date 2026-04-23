@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { IonIcon } from "@ionic/react";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory, useLocation } from "react-router-dom";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import "./AdminDashboard.css";
 import "./ItemInfo.css";
 import { UsernameInput } from "../../components/Reusable/Username";
@@ -24,6 +26,8 @@ type LocationState = {
 const ItemInfoPage: React.FC = () => {
   const history = useHistory();
   const location = useLocation<LocationState>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const passedItem = location.state?.item;
@@ -117,7 +121,12 @@ const ItemInfoPage: React.FC = () => {
   };
 
   return (
-    <div className="admin-dashboard-container">
+    <>
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
+      <div className="admin-dashboard-container">
       <div className="admin-main-container">
         <div className="admin-top-header">
           <BackButton
@@ -128,6 +137,16 @@ const ItemInfoPage: React.FC = () => {
           </BackButton>
 
           <h2>Edit Products</h2>
+          {isMobileView && (
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         {!passedItem && (
@@ -244,6 +263,7 @@ const ItemInfoPage: React.FC = () => {
         type={statusType}
       />
     </div>
+  </>
   );
 };
 

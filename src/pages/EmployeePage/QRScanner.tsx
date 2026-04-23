@@ -29,6 +29,7 @@ import {
   MembershipTypeResponse,
 } from "../../logicHandlers/membershipCrud";
 import { getMemberById } from "../../logicHandlers/memberCrud";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 // Local Repository Fallbacks
 import { getLocalGymPricing } from "../../repositories/pricingRepository";
@@ -87,6 +88,7 @@ function mapOfflineResultToVisitResult(
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
 
   const [showModal, setShowModal] = useState(false);
   const [visitResult, setVisitResult] = useState<ScanVisitResult | null>(null);
@@ -418,14 +420,16 @@ const QRScannerHome: React.FC = () => {
           </div>
 
           <div className="header-action-group">
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setShowEmployeeMenu(true)}
-              aria-label="Open menu"
-            >
-              <IonIcon icon={menu} />
-            </button>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
+              >
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
         </div>
 
