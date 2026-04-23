@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
 import { arrowBack, menu } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import { getMembershipDistribution } from "../../repositories/memberRepository";
 import { getMembers } from "../../logicHandlers/memberCrud";
 import { getMembershipTypes } from "../../logicHandlers/membershipCrud";
@@ -9,6 +10,10 @@ import {
   getAllTransactions,
   TransactionResponse,
 } from "../../logicHandlers/transactionHandler";
+import {
+  getLowStockItems,
+  InventoryItem,
+} from "../../logicHandlers/itemInvCrud";
 import { Capacitor } from "@capacitor/core";
 import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
@@ -56,13 +61,14 @@ ChartJS.register(
 );
 
 const AdminDashboard: React.FC = () => {
+  const history = useHistory();
+  const isMobileView = useResponsiveView();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("Monthly");
   const [revenueSubtitle, setRevenueSubtitle] = useState(
     "Total monthly revenue",
   );
   const [currentRevenue, setCurrentRevenue] = useState(184950);
-  const history = useHistory();
 
   const [checkInsToday, setCheckInsToday] = useState<number | null>(null);
   const [revenueToday, setRevenueToday] = useState<number | null>(null);
@@ -99,13 +105,7 @@ const AdminDashboard: React.FC = () => {
     { name: "Lifting Straps", sales: 8100 },
   ];
 
-  const lowOnStocks = [
-    { name: "Whey Protein 2lb", stock: 3 },
-    { name: "Creatine Monohydrate", stock: 5 },
-    { name: "Resistance Bands Set", stock: 2 },
-    { name: "Shaker Bottle", stock: 8 },
-    { name: "Lifting Straps", stock: 1 },
-  ];
+  const [lowOnStocks, setLowOnStocks] = useState<InventoryItem[] | null>(null);
 
   const membershipTotal = useMemo(
     () => membershipPlans?.reduce((total, plan) => total + plan.count, 0) ?? 0,
@@ -257,6 +257,17 @@ const AdminDashboard: React.FC = () => {
         setLatestPayments([]);
       }
 
+      // Fetch low stock items
+      try {
+        const lowStock = await getLowStockItems(10, 5);
+        // Sort by quantity ascending so the lowest is Rank 1
+        const sortedLowStock = lowStock.sort((a, b) => a.quantity - b.quantity);
+        setLowOnStocks(sortedLowStock);
+      } catch (err) {
+        console.error("Failed to fetch low stock items:", err);
+        setLowOnStocks([]);
+      }
+
       if (platform === "web") {
         // Fetch from API on web
         const [members, types] = await Promise.all([
@@ -379,11 +390,13 @@ const AdminDashboard: React.FC = () => {
 
           <h1>Dashboard</h1>
 
-          <IonIcon
-            icon={menu}
-            className="menu-icon"
-            onClick={handleMenuClick}
-          />
+          {isMobileView && (
+            <IonIcon
+              icon={menu}
+              className="menu-icon"
+              onClick={handleMenuClick}
+            />
+          )}
         </div>
 
         <div className="admin-main-content">
@@ -715,14 +728,6 @@ const AdminDashboard: React.FC = () => {
                       )}
                     </div>
                   </div>
-
-                  <button
-                    type="button"
-                    className="ad-ghost-action-btn"
-                    onClick={() => history.push("/status-member")}
-                  >
-                    View Details
-                  </button>
                 </section>
 
                 <section className="ad-dashboard-card ad-best-sellers-card">
@@ -741,10 +746,6 @@ const AdminDashboard: React.FC = () => {
                       </li>
                     ))}
                   </ol>
-
-                  <button type="button" className="ad-ghost-action-btn">
-                    View Details
-                  </button>
                 </section>
 
                 <section className="ad-dashboard-card ad-low-stock-card">
@@ -753,18 +754,26 @@ const AdminDashboard: React.FC = () => {
                   </div>
 
                   <ol className="ad-best-sellers-list">
-                    {lowOnStocks.map((item, index) => (
-                      <li key={item.name} className="ad-best-seller-item">
-                        <span className="ad-seller-rank">{index + 1}</span>
-                        <span className="ad-seller-name">{item.name}</span>
-                        <span className="ad-seller-sales">{item.stock}</span>
-                      </li>
-                    ))}
+                    {lowOnStocks === null ? (
+                      [1, 2, 3, 4, 5].map((i) => (
+                        <li key={`low-stock-skeleton-${i}`} className="ad-best-seller-item">
+                          <span className="ad-seller-rank">{i}</span>
+                          <IonSkeletonText animated={true} style={{ width: "60%", height: "14px" }} />
+                          <IonSkeletonText animated={true} style={{ width: "20%", height: "14px" }} />
+                        </li>
+                      ))
+                    ) : lowOnStocks.length === 0 ? (
+                      <p style={{ textAlign: "center", color: "#666", padding: "10px" }}>No low stock items</p>
+                    ) : (
+                      lowOnStocks.map((item, index) => (
+                        <li key={item.item_id} className="ad-best-seller-item">
+                          <span className="ad-seller-rank">{index + 1}</span>
+                          <span className="ad-seller-name">{item.item_name}</span>
+                          <span className="ad-seller-sales">{item.quantity}</span>
+                        </li>
+                      ))
+                    )}
                   </ol>
-
-                  <button type="button" className="ad-ghost-action-btn">
-                    View Details
-                  </button>
                 </section>
               </div>
             </>

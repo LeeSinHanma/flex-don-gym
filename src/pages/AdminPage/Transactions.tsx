@@ -16,9 +16,11 @@ import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import "./AdminDashboard.css";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 const Transactions: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -299,11 +301,13 @@ const Transactions: React.FC = () => {
 
           <h1>All Transactions</h1>
 
-          <IonIcon
-            icon={menu}
-            className="menu-icon"
-            onClick={handleMenuClick}
-          />
+          {isMobileView && (
+            <IonIcon
+              icon={menu}
+              className="menu-icon"
+              onClick={handleMenuClick}
+            />
+          )}
         </div>
 
         <div className="admin-main-content">

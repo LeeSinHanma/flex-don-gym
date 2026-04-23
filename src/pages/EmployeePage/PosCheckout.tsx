@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IonIcon } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { useHistory, useLocation } from "react-router-dom";
@@ -13,6 +13,8 @@ import ReceiptModal from "../../components/Reusable/ReceiptModal";
 import TransacModal from "../../components/Reusable/TransacModal";
 import StatusModal from "../../components/Reusable/StatusModal";
 import { getCurrentUser } from "../../logicHandlers/userServices";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 type CartItem = InventoryItem & {
   cartQuantity: number;
@@ -29,6 +31,8 @@ import { processSaleOffline } from "../../logicHandlers/offlineSales";
 const PosCheckout: React.FC = () => {
   const history = useHistory();
   const location = useLocation<LocationState>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const cartItems = location.state?.cartItems ?? [];
   const totalAmount = location.state?.totalAmount ?? 0;
@@ -145,6 +149,10 @@ const PosCheckout: React.FC = () => {
 
   return (
     <div className="pos-item-container">
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
       <div className="item-main-container">
         <div className="top-top-header">
           <BackButton
@@ -155,6 +163,16 @@ const PosCheckout: React.FC = () => {
             <IonIcon icon={arrowBack} />
           </BackButton>
           <h2>Checkout</h2>
+          {isMobileView && (
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         <div className="pos-checkout-info">
@@ -180,6 +198,7 @@ const PosCheckout: React.FC = () => {
             className="btn-checkout"
             type="button"
             onClick={() => setShowTransacModal(true)}
+            disabled={isLoading}
           >
             Place order
           </Button>
@@ -209,6 +228,7 @@ const PosCheckout: React.FC = () => {
         setPaymentMethod={setPaymentMethod}
         amountGiven={amountGiven}
         setAmountGiven={setAmountGiven}
+        isLoading={isLoading}
       />
 
       <StatusModal

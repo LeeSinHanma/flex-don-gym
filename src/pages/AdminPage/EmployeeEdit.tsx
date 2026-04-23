@@ -3,7 +3,9 @@ import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import { Modal } from "../../components/Reusable/Modals";
 import StatusModal from "../../components/Reusable/StatusModal";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
@@ -14,6 +16,8 @@ import {
   getUserById,
   updateUser,
   deleteUser,
+  changePassword,
+  getCurrentUser,
   User,
 } from "../../logicHandlers/userServices";
 
@@ -24,16 +28,22 @@ interface RouteParams {
 const EmployeeEdit: React.FC = () => {
   const history = useHistory();
   const { userId } = useParams<RouteParams>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const [employee, setEmployee] = useState<User | null>(null);
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmType, setConfirmType] = useState<"update" | "delete" | null>(
-    null,
-  );
+  const [confirmType, setConfirmType] = useState<
+    "update" | "delete" | "password" | null
+  >(null);
 
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
@@ -53,11 +63,15 @@ const EmployeeEdit: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const currentUser = getCurrentUser();
+  const isAdmin = currentUser?.role === 0 || currentUser?.userType === 0;
+
   const accessOptions = [
     { label: "Dashboard", value: "dashboard" },
     { label: "Employee Edit", value: "employees" },
     { label: "Products Edit", value: "products" },
     { label: "Membership Plan", value: "membership-plans" },
+    { label: "Transactions", value: "transactions" },
     { label: "QR Scanner", value: "qr-scanner" },
     { label: "POS", value: "pos" },
     { label: "Members Page", value: "status" },
@@ -185,6 +199,52 @@ const EmployeeEdit: React.FC = () => {
     }
   };
 
+  const handleChangePassword = async () => {
+    if (!employee) return;
+
+    if (!newPassword || !confirmNewPassword) {
+      openStatusModal(
+        "Validation Error",
+        "Please fill in both password fields.",
+        "warning",
+      );
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      openStatusModal(
+        "Validation Error",
+        "Passwords do not match.",
+        "warning",
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await changePassword(employee.id, newPassword);
+
+      setShowPasswordModal(false);
+      setNewPassword("");
+      setConfirmNewPassword("");
+
+      openStatusModal(
+        "Password Updated",
+        "Employee password has been updated successfully.",
+        "success",
+      );
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      openStatusModal(
+        "Update Failed",
+        "Failed to update employee password.",
+        "error",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleConfirmAction = async () => {
     setShowConfirmModal(false);
 
@@ -196,11 +256,20 @@ const EmployeeEdit: React.FC = () => {
       await handleDelete();
     }
 
+    if (confirmType === "password") {
+      await handleChangePassword();
+    }
+
     setConfirmType(null);
   };
 
   return (
-    <div className="manage-member-container">
+    <>
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
+      <div className="manage-member-container">
       <div className="main-container">
         <div className="status-top-header">
           <BackButton
@@ -210,6 +279,16 @@ const EmployeeEdit: React.FC = () => {
             <IonIcon icon={arrowBack} />
           </BackButton>
           <h2>Edit Employee</h2>
+          {isMobileView && (
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         <div className="member-container member-container-employee">
@@ -269,6 +348,16 @@ const EmployeeEdit: React.FC = () => {
             >
               Update
             </Button>
+
+            {isAdmin && (
+              <Button
+                type="button"
+                className="edit-btn"
+                onClick={() => setShowPasswordModal(true)}
+              >
+                Change Password
+              </Button>
+            )}
 
             <Button
               type="button"
@@ -402,15 +491,101 @@ const EmployeeEdit: React.FC = () => {
         </div>
       </Modal>
 
+      <Modal
+        className="modal-box"
+        isOpen={showPasswordModal}
+        title="Change Password"
+        showCloseButton={false}
+        onClose={() => setShowPasswordModal(false)}
+      >
+        <div className="employee-form">
+          <div className="form-group">
+            <label>New Password</label>
+            <UsernameInput
+              className="employee-input"
+              value={newPassword}
+              type="password"
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Confirm New Password</label>
+            <UsernameInput
+              className="employee-input"
+              value={confirmNewPassword}
+              type="password"
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+            />
+          </div>
+
+          <div className="form-actions" style={{ display: "flex", gap: 10 }}>
+            <Button
+              type="button"
+              className="btn-modal btn-submit-modal"
+              onClick={() => {
+                if (newPassword !== confirmNewPassword) {
+                  openStatusModal(
+                    "Validation Error",
+                    "Passwords do not match.",
+                    "warning",
+                  );
+                  return;
+                }
+                if (!newPassword) {
+                  openStatusModal(
+                    "Validation Error",
+                    "Password cannot be empty.",
+                    "warning",
+                  );
+                  return;
+                }
+                setShowPasswordModal(false);
+                setConfirmType("password");
+                setShowConfirmModal(true);
+              }}
+            >
+              Update Password
+            </Button>
+
+            <Button
+              type="button"
+              className="cancel-btn"
+              onClick={() => {
+                setShowPasswordModal(false);
+                setNewPassword("");
+                setConfirmNewPassword("");
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
       <ConfirmModal
         isOpen={showConfirmModal}
-        title={confirmType === "update" ? "Confirm Update" : "Confirm Delete"}
+        title={
+          confirmType === "update"
+            ? "Confirm Update"
+            : confirmType === "delete"
+              ? "Confirm Delete"
+              : "Confirm Password Change"
+        }
         message={
           confirmType === "update"
             ? "Are you sure you want to update this employee?"
-            : "Are you sure you want to delete this employee?"
+            : confirmType === "delete"
+              ? "Are you sure you want to delete this employee?"
+              : "Are you sure you want to change the password for this employee?"
         }
-        confirmText={confirmType === "update" ? "Update" : "Delete"}
+        confirmText={
+          confirmType === "update"
+            ? "Update"
+            : confirmType === "delete"
+              ? "Delete"
+              : "Change Password"
+        }
         cancelText="Cancel"
         onCancel={() => {
           setShowConfirmModal(false);
@@ -452,6 +627,7 @@ const EmployeeEdit: React.FC = () => {
         type={statusType}
       />
     </div>
+  </>
   );
 };
 

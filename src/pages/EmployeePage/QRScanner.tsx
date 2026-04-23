@@ -29,6 +29,7 @@ import {
   MembershipTypeResponse,
 } from "../../logicHandlers/membershipCrud";
 import { getMemberById } from "../../logicHandlers/memberCrud";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 // Local Repository Fallbacks
 import { getLocalGymPricing } from "../../repositories/pricingRepository";
@@ -87,6 +88,7 @@ function mapOfflineResultToVisitResult(
 
 const QRScannerHome: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
 
   const [showModal, setShowModal] = useState(false);
   const [visitResult, setVisitResult] = useState<ScanVisitResult | null>(null);
@@ -247,9 +249,14 @@ const QRScannerHome: React.FC = () => {
   useEffect(() => {
     const loadPricing = async () => {
       try {
-        const data = await getGymPricing().catch(async () => {
-          console.warn("Pricing API failed, using local...");
-          return await getLocalGymPricing();
+        const data = await getGymPricing().catch(async (e) => {
+          console.warn("Pricing API failed, using local fallback...", e);
+          try {
+            return await getLocalGymPricing();
+          } catch (localErr) {
+            console.warn("Local gym pricing fallback failed:", localErr);
+            return null;
+          }
         });
 
         if (data) {
@@ -257,9 +264,14 @@ const QRScannerHome: React.FC = () => {
           setAmountToPay(data.base_day_pass_price);
         }
 
-        const mTypes = await getMembershipTypes().catch(async () => {
-          console.warn("Membership API failed, using local...");
-          return await getAllMembershipTypes();
+        const mTypes = await getMembershipTypes().catch(async (e) => {
+          console.warn("Membership API failed, using local fallback...", e);
+          try {
+            return await getAllMembershipTypes();
+          } catch (localErr) {
+            console.warn("Local membership types fallback failed:", localErr);
+            return [];
+          }
         });
 
         if (mTypes) {
@@ -408,14 +420,16 @@ const QRScannerHome: React.FC = () => {
           </div>
 
           <div className="header-action-group">
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setShowEmployeeMenu(true)}
-              aria-label="Open menu"
-            >
-              <IonIcon icon={menu} />
-            </button>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
+              >
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
         </div>
 

@@ -65,3 +65,65 @@ p {
   align-items: center;
   color: #04354f;
 }
+
+/* Responsive layout for web and mobile */
+@media (min-width: 769px) {
+  /* Web view - accommodate fixed sidebar (280px) only when sidebar is visible */
+  html {
+    background-color: white;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+
+  body.has-sidebar ion-app {
+    margin-left: 280px;
+  }
+
+  ion-app {
+    background-color: white;
+  }
+
+  ion-router-outlet {
+    width: auto;
+  }
+
+  ion-page {
+    width: 100%;
+  }
+
+  ion-content {
+    --padding-start: 24px;
+    --padding-end: 24px;
+  }
+
+  /* Hide menu button on web view */
+  ion-menu-button {
+    display: none;
+  }
+
+  /* Hide Ionic menu on web */
+  ion-menu {
+    display: none;
+  }
+}
+
+/* Mobile view - full width */
+@media (max-width: 768px) {
+  ion-router-outlet {
+    --ion-safe-area-left: 0;
+    margin-left: 0;
+  }
+
+  ion-menu[type="overlay"] {
+    --width: 250px;
+  }
+
+  ion-content {
+    --padding-start: 16px;
+    --padding-end: 16px;
+  }
+}

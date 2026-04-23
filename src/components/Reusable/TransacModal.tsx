@@ -12,6 +12,7 @@ interface TransacModalProps {
   setPaymentMethod: (method: "cash" | "gcash") => void;
   amountGiven: string;
   setAmountGiven: (value: string) => void;
+  isLoading?: boolean;
 }
 
 const TransacModal: React.FC<TransacModalProps> = ({
@@ -23,6 +24,7 @@ const TransacModal: React.FC<TransacModalProps> = ({
   setPaymentMethod,
   amountGiven,
   setAmountGiven,
+  isLoading = false,
 }) => {
   const isGcash = paymentMethod === "gcash";
   const change = isGcash
@@ -50,6 +52,7 @@ const TransacModal: React.FC<TransacModalProps> = ({
                 paymentMethod === "cash" ? "active" : ""
               }`}
               onClick={() => setPaymentMethod("cash")}
+              disabled={isLoading}
             >
               Cash
             </button>
@@ -60,6 +63,7 @@ const TransacModal: React.FC<TransacModalProps> = ({
                 paymentMethod === "gcash" ? "active" : ""
               }`}
               onClick={() => setPaymentMethod("gcash")}
+              disabled={isLoading}
             >
               GCash
             </button>
@@ -74,7 +78,7 @@ const TransacModal: React.FC<TransacModalProps> = ({
             placeholder="Enter amount"
             value={isGcash ? totalAmount : amountGiven}
             onChange={(e) => setAmountGiven(e.target.value)}
-            disabled={isGcash}
+            disabled={isGcash || isLoading}
           />
         </div>
 
@@ -83,8 +87,13 @@ const TransacModal: React.FC<TransacModalProps> = ({
         </div>
 
         <div className="transac-actions">
-          <Button type="button" className="btn-checkout" onClick={onCheckout}>
-            Checkout
+          <Button
+            type="button"
+            className="btn-checkout"
+            onClick={onCheckout}
+            disabled={isLoading}
+          >
+            {isLoading ? "Processing..." : "Checkout"}
           </Button>
         </div>
       </div>

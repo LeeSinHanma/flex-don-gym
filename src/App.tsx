@@ -5,12 +5,14 @@ import { Route, Redirect, Switch } from "react-router-dom";
 import "./App.css";
 
 import Page from "./pages/Page";
+import Menu from "./components/Menu";
 
 import LoginRegister from "./pages/EmployeePage/LoginRegister";
 import MemberMenu from "./pages/EmployeePage/Member";
 import WalkInMenu from "./pages/EmployeePage/WalkIn";
 import PrepaidMenu from "./pages/EmployeePage/Prepaid";
 import QRScannerHome from "./pages/EmployeePage/QRScanner";
+import AccountPage from "./pages/EmployeePage/Account";
 
 import StartingPageAdmin from "./pages/AdminPage/StartingPage";
 import EmployeeMenu from "./pages/AdminPage/Employee";
@@ -67,7 +69,8 @@ const App: React.FC = () => {
         <AppInitializer showStatus={true} />
         <OfflineBanner />
         <IonReactRouter>
-          <IonRouterOutlet>
+          <Menu />
+          <IonRouterOutlet id="main">
             <Switch>
               {/* Default Redirect */}
               <Route exact path="/">
@@ -172,7 +175,7 @@ const App: React.FC = () => {
               <PrivateRoute
                 exact
                 path="/admin-transactions"
-                requiredAccess="dashboard"
+                requiredAccess="transactions"
                 component={Transactions}
               />
               <PrivateRoute
@@ -180,6 +183,11 @@ const App: React.FC = () => {
                 path="/admin-item-info"
                 requiredAccess="products"
                 component={ItemInfoPage}
+              />
+              <PrivateRoute
+                exact
+                path="/account"
+                component={AccountPage}
               />
               {/* Folder Route (keep last) */}
               <Route exact path="/folder/:name" component={Page} />

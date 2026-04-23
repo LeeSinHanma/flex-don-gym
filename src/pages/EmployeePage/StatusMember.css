@@ -26,6 +26,12 @@
   overflow: hidden;
 }
 
+@media (min-width: 769px) {
+  .main-container {
+    max-width: 600px;
+  }
+}
+
 .top-header {
   display: flex;
   width: 100%;

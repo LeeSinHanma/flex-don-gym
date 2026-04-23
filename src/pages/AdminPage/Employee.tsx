@@ -13,6 +13,7 @@ import StatusModal from "../../components/Reusable/StatusModal";
 import "./AdminDashboard.css";
 import "./Employee.css";
 import { useNetworkStatus } from "../../hooks/useNetworkStatus";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 import {
   createUser,
@@ -23,6 +24,7 @@ import {
 
 const EmployeeMenu: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -56,6 +58,7 @@ const EmployeeMenu: React.FC = () => {
     { label: "Employee Edit", value: "employees" },
     { label: "Products Edit", value: "products" },
     { label: "Membership Plan", value: "membership-plans" },
+    { label: "Transactions", value: "transactions" },
     { label: "QR Scanner", value: "qr-scanner" },
     { label: "POS", value: "pos" },
     { label: "Members Page", value: "status" },
@@ -224,11 +227,13 @@ const EmployeeMenu: React.FC = () => {
           </BackButton>
 
           <h1>Employee</h1>
-          <IonIcon
-            icon={menu}
-            className="menu-icon"
-            onClick={handleMenuClick}
-          />
+          {isMobileView && (
+            <IonIcon
+              icon={menu}
+              className="menu-icon"
+              onClick={handleMenuClick}
+            />
+          )}
         </div>
 
         <div className="search-bar">
