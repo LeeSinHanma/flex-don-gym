@@ -22,6 +22,12 @@
   height: 95dvh;
 }
 
+@media (min-width: 769px) {
+  .main-container {
+    max-width: 600px;
+  }
+}
+
 .menu-qr-container {
   display: flex;
   flex-direction: column;

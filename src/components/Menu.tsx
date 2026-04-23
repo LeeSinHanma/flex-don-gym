@@ -13,6 +13,7 @@ import {
 import { useLocation } from 'react-router-dom';
 import { archiveOutline, archiveSharp, bookmarkOutline, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
 import './Menu.css';
+import useResponsiveView from '../hooks/useResponsiveView';
 
 interface AppPage {
   url: string;
@@ -64,9 +65,11 @@ const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
 const Menu: React.FC = () => {
   const location = useLocation();
+  const isMobileView = useResponsiveView();
+  const isWebView = !isMobileView;
 
   return (
-    <IonMenu contentId="main" type="overlay">
+    <IonMenu contentId="main" type={isWebView ? "push" : "overlay"} className={isWebView ? 'web-menu' : 'mobile-menu'}>
       <IonContent>
         <IonList id="inbox-list">
           <IonListHeader>Inbox</IonListHeader>

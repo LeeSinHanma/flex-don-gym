@@ -8,12 +8,14 @@ import { BackButton } from "../../components/Reusable/BackButton";
 import Menu from "../../components/Reusable/Menu";
 import { Button } from "../../components/Reusable/Button";
 import { Modal } from "../../components/Reusable/Modals";
+import useResponsiveView from "../../hooks/useResponsiveView";
 
 import "./StatusMember.css"; 
 import "./Account.css"; 
 
 const AccountPage: React.FC = () => {
   const history = useHistory();
+  const isMobileView = useResponsiveView();
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -115,13 +117,15 @@ const AccountPage: React.FC = () => {
 
             <h2 className="account-title">My Account</h2>
 
-            <button
-              type="button"
-              className="icon-button account-menu-btn"
-              onClick={() => setShowEmployeeMenu(true)}
-            >
-              <IonIcon icon={menu} />
-            </button>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button account-menu-btn"
+                onClick={() => setShowEmployeeMenu(true)}
+              >
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
         </div>
 

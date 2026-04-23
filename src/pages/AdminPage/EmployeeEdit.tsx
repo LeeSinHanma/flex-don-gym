@@ -3,7 +3,9 @@ import { useHistory, useParams } from "react-router-dom";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import { Modal } from "../../components/Reusable/Modals";
 import StatusModal from "../../components/Reusable/StatusModal";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
@@ -26,6 +28,8 @@ interface RouteParams {
 const EmployeeEdit: React.FC = () => {
   const history = useHistory();
   const { userId } = useParams<RouteParams>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const [employee, setEmployee] = useState<User | null>(null);
 
@@ -260,7 +264,12 @@ const EmployeeEdit: React.FC = () => {
   };
 
   return (
-    <div className="manage-member-container">
+    <>
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
+      <div className="manage-member-container">
       <div className="main-container">
         <div className="status-top-header">
           <BackButton
@@ -270,6 +279,16 @@ const EmployeeEdit: React.FC = () => {
             <IonIcon icon={arrowBack} />
           </BackButton>
           <h2>Edit Employee</h2>
+          {isMobileView && (
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         <div className="member-container member-container-employee">
@@ -608,6 +627,7 @@ const EmployeeEdit: React.FC = () => {
         type={statusType}
       />
     </div>
+  </>
   );
 };
 

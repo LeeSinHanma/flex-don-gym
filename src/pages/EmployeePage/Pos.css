@@ -25,6 +25,12 @@
   overflow: hidden;
 }
 
+@media (min-width: 769px) {
+  .pos-container {
+    max-width: 600px;
+  }
+}
+
 .pos-header {
   display: flex;
   flex-direction: row;

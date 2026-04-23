@@ -72,6 +72,12 @@
   flex-shrink: 0;
 }
 
+@media (min-width: 769px) {
+  .admin-dashboard-container .main-container.product-main-container {
+    max-width: 600px;
+  }
+}
+
 .sort-dropdown {
   mask-image: linear-gradient(to bottom, black 85%, transparent);
 }

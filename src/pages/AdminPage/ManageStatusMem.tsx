@@ -4,7 +4,9 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
 import { Capacitor } from "@capacitor/core";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import "./ManageStatusMem.css";
 import { Modal } from "../../components/Reusable/Modals";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
@@ -39,6 +41,8 @@ interface RouteParams {
 const ManageStatusMemPage: React.FC = () => {
   const history = useHistory();
   const { memberId } = useParams<RouteParams>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
 
   const [member, setMember] = useState<Member | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -325,7 +329,12 @@ const ManageStatusMemPage: React.FC = () => {
   };
 
   return (
-    <div className="manage-member-container">
+    <>
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
+      <div className="manage-member-container">
       <div className="main-container">
         <div className="status-top-header">
           <BackButton
@@ -335,6 +344,16 @@ const ManageStatusMemPage: React.FC = () => {
             <IonIcon icon={arrowBack} />
           </BackButton>
           <h2>Manage Member</h2>
+          {isMobileView && (
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         <div className="status-content-scroll">
@@ -802,6 +821,7 @@ const ManageStatusMemPage: React.FC = () => {
         </div>
       </Modal>
     </div>
+  </>
   );
 };
 

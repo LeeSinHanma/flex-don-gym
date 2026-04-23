@@ -4,7 +4,9 @@ import { UsernameInput } from "../../components/Reusable/Username";
 import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { IonIcon } from "@ionic/react";
-import { arrowBack } from "ionicons/icons";
+import { arrowBack, menu } from "ionicons/icons";
+import Menu from "../../components/Reusable/Menu";
+import useResponsiveView from "../../hooks/useResponsiveView";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import NumberInput from "../../components/Reusable/NumberInput";
 import LoadingScreen from "../LoadingScreen";
@@ -26,6 +28,8 @@ interface RouteParams {
 const AdminEditMembership: React.FC = () => {
   const history = useHistory();
   const { membershipId } = useParams<RouteParams>();
+  const isMobileView = useResponsiveView();
+  const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -190,6 +194,10 @@ const AdminEditMembership: React.FC = () => {
     <>
       {isLoading && <LoadingScreen />}
 
+      <Menu
+        isOpen={showEmployeeMenu}
+        onClose={() => setShowEmployeeMenu(false)}
+      />
       <div className="member-menu-container">
         <div className="main-container">
           <div className="top-container">
@@ -201,6 +209,16 @@ const AdminEditMembership: React.FC = () => {
                 <IonIcon icon={arrowBack} />
               </BackButton>
               <h1>Edit Membership</h1>
+              {isMobileView && (
+                <button
+                  type="button"
+                  className="icon-button"
+                  onClick={() => setShowEmployeeMenu(true)}
+                  aria-label="Open menu"
+                >
+                  <IonIcon icon={menu} />
+                </button>
+              )}
             </div>
           </div>
 
