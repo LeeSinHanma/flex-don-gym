@@ -130,6 +130,10 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   // 3. Periodic Health Check (Adaptive Interval)
+  // NOTE: Empty dependency array — this effect runs ONCE on mount.
+  // It reads `isRunning` (module-level) to check busy state without needing
+  // React state in the dependency array, which was causing the effect to
+  // restart and create duplicate health check chains.
   React.useEffect(() => {
     let timeoutId: any;
     let isMounted = true;
@@ -140,37 +144,35 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({
     };
 
     const checkHealth = async () => {
-      // Don't check health if already initializing/syncing
-      if (isRunning || isInitializing || isSyncing) {
-        scheduleNextCheck(5000); // Check again shortly if busy
+      // Don't check health if already initializing/syncing (uses module-level mutex)
+      if (isRunning) {
+        scheduleNextCheck(30000); // Check again in 30s if busy
         return;
       }
 
       let checkFailed = false;
 
       try {
-        setIsApiConnecting(true);
         await healthCheck();
-        setError(null);
       } catch (err: any) {
         console.warn("Backend Health Check failed:", err);
-        setError("Backend health check failed");
         checkFailed = true;
       } finally {
         if (isMounted) {
-          setIsApiConnecting(false);
-          scheduleNextCheck(checkFailed ? 5000 : 5 * 60 * 1000); // Retry in 5s if failed, else 5m
+          // Retry in 30s if failed, else 5m
+          scheduleNextCheck(checkFailed ? 30000 : 5 * 60 * 1000);
         }
       }
     };
 
-    checkHealth();
+    // Initial health check after a short delay to let the app settle
+    scheduleNextCheck(3000);
 
     return () => {
       isMounted = false;
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isInitializing, isSyncing, initApp]);
+  }, []);
 
   // 4. Real-time Network Listener (Sync on Reconnection)
   React.useEffect(() => {

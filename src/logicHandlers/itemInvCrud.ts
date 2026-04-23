@@ -84,6 +84,24 @@ export async function deleteInventoryItem(itemId: string): Promise<void> {
   }
 }
 
+// ✅ GET /inventory-items/low-stock
+export async function getLowStockItems(
+  maxQuantity: number = 10,
+  limit?: number,
+): Promise<InventoryItem[]> {
+  try {
+    const params: any = { max_quantity: maxQuantity };
+    if (limit) params.limit = limit;
+
+    const res = await api.get<InventoryItem[]>("/inventory-items/low-stock", {
+      params,
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(getErrorMessage(err));
+  }
+}
+
 function getErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
     const detail = (err.response?.data as any)?.detail;
