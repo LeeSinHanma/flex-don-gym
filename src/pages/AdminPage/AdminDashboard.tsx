@@ -19,16 +19,11 @@ import { useAppInitialization } from "../../hooks/useAppInitialization";
 import { LoadingSpinner } from "../../components/Reusable/LoadingSpinner";
 import { BackButton } from "../../components/Reusable/BackButton";
 import {
-  connectCheckInsWS,
-  disconnectCheckInsWS,
-  connectRevenueWS,
-  disconnectRevenueWS,
-} from "../../logicHandlers/webSocket";
-import {
   getRevenueLastDays,
   getRevenueLine,
   getRevenueSource,
   getRevenueGrowth,
+  getTodayMetrics,
 } from "../../logicHandlers/graphHandler";
 import Menu from "../../components/Reusable/Menu";
 import {
@@ -257,6 +252,15 @@ const AdminDashboard: React.FC = () => {
         setLatestPayments([]);
       }
 
+      // Fetch today metrics
+      try {
+        const metrics = await getTodayMetrics();
+        setCheckInsToday(metrics.check_ins_today);
+        setRevenueToday(metrics.total_revenue_today);
+      } catch (err) {
+        console.error("Failed to fetch today metrics:", err);
+      }
+
       // Fetch low stock items
       try {
         const lowStock = await getLowStockItems(10, 5);
@@ -305,17 +309,19 @@ const AdminDashboard: React.FC = () => {
 
     fetchDashboardData();
 
-    connectCheckInsWS((count) => {
-      setCheckInsToday(count);
-    });
-
-    connectRevenueWS((amount) => {
-      setRevenueToday(amount);
-    });
+    // Set up polling for today metrics every 60 seconds
+    const intervalId = setInterval(async () => {
+      try {
+        const metrics = await getTodayMetrics();
+        setCheckInsToday(metrics.check_ins_today);
+        setRevenueToday(metrics.total_revenue_today);
+      } catch (err) {
+        console.error("Polling error for today metrics:", err);
+      }
+    }, 60000);
 
     return () => {
-      disconnectCheckInsWS();
-      disconnectRevenueWS();
+      clearInterval(intervalId);
     };
   }, [isReady, fetchDashboardData]);
 
