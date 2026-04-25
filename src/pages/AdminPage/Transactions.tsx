@@ -9,6 +9,7 @@ import {
   getAllTransactions,
   TransactionResponse,
   getTransactionById,
+  getTransactionsByDateRange,
 } from "../../logicHandlers/transactionHandler";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -29,6 +30,8 @@ const Transactions: React.FC = () => {
     null,
   );
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [jumpToPage, setJumpToPage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("All");
   const itemsPerPage = 10;
@@ -84,20 +87,48 @@ const Transactions: React.FC = () => {
       36,
     );
 
-    const exportData = transactions.filter((t) => {
-      let matchType = exportType === "All" || t.transaction_type === exportType;
-      let matchDate = true;
-      const txDate = new Date(t.created_at);
-      if (exportStartDate) {
-        matchDate = matchDate && txDate >= new Date(exportStartDate);
+    // Fetch data from server for export
+    let exportData: TransactionResponse[] = [];
+    try {
+      if (exportStartDate && exportEndDate) {
+        exportData = await getTransactionsByDateRange({
+          start_date: exportStartDate,
+          end_date: exportEndDate,
+          transaction_type: exportType === "All" ? undefined : exportType,
+        });
+      } else {
+        // Fallback: fetch all filtered by type if no specific date range is provided
+        exportData = await getAllTransactions({
+          transaction_type: exportType === "All" ? undefined : exportType,
+        });
+        
+        // If there were start or end dates but not both, we still need to filter locally 
+        // because getAllTransactions doesn't support partial date range.
+        if (exportStartDate || exportEndDate) {
+          exportData = exportData.filter((t) => {
+            let matchDate = true;
+            const txDate = new Date(t.created_at);
+            if (exportStartDate) {
+              matchDate = matchDate && txDate >= new Date(exportStartDate);
+            }
+            if (exportEndDate) {
+              const end = new Date(exportEndDate);
+              end.setHours(23, 59, 59, 999);
+              matchDate = matchDate && txDate <= end;
+            }
+            return matchDate;
+          });
+        }
       }
-      if (exportEndDate) {
-        const end = new Date(exportEndDate);
-        end.setHours(23, 59, 59, 999);
-        matchDate = matchDate && txDate <= end;
-      }
-      return matchType && matchDate;
-    });
+      
+      // Sort by date descending for the PDF
+      exportData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    } catch (err) {
+      console.error("Failed to fetch data for export:", err);
+      alert("Failed to fetch data for export. Please try again.");
+      return;
+    }
 
     let totalAmount = 0;
     const summary: Record<string, number> = {};
@@ -207,14 +238,19 @@ const Transactions: React.FC = () => {
     const loadTransactions = async () => {
       try {
         setLoading(true);
-        // You might want to filter or limit these as needed
-        const data = await getAllTransactions();
-        // Option to sort by date descending
-        const sortedData = data.sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-        );
-        setTransactions(sortedData);
+        const params = {
+          skip: (currentPage - 1) * itemsPerPage,
+          limit: itemsPerPage,
+          transaction_type: filterType === "All" ? undefined : filterType,
+        };
+        const data = await getAllTransactions(params);
+        setTransactions(data);
+
+        // Fetch the total count for the current filter
+        const allFilteredData = await getAllTransactions({ 
+          transaction_type: filterType === "All" ? undefined : filterType 
+        });
+        setTotalCount(allFilteredData.length);
       } catch (error) {
         console.error("Failed to load transactions:", error);
       } finally {
@@ -222,7 +258,7 @@ const Transactions: React.FC = () => {
       }
     };
     loadTransactions();
-  }, []);
+  }, [currentPage, filterType]);
 
   const handleMenuClick = () => {
     setIsMenuOpen(true);
@@ -257,12 +293,8 @@ const Transactions: React.FC = () => {
     ...Array.from(new Set(transactions.map((t) => t.transaction_type))),
   ];
 
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = filteredTransactions.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const currentItems = transactions;
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -271,19 +303,25 @@ const Transactions: React.FC = () => {
   };
 
   const getVisiblePages = () => {
-    const maxVisible = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    let endPage = startPage + maxVisible - 1;
+    const pages: (number | string)[] = [];
+    const delta = 1;
 
-    if (endPage > totalPages) {
-      endPage = totalPages;
-      startPage = Math.max(1, endPage - maxVisible + 1);
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - delta && i <= currentPage + delta)
+      ) {
+        pages.push(i);
+      } else if (
+        i === currentPage - delta - 1 ||
+        i === currentPage + delta + 1
+      ) {
+        pages.push("...");
+      }
     }
 
-    return Array.from(
-      { length: Math.max(0, endPage - startPage + 1) },
-      (_, i) => startPage + i,
-    );
+    return pages.filter((v, i, a) => v !== "..." || a[i - 1] !== "...");
   };
   const visiblePages = getVisiblePages();
 
@@ -518,46 +556,72 @@ const Transactions: React.FC = () => {
                 </tbody>
               </table>
             </div>
-            {/* Pagination Controls Outside the List */}
-            {!loading && filteredTransactions.length > 0 && (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: "1rem 0 0.5rem",
-                  gap: "5px",
-                  marginTop: "auto",
-                }}
-              >
-                <button
-                  type="button"
-                  className="pagination-btn"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  &lt;
-                </button>
-                {visiblePages.map((page) => (
+            {/* Modern Pagination Controls */}
+            {!loading && totalCount > 0 && (
+              <div className="modern-pagination-container">
+                <div className="pagination-inner">
                   <button
-                    key={page}
                     type="button"
-                    className={`pagination-btn ${
-                      currentPage === page ? "active" : ""
-                    }`}
-                    onClick={() => handlePageChange(page)}
+                    className="pagination-arrow"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
                   >
-                    {page}
+                    &lt;
                   </button>
-                ))}
-                <button
-                  type="button"
-                  className="pagination-btn"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === Math.max(1, totalPages)}
-                >
-                  &gt;
-                </button>
+
+                  {visiblePages.map((page, index) =>
+                    page === "..." ? (
+                      <span
+                        key={`ellipsis-${index}`}
+                        className="pagination-ellipsis"
+                      >
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        type="button"
+                        className={`pagination-number ${
+                          currentPage === page ? "active" : ""
+                        }`}
+                        onClick={() => handlePageChange(Number(page))}
+                      >
+                        {page}
+                      </button>
+                    ),
+                  )}
+
+                  <button
+                    type="button"
+                    className="pagination-arrow"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    &gt;
+                  </button>
+
+                  <div className="pagination-jump">
+                    <span>Go to</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={totalPages}
+                      value={jumpToPage}
+                      onChange={(e) => setJumpToPage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const pageNum = Number(jumpToPage);
+                          if (pageNum >= 1 && pageNum <= totalPages) {
+                            handlePageChange(pageNum);
+                            setJumpToPage("");
+                          }
+                        }
+                      }}
+                      placeholder={currentPage.toString()}
+                    />
+                    <span>Page</span>
+                  </div>
+                </div>
               </div>
             )}
 
