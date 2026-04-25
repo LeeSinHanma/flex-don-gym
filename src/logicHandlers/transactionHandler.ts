@@ -57,6 +57,13 @@ export interface GetAllTransactionsParams {
   year?: number;
 }
 
+// ✅ DATE RANGE FILTERS FOR /transactions/date-range
+export interface GetTransactionsByDateRangeParams {
+  start_date: string;
+  end_date: string;
+  transaction_type?: string;
+}
+
 // ✅ UPDATE /transactions/update/{transaction_id}
 export interface UpdateTransactionPayload {
   member_id: string;
@@ -82,6 +89,14 @@ export async function getAllTransactions(
   params?: GetAllTransactionsParams
 ): Promise<TransactionResponse[]> {
   const res = await api.get("/transactions/all", { params });
+  return res.data;
+}
+
+// ✅ GET /transactions/date-range
+export async function getTransactionsByDateRange(
+  params: GetTransactionsByDateRangeParams
+): Promise<TransactionResponse[]> {
+  const res = await api.get("/transactions/date-range", { params });
   return res.data;
 }
 
