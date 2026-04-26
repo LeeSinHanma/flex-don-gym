@@ -65,7 +65,7 @@ const StartingPageAdmin: React.FC = () => {
             className="btn btn-signup"
             type="submit"
             onClick={() => 
-              user?.role === 0 ? history.push("/admin-dashboard") : history.push("/qr")}
+              (user?.role === 0 || user?.userType === 0) ? history.push("/admin-dashboard") : history.push("/qr")}
           >
             Start
           </Button>

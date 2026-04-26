@@ -64,16 +64,17 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 0.8rem;
   align-items: center;
-  flex: 1;
-  justify-content: flex-end;
+  flex: 0 0 auto;
+  padding-bottom: 1rem;
 }
 
 .btn-signup {
-  width: 100%;
-  padding: 0.6rem;
-  height: 48px;
+  width: 75%;
+  max-width: 280px;
+  padding: 0.5rem;
+  height: 40px;
   background-color: #04354f;
   color: #d9d9d9;
   font-family: "Inter", sans-serif;
@@ -96,9 +97,10 @@
 }
 
 .btn-logout {
-  width: 100%;
-  padding: 0.6rem;
-  height: 48px;
+  width: 75%;
+  max-width: 280px;
+  padding: 0.5rem;
+  height: 40px;
   background-color: #920303;
   color: #d9d9d9;
   font-family: "Inter", sans-serif;
@@ -140,9 +142,10 @@
   }
 
   .admin-image-group {
-    flex: 0 0 auto;
+    flex: 1;
     gap: 0.75rem;
     margin-bottom: 0.5rem;
+    justify-content: center;
   }
 
   .admin-gym-name {
@@ -168,10 +171,10 @@
   }
 
   .admin-button-group {
-    flex: 1;
-    justify-content: flex-end;
-    gap: 1rem;
+    flex: 0 0 auto;
+    gap: 0.8rem;
     margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
   }
 
   .login-form {
@@ -188,10 +191,11 @@
 
   .btn-signup,
   .btn-logout {
-    height: 45px;
+    height: 40px;
     font-size: 13px;
     font-weight: 600;
     border-radius: 10px;
-    width: 100%;
+    width: 75%;
+    max-width: 280px;
   }
 }
