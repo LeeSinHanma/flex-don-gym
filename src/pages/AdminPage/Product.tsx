@@ -74,6 +74,8 @@ const ProductPage: React.FC = () => {
 
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -179,6 +181,23 @@ const ProductPage: React.FC = () => {
 
     return result;
   }, [items, searchValue, sortType, stockFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / itemsPerPage));
+
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredItems.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredItems, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchValue, sortType, stockFilter]);
 
   const openAddProductModal = () => {
     setIsModalOpen(true);
@@ -457,7 +476,7 @@ const ProductPage: React.FC = () => {
                 {isOffline ? "Currently Offline" : "No products found."}
               </p>
             ) : (
-              filteredItems.map((item) => (
+              paginatedItems.map((item) => (
                 <div
                   key={item.item_id}
                   onClick={() =>
@@ -480,6 +499,32 @@ const ProductPage: React.FC = () => {
             )}
           </div>
         </div>
+
+        {!isLoading && filteredItems.length > 0 && (
+          <div className="pagination-bar" aria-label="Products pagination">
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+
+            <span className="pagination-status">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         <div className="bottom-container">
           <Button

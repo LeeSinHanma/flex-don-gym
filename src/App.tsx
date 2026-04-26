@@ -54,6 +54,7 @@ import PrivateRoute from "./PrivateRoute";
 import ProductPage from "./pages/AdminPage/Product";
 import MembershipPage from "./pages/AdminPage/Membership";
 import EmployeeEdit from "./pages/AdminPage/EmployeeEdit";
+import EmailPage from "./pages/AdminPage/Email";
 import GetStarted from "./pages/EmployeePage/GetStarted";
 
 import { OfflineBanner } from "./components/Reusable/OfflineBanner";
@@ -188,6 +189,12 @@ const App: React.FC = () => {
                 exact
                 path="/account"
                 component={AccountPage}
+              />
+              <PrivateRoute
+                exact
+                path="/admin-email"
+                component={EmailPage}
+                requiredAdmin={true}
               />
               {/* Folder Route (keep last) */}
               <Route exact path="/folder/:name" component={Page} />

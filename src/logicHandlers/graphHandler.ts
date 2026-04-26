@@ -1,5 +1,20 @@
 import api from "../api/axios";
 
+export type BestSellingProductsRange = "7d" | "1m" | "3m" | "1y" | "all-time";
+
+export interface BestSellingProduct {
+  item_id: string;
+  item_name: string;
+  quantity_sold: number;
+  revenue_generated: number;
+}
+
+export interface BestSellingProductsResponse {
+  range: string;
+  timezone: string;
+  products: BestSellingProduct[];
+}
+
 export interface RevenueLineResponse {
   range: string;
   timezone: string;
@@ -141,6 +156,21 @@ export const getTodayMetrics = async (): Promise<TodayMetricsResponse> => {
     return response.data;
   } catch (error) {
     console.error("Error fetching today metrics:", error);
+    throw error;
+  }
+};
+
+export const getBestSellingProducts = async (
+  range: BestSellingProductsRange = "all-time",
+): Promise<BestSellingProductsResponse> => {
+  try {
+    const response = await api.get(`/dashboard/best-selling-products`, {
+      params: { range },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching best selling products:", error);
     throw error;
   }
 };

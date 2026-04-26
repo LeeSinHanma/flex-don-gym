@@ -108,6 +108,12 @@ const Menu: React.FC<MenuProps> = ({
         </Button>
       )}
 
+      {isAdmin && (
+        <Button className="menu-btn" onClick={() => goTo("/admin-email")}>
+          EMAIL SETTINGS
+        </Button>
+      )}
+
       <Button className="menu-btn" onClick={() => goTo("/account")}>
         ACCOUNT
       </Button>
