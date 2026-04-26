@@ -7,6 +7,7 @@ import * as htmlToImage from "html-to-image";
 import QRCode from "react-qr-code";
 import { Modal } from "./Modals";
 import { Button } from "./Button";
+import { getEmailPreset, formatEmailBody } from "../../logicHandlers/emailPresetHandler";
 import "./QrCodeModal.css";
 
 type QrCodeModalProps = {
@@ -97,14 +98,10 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
 
       const base64Data = dataUrl.split(",")[1];
       const fileName = `${downloadFileName}.png`;
-      const subject = `${title} QR Code`;
-      const body = [
-        `Hi ${memberName || "Member"},`,
-        "",
-        "Attached is your QR code for gym access.",
-        "",
-        "If the attachment does not open, please save the image and keep it available on your device.",
-      ].join("\n");
+      
+      const emailPreset = getEmailPreset();
+      const subject = emailPreset.subject;
+      const body = formatEmailBody(emailPreset.bodyTemplate, memberName || "Member");
 
       if (Capacitor.getPlatform() === "web") {
         const toPart = memberEmail ? encodeURIComponent(memberEmail) : "";

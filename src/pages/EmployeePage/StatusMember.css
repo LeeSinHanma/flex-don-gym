@@ -105,7 +105,7 @@
   color: #04354f;
   font-weight: 600;
   border: none;
-  width: 400px;
+  width: 600px;
   height: 40px;
 }
 
@@ -191,6 +191,49 @@
   padding-top: 0.5rem;
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.pagination-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.pagination-arrow {
+  min-width: 72px;
+  padding: 0.55rem 0.9rem;
+  border: none;
+  border-radius: 999px;
+  background: #04354f;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.pagination-arrow:hover:not(:disabled) {
+  background: #053a56;
+  transform: translateY(-1px);
+}
+
+.pagination-arrow:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-status {
+  color: #04354f;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .cards-container::-webkit-scrollbar {
@@ -323,6 +366,21 @@ h3 {
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+  }
+
+  .pagination-bar {
+    gap: 0.5rem;
+    padding: 0.5rem 0 0.2rem;
+  }
+
+  .pagination-arrow {
+    min-width: 64px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .pagination-status {
+    font-size: 0.85rem;
   }
 }
 

@@ -281,14 +281,16 @@ const PosPage: React.FC = () => {
           >
             More Items
           </Button>
-          <button
-            type="button"
-            className="icon-button"
-            onClick={() => setShowEmployeeMenu(true)}
-            aria-label="Open menu"
-          >
-            <IonIcon icon={menu} />
-          </button>
+          {isMobileView && (
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         <div

@@ -14,6 +14,7 @@ import dondonLogo from "../../resource/dondon-logo.png";
 import QRCode from "react-qr-code";
 import * as htmlToImage from "html-to-image";
 import { EmailComposer } from "capacitor-email-composer";
+import { getEmailPreset, formatEmailBody } from "../../logicHandlers/emailPresetHandler";
 import { getVisitsByMemberId, Visit } from "../../logicHandlers/visits";
 import {
   getMemberById,
@@ -288,14 +289,9 @@ const ManageStatusMemPage: React.FC = () => {
         canvasHeight: node.offsetHeight,
       });
 
-      const subject = "DONDON'S FITNESS GYM QR Code";
-      const body = [
-        `Hi ${member.first_name || "Member"},`,
-        "",
-        "Attached is your QR code for gym access.",
-        "",
-        "If the attachment does not open, please save the image and keep it available on your device.",
-      ].join("\n");
+      const emailPreset = getEmailPreset();
+      const subject = emailPreset.subject;
+      const body = formatEmailBody(emailPreset.bodyTemplate, member.first_name || "Member");
 
       if (Capacitor.getPlatform() === "web") {
         const mailto = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

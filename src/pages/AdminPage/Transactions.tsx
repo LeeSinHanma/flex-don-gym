@@ -16,7 +16,7 @@ import autoTable from "jspdf-autotable";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
-import "./AdminDashboard.css";
+import "./Transactions.css";
 import useResponsiveView from "../../hooks/useResponsiveView";
 
 const Transactions: React.FC = () => {
@@ -31,7 +31,6 @@ const Transactions: React.FC = () => {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [jumpToPage, setJumpToPage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("All");
   const itemsPerPage = 10;
@@ -101,8 +100,8 @@ const Transactions: React.FC = () => {
         exportData = await getAllTransactions({
           transaction_type: exportType === "All" ? undefined : exportType,
         });
-        
-        // If there were start or end dates but not both, we still need to filter locally 
+
+        // If there were start or end dates but not both, we still need to filter locally
         // because getAllTransactions doesn't support partial date range.
         if (exportStartDate || exportEndDate) {
           exportData = exportData.filter((t) => {
@@ -120,10 +119,12 @@ const Transactions: React.FC = () => {
           });
         }
       }
-      
-      // Sort by date descending for the PDF
-      exportData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
+      // Sort by date descending for the PDF
+      exportData.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
     } catch (err) {
       console.error("Failed to fetch data for export:", err);
       alert("Failed to fetch data for export. Please try again.");
@@ -238,19 +239,9 @@ const Transactions: React.FC = () => {
     const loadTransactions = async () => {
       try {
         setLoading(true);
-        const params = {
-          skip: (currentPage - 1) * itemsPerPage,
-          limit: itemsPerPage,
-          transaction_type: filterType === "All" ? undefined : filterType,
-        };
-        const data = await getAllTransactions(params);
+        const data = await getAllTransactions({});
         setTransactions(data);
-
-        // Fetch the total count for the current filter
-        const allFilteredData = await getAllTransactions({ 
-          transaction_type: filterType === "All" ? undefined : filterType 
-        });
-        setTotalCount(allFilteredData.length);
+        setTotalCount(data.length);
       } catch (error) {
         console.error("Failed to load transactions:", error);
       } finally {
@@ -258,7 +249,7 @@ const Transactions: React.FC = () => {
       }
     };
     loadTransactions();
-  }, [currentPage, filterType]);
+  }, []);
 
   const handleMenuClick = () => {
     setIsMenuOpen(true);
@@ -293,8 +284,12 @@ const Transactions: React.FC = () => {
     ...Array.from(new Set(transactions.map((t) => t.transaction_type))),
   ];
 
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const currentItems = transactions;
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / itemsPerPage));
+
+  const paginatedTransactions = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredTransactions, currentPage]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -302,31 +297,12 @@ const Transactions: React.FC = () => {
     }
   };
 
-  const getVisiblePages = () => {
-    const pages: (number | string)[] = [];
-    const delta = 1;
-
-    for (let i = 1; i <= totalPages; i++) {
-      if (
-        i === 1 ||
-        i === totalPages ||
-        (i >= currentPage - delta && i <= currentPage + delta)
-      ) {
-        pages.push(i);
-      } else if (
-        i === currentPage - delta - 1 ||
-        i === currentPage + delta + 1
-      ) {
-        pages.push("...");
-      }
-    }
-
-    return pages.filter((v, i, a) => v !== "..." || a[i - 1] !== "...");
-  };
-  const visiblePages = getVisiblePages();
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterType]);
 
   return (
-    <div className="admin-dashboard-container">
+    <div className="admin-transactions-container">
       <div className="admin-main-container">
         <div className="admin-top-header">
           <BackButton
@@ -447,7 +423,7 @@ const Transactions: React.FC = () => {
                   width: "100%",
                   minWidth: "auto",
                   tableLayout: "fixed",
-                  height: currentItems.length > 0 ? "100%" : "auto",
+                  height: paginatedTransactions.length > 0 ? "100%" : "auto",
                 }}
               >
                 <thead>
@@ -480,7 +456,7 @@ const Transactions: React.FC = () => {
                         Loading transactions...
                       </td>
                     </tr>
-                  ) : transactions.length === 0 ? (
+                  ) : filteredTransactions.length === 0 ? (
                     <tr>
                       <td
                         colSpan={3}
@@ -494,7 +470,7 @@ const Transactions: React.FC = () => {
                       </td>
                     </tr>
                   ) : (
-                    currentItems.map((transaction, index) => (
+                    paginatedTransactions.map((transaction, index) => (
                       <tr
                         key={`${transaction.transaction_id}-${index}`}
                         onClick={async () => {
@@ -556,72 +532,30 @@ const Transactions: React.FC = () => {
                 </tbody>
               </table>
             </div>
-            {/* Modern Pagination Controls */}
-            {!loading && totalCount > 0 && (
-              <div className="modern-pagination-container">
-                <div className="pagination-inner">
-                  <button
-                    type="button"
-                    className="pagination-arrow"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    &lt;
-                  </button>
+            {/* Simple Pagination Controls */}
+            {!loading && filteredTransactions.length > 0 && (
+              <div className="pagination-bar" aria-label="Transaction pagination">
+                <button
+                  type="button"
+                  className="pagination-arrow"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Prev
+                </button>
 
-                  {visiblePages.map((page, index) =>
-                    page === "..." ? (
-                      <span
-                        key={`ellipsis-${index}`}
-                        className="pagination-ellipsis"
-                      >
-                        ...
-                      </span>
-                    ) : (
-                      <button
-                        key={page}
-                        type="button"
-                        className={`pagination-number ${
-                          currentPage === page ? "active" : ""
-                        }`}
-                        onClick={() => handlePageChange(Number(page))}
-                      >
-                        {page}
-                      </button>
-                    ),
-                  )}
+                <span className="pagination-status">
+                  Page {currentPage} of {totalPages}
+                </span>
 
-                  <button
-                    type="button"
-                    className="pagination-arrow"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    &gt;
-                  </button>
-
-                  <div className="pagination-jump">
-                    <span>Go to</span>
-                    <input
-                      type="number"
-                      min="1"
-                      max={totalPages}
-                      value={jumpToPage}
-                      onChange={(e) => setJumpToPage(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          const pageNum = Number(jumpToPage);
-                          if (pageNum >= 1 && pageNum <= totalPages) {
-                            handlePageChange(pageNum);
-                            setJumpToPage("");
-                          }
-                        }
-                      }}
-                      placeholder={currentPage.toString()}
-                    />
-                    <span>Page</span>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  className="pagination-arrow"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
               </div>
             )}
 

@@ -1,0 +1,209 @@
+.admin-transactions-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.admin-transactions-container .admin-main-container {
+  background-color: #d9d9d9;
+  color: #111827;
+  width: 100%;
+  max-width: 440px;
+  height: 95vh;
+  height: 95dvh;
+  border-radius: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+@media (min-width: 769px) {
+  .admin-transactions-container .admin-main-container {
+    max-width: 600px;
+  }
+}
+
+.admin-transactions-container .admin-top-header {
+  padding: 0.8rem 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.admin-transactions-container .admin-top-header h1 {
+  margin: 0;
+  color: #0f172a;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.admin-transactions-container .admin-top-header .btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.admin-transactions-container .admin-top-header .menu-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  height: 32px;
+  width: 32px;
+  transform: translateY(-50%);
+  border-radius: 8px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #04354f;
+}
+
+.admin-transactions-container .admin-top-header .menu-icon:hover {
+  background-color: rgba(4, 53, 79, 0.1);
+}
+
+.admin-transactions-container .admin-main-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0.8rem;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-transactions-container .admin-main-content::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-transactions-container .ad-dashboard-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+  border: 1px solid #eef2f7;
+}
+
+.admin-transactions-container .ad-table-card .ad-section-head h2 {
+  margin: 10px 0px;
+  font-size: 0.95rem;
+  color: #2563eb;
+}
+
+.admin-transactions-container .ad-table-wrapper {
+  overflow-x: hidden;
+  margin-bottom: 0.6rem;
+}
+
+.admin-transactions-container .ad-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-transactions-container .ad-table-card th,
+.admin-transactions-container .ad-table-card td {
+  text-align: left;
+  padding: 0.5rem 0.3rem;
+  border-bottom: 1px solid #edf1f7;
+  font-size: 0.72rem;
+}
+
+.admin-transactions-container .ad-table-card th {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.admin-transactions-container .ad-table-card td {
+  color: #0f172a;
+}
+
+.pagination-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.pagination-arrow {
+  min-width: 72px;
+  padding: 0.55rem 0.9rem;
+  border: none;
+  border-radius: 999px;
+  background: #04354f;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.pagination-arrow:hover:not(:disabled) {
+  background: #053a56;
+  transform: translateY(-1px);
+}
+
+.pagination-arrow:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pagination-status {
+  color: #04354f;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .admin-transactions-container {
+    padding: 0.6rem;
+    justify-content: flex-start;
+  }
+
+  .admin-transactions-container .admin-main-container {
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-transactions-container {
+    padding: 0.5rem;
+  }
+
+  .admin-transactions-container .admin-main-content {
+    padding: 0.75rem;
+  }
+
+  .pagination-bar {
+    gap: 0.5rem;
+    padding: 0.5rem 0 0.2rem;
+  }
+
+  .pagination-arrow {
+    min-width: 64px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .pagination-status {
+    font-size: 0.85rem;
+  }
+}
