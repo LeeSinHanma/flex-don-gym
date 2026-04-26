@@ -5,7 +5,6 @@ import { Route, Redirect, Switch } from "react-router-dom";
 import "./App.css";
 
 import Page from "./pages/Page";
-import Menu from "./components/Menu";
 
 import LoginRegister from "./pages/EmployeePage/LoginRegister";
 import MemberMenu from "./pages/EmployeePage/Member";
@@ -70,7 +69,6 @@ const App: React.FC = () => {
         <AppInitializer showStatus={true} />
         <OfflineBanner />
         <IonReactRouter>
-          <Menu />
           <IonRouterOutlet id="main">
             <Switch>
               {/* Default Redirect */}
