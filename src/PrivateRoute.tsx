@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Redirect } from "react-router-dom";
 import { getCurrentUser } from "./logicHandlers/userServices";
 
-const PrivateRoute = ({ component: Component, requiredAccess, ...rest }: any) => (
+const PrivateRoute = ({ component: Component, requiredAccess, requiredAdmin, ...rest }: any) => (
   <Route
     {...rest}
     render={(props) => {
@@ -11,6 +11,10 @@ const PrivateRoute = ({ component: Component, requiredAccess, ...rest }: any) =>
 
       const isAdmin = user.role === 0 || user.userType === 0;
       const accessList: string[] = user.accessList || [];
+
+      if (requiredAdmin && !isAdmin) {
+        return <Redirect to="/" />;
+      }
 
       if (requiredAccess && !isAdmin && !accessList.includes(requiredAccess)) {
         return <Redirect to="/" />;
@@ -21,4 +25,4 @@ const PrivateRoute = ({ component: Component, requiredAccess, ...rest }: any) =>
   />
 );
 
-export default PrivateRoute;
+export default PrivateRoute;
