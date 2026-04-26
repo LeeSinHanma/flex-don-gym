@@ -24,6 +24,8 @@ import {
   getRevenueSource,
   getRevenueGrowth,
   getTodayMetrics,
+  getBestSellingProducts,
+  BestSellingProduct,
 } from "../../logicHandlers/graphHandler";
 import Menu from "../../components/Reusable/Menu";
 import {
@@ -92,13 +94,9 @@ const AdminDashboard: React.FC = () => {
 
   const membershipColors = ["#14b8a6", "#22c55e", "#38bdf8", "#f59e0b"];
 
-  const bestSellers = [
-    { name: "Whey Protein 2lb", sales: 24600 },
-    { name: "Creatine Monohydrate", sales: 18400 },
-    { name: "Resistance Bands Set", sales: 13950 },
-    { name: "Shaker Bottle", sales: 9250 },
-    { name: "Lifting Straps", sales: 8100 },
-  ];
+  const [bestSellingProducts, setBestSellingProducts] = useState<
+    BestSellingProduct[] | null
+  >(null);
 
   const [lowOnStocks, setLowOnStocks] = useState<InventoryItem[] | null>(null);
 
@@ -270,6 +268,21 @@ const AdminDashboard: React.FC = () => {
       } catch (err) {
         console.error("Failed to fetch low stock items:", err);
         setLowOnStocks([]);
+      }
+
+      try {
+        const bestSelling = await getBestSellingProducts("all-time");
+        const sortedBestSelling = [...bestSelling.products]
+          .sort(
+            (left, right) =>
+              right.quantity_sold - left.quantity_sold ||
+              right.revenue_generated - left.revenue_generated,
+          )
+          .slice(0, 5);
+        setBestSellingProducts(sortedBestSelling);
+      } catch (err) {
+        console.error("Failed to fetch best selling products:", err);
+        setBestSellingProducts([]);
       }
 
       if (platform === "web") {
@@ -748,19 +761,55 @@ const AdminDashboard: React.FC = () => {
 
                   <section className="ad-dashboard-card ad-best-sellers-card">
                     <div className="ad-section-head">
-                      <h2>Best Sellers</h2>
+                      <h2>Best Selling Products</h2>
                     </div>
 
                     <ol className="ad-best-sellers-list">
-                      {bestSellers.map((item, index) => (
-                        <li key={item.name} className="ad-best-seller-item">
-                          <span className="ad-seller-rank">{index + 1}</span>
-                          <span className="ad-seller-name">{item.name}</span>
-                          <span className="ad-seller-sales">
-                            {formatPeso(item.sales)}
-                          </span>
-                        </li>
-                      ))}
+                      {bestSellingProducts === null ? (
+                        [1, 2, 3, 4, 5].map((i) => (
+                          <li
+                            key={`best-selling-skeleton-${i}`}
+                            className="ad-best-seller-item"
+                          >
+                            <span className="ad-seller-rank">{i}</span>
+                            <IonSkeletonText
+                              animated={true}
+                              style={{ width: "55%", height: "14px" }}
+                            />
+                            <IonSkeletonText
+                              animated={true}
+                              style={{ width: "20%", height: "14px" }}
+                            />
+                          </li>
+                        ))
+                      ) : bestSellingProducts.length === 0 ? (
+                        <p
+                          style={{
+                            textAlign: "center",
+                            color: "#666",
+                            padding: "10px",
+                          }}
+                        >
+                          No best selling products found
+                        </p>
+                      ) : (
+                        bestSellingProducts.map((item, index) => (
+                          <li key={item.item_id} className="ad-best-seller-item">
+                            <span className="ad-seller-rank">{index + 1}</span>
+                            <span className="ad-seller-name">
+                              {item.item_name}
+                            </span>
+                            <span className="ad-best-seller-meta">
+                              <span className="ad-seller-sales">
+                                {item.quantity_sold} sold
+                              </span>
+                              <span className="ad-seller-sales">
+                                {formatPeso(item.revenue_generated)}
+                              </span>
+                            </span>
+                          </li>
+                        ))
+                      )}
                     </ol>
                   </section>
 
