@@ -127,143 +127,143 @@ const ItemInfoPage: React.FC = () => {
         onClose={() => setShowEmployeeMenu(false)}
       />
       <div className="admin-dashboard-container">
-      <div className="admin-main-container">
-        <div className="admin-top-header">
-          <BackButton
-            className="btn status-btn-back"
-            onClick={() => history.push("/admin-product")}
-          >
-            <IonIcon icon={arrowBack} />
-          </BackButton>
-
-          <h2>Edit Products</h2>
-          {isMobileView && (
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => setShowEmployeeMenu(true)}
-              aria-label="Open menu"
+        <div className="main-container">
+          <div className="admin-top-header">
+            <BackButton
+              className="btn status-btn-back"
+              onClick={() => history.push("/admin-product")}
             >
-              <IonIcon icon={menu} />
-            </button>
+              <IonIcon icon={arrowBack} />
+            </BackButton>
+
+            <h2>Edit Products</h2>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
+              >
+                <IonIcon icon={menu} />
+              </button>
+            )}
+          </div>
+
+          {!passedItem && (
+            <p style={{ textAlign: "center", color: "red" }}>
+              No product selected. Go back and click a product card.
+            </p>
           )}
-        </div>
 
-        {!passedItem && (
-          <p style={{ textAlign: "center", color: "red" }}>
-            No product selected. Go back and click a product card.
-          </p>
-        )}
+          <div className="form-container">
+            <div className="form-group">
+              <label>Item Name:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Item Name"
+                value={itemName}
+                onChange={(e: any) => setItemName(e.target.value)}
+              />
+            </div>
 
-        <div className="form-container">
-          <div className="form-group">
-            <label>Item Name:</label>
-            <UsernameInput
-              className="input-username"
-              placeholder="Item Name"
-              value={itemName}
-              onChange={(e: any) => setItemName(e.target.value)}
-            />
+            <div className="form-group">
+              <label>Item Description:</label>
+              <UsernameInput
+                className="input-username"
+                placeholder="Description"
+                type="text"
+                value={description}
+                onChange={(e: any) => setDescription(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Price:</label>
+              <NumberInput
+                className="input-username"
+                placeholder="Price"
+                value={price}
+                onChange={setPrice}
+                allowDecimal
+                prefix="₱"
+                formatWithCommas
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Stock:</label>
+              <NumberInput
+                className="input-username"
+                placeholder="Quantity"
+                value={quantity}
+                onChange={setQuantity}
+                formatWithCommas
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label>Item Description:</label>
-            <UsernameInput
-              className="input-username"
-              placeholder="Description"
-              type="text"
-              value={description}
-              onChange={(e: any) => setDescription(e.target.value)}
-            />
-          </div>
+          <div className="status-button-container">
+            <div className="status-button">
+              <Button
+                type="button"
+                className="renew-btn"
+                disabled={!passedItem || isSaving}
+                onClick={() => {
+                  setConfirmType("save");
+                  setShowConfirmModal(true);
+                }}
+              >
+                {isSaving ? "Saving..." : "Save"}
+              </Button>
 
-          <div className="form-group">
-            <label>Price:</label>
-            <NumberInput
-              className="input-username"
-              placeholder="Price"
-              value={price}
-              onChange={setPrice}
-              allowDecimal
-              prefix="₱"
-              formatWithCommas
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Stock:</label>
-            <NumberInput
-              className="input-username"
-              placeholder="Quantity"
-              value={quantity}
-              onChange={setQuantity}
-              formatWithCommas
-            />
-          </div>
-        </div>
-
-        <div className="status-button-container">
-          <div className="status-button">
-            <Button
-              type="button"
-              className="renew-btn"
-              disabled={!passedItem || isSaving}
-              onClick={() => {
-                setConfirmType("save");
-                setShowConfirmModal(true);
-              }}
-            >
-              {isSaving ? "Saving..." : "Save"}
-            </Button>
-
-            <Button
-              type="button"
-              className="cancel-btn"
-              disabled={!passedItem}
-              onClick={() => {
-                setConfirmType("delete");
-                setShowConfirmModal(true);
-              }}
-            >
-              Delete
-            </Button>
+              <Button
+                type="button"
+                className="cancel-btn"
+                disabled={!passedItem}
+                onClick={() => {
+                  setConfirmType("delete");
+                  setShowConfirmModal(true);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <ConfirmModal
-        isOpen={showConfirmModal}
-        title={confirmType === "delete" ? "Confirm Delete" : "Confirm Save"}
-        message={
-          confirmType === "delete"
-            ? "Are you sure you want to delete this product?"
-            : "Are you sure you want to save these changes?"
-        }
-        confirmText={confirmType === "delete" ? "Delete" : "Save"}
-        cancelText="Cancel"
-        onCancel={() => {
-          setShowConfirmModal(false);
-          setConfirmType(null);
-        }}
-        onConfirm={handleConfirmAction}
-      />
-
-      <StatusModal
-        isOpen={showStatusModal}
-        onClose={() => {
-          setShowStatusModal(false);
-
-          if (shouldRedirect) {
-            setShouldRedirect(false);
-            history.push("/admin-product");
+        <ConfirmModal
+          isOpen={showConfirmModal}
+          title={confirmType === "delete" ? "Confirm Delete" : "Confirm Save"}
+          message={
+            confirmType === "delete"
+              ? "Are you sure you want to delete this product?"
+              : "Are you sure you want to save these changes?"
           }
-        }}
-        title={statusTitle}
-        message={statusMessage}
-        type={statusType}
-      />
-    </div>
-  </>
+          confirmText={confirmType === "delete" ? "Delete" : "Save"}
+          cancelText="Cancel"
+          onCancel={() => {
+            setShowConfirmModal(false);
+            setConfirmType(null);
+          }}
+          onConfirm={handleConfirmAction}
+        />
+
+        <StatusModal
+          isOpen={showStatusModal}
+          onClose={() => {
+            setShowStatusModal(false);
+
+            if (shouldRedirect) {
+              setShouldRedirect(false);
+              history.push("/admin-product");
+            }
+          }}
+          title={statusTitle}
+          message={statusMessage}
+          type={statusType}
+        />
+      </div>
+    </>
   );
 };
 

@@ -25,6 +25,12 @@
   overflow: hidden;
 }
 
+@media (min-width: 769px) {
+  .main-container {
+    max-width: 600px;
+  }
+}
+
 .status-content-scroll {
   width: 100%;
   flex: 1;
@@ -144,7 +150,6 @@
 
 .middle-container {
   width: 100%;
-  max-width: 420px;
   border-radius: 12px;
 
   display: flex;
