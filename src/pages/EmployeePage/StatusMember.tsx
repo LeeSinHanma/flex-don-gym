@@ -19,6 +19,7 @@ import StatusModal from "../../components/Reusable/StatusModal";
 const StatusMemberPage: React.FC = () => {
   const history = useHistory();
   const isMobileView = useResponsiveView();
+  const itemsPerPage = 10;
 
   const [allMembers, setAllMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState("");
@@ -28,6 +29,7 @@ const StatusMemberPage: React.FC = () => {
   >({});
   const [selectedFilter, setSelectedFilter] = useState<number | string>("All");
   const [showEmployeeMenu, setShowEmployeeMenu] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusTitle, setStatusTitle] = useState("");
@@ -214,6 +216,27 @@ const StatusMemberPage: React.FC = () => {
     });
   }, [search, allMembers, selectedFilter]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredMembers.length / itemsPerPage));
+
+  const paginatedMembers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredMembers.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredMembers, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedFilter]);
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages));
+  }, [totalPages]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
   return (
     <div className="manage-member-container">
       <div className="main-container">
@@ -309,7 +332,7 @@ const StatusMemberPage: React.FC = () => {
           ) : filteredMembers.length === 0 ? (
             <p style={{ textAlign: "center" }}>No members found.</p>
           ) : (
-            filteredMembers.map((m) => (
+            paginatedMembers.map((m) => (
               <div
                 key={m.member_id}
                 className="status-card"
@@ -351,6 +374,31 @@ const StatusMemberPage: React.FC = () => {
             ))
           )}
         </div>
+        {!loading && filteredMembers.length > 0 && (
+          <div className="pagination-bar" aria-label="Member pagination">
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+
+            <span className="pagination-status">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
         <div className="bottom-container">
           <Button
             className="btn btn-submit"

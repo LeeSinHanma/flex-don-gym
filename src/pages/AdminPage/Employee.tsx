@@ -42,6 +42,8 @@ const EmployeeMenu: React.FC = () => {
   const [isActive, setIsActive] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [access, setAccess] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Modals state
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -124,6 +126,23 @@ const EmployeeMenu: React.FC = () => {
       );
     });
   }, [users, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage));
+
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredUsers, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   const handleAddEmployee = () => {
     setIsModalOpen(true);
@@ -280,7 +299,7 @@ const EmployeeMenu: React.FC = () => {
               {isOffline ? "Currently Offline" : "No users found."}
             </p>
           ) : (
-            filteredUsers.map((u) => (
+            paginatedUsers.map((u) => (
               <div
                 key={u.id}
                 className={`status-card ${isOffline ? "disabled-card" : ""}`}
@@ -305,6 +324,32 @@ const EmployeeMenu: React.FC = () => {
             ))
           )}
         </div>
+
+        {!loading && filteredUsers.length > 0 && (
+          <div className="pagination-bar" aria-label="Employee pagination">
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Prev
+            </button>
+
+            <span className="pagination-status">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
 
         <div className="bottom-container">
           <Button
