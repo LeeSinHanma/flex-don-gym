@@ -25,6 +25,12 @@
   overflow: hidden;
 }
 
+@media (min-width: 769px) {
+  .item-main-container {
+    max-width: 600px;
+  }
+}
+
 /* ✅ UNTOUCHED */
 .item-search-bar {
   display: flex;
@@ -38,7 +44,7 @@
   background-color: #c5c5c5;
   color: #04354f;
   border: none;
-  width: 400px;
+  width: 550px;
   height: 40px;
   padding: 0 0.75rem;
   font-size: 14px;

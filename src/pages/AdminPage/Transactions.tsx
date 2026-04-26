@@ -16,7 +16,7 @@ import autoTable from "jspdf-autotable";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
-import "./AdminDashboard.css";
+import "./Transactions.css";
 import useResponsiveView from "../../hooks/useResponsiveView";
 
 const Transactions: React.FC = () => {
@@ -101,8 +101,8 @@ const Transactions: React.FC = () => {
         exportData = await getAllTransactions({
           transaction_type: exportType === "All" ? undefined : exportType,
         });
-        
-        // If there were start or end dates but not both, we still need to filter locally 
+
+        // If there were start or end dates but not both, we still need to filter locally
         // because getAllTransactions doesn't support partial date range.
         if (exportStartDate || exportEndDate) {
           exportData = exportData.filter((t) => {
@@ -120,10 +120,12 @@ const Transactions: React.FC = () => {
           });
         }
       }
-      
-      // Sort by date descending for the PDF
-      exportData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
+      // Sort by date descending for the PDF
+      exportData.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
     } catch (err) {
       console.error("Failed to fetch data for export:", err);
       alert("Failed to fetch data for export. Please try again.");
@@ -247,8 +249,8 @@ const Transactions: React.FC = () => {
         setTransactions(data);
 
         // Fetch the total count for the current filter
-        const allFilteredData = await getAllTransactions({ 
-          transaction_type: filterType === "All" ? undefined : filterType 
+        const allFilteredData = await getAllTransactions({
+          transaction_type: filterType === "All" ? undefined : filterType,
         });
         setTotalCount(allFilteredData.length);
       } catch (error) {
@@ -326,7 +328,7 @@ const Transactions: React.FC = () => {
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="admin-dashboard-container">
+    <div className="admin-transactions-container">
       <div className="admin-main-container">
         <div className="admin-top-header">
           <BackButton
