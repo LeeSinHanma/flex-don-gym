@@ -322,9 +322,9 @@ const Transactions: React.FC = () => {
   return (
     <div className="admin-transactions-container">
       <div className="admin-main-container">
-        <div className="admin-top-header">
+        <div className="status-header-row">
           <BackButton
-            className="btn"
+            className="status-page-back"
             onClick={() => history.push("/admin-dashboard")}
           >
             <IonIcon icon={arrowBack} />

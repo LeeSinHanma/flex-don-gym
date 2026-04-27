@@ -14,53 +14,6 @@
   flex-direction: column;
 }
 
-.account-header {
-  margin-bottom: 20px;
-}
-
-/* Rely on status-header-row from StatusMember.css for layout */
-.account-header-row {
-  /* No layout overrides needed, base classes center text magically */
-}
-
-.account-back-btn {
-  position: absolute;
-  left: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.account-title {
-  margin: 0;
-  margin-bottom: 8px;
-  font-family: "Inter", sans-serif;
-  color: #04354f;
-  font-weight: bold;
-  font-size: 18px; /* Match StatusMember reference */
-  text-align: center;
-}
-
-.account-menu-btn {
-  position: absolute;
-  right: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #04354f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-}
-
-@media (max-width: 480px) {
-  .account-title {
-    font-size: 24px;
-  }
-}
-
 .account-cards {
   background: #fff;
   border-radius: 15px;

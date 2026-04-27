@@ -70,6 +70,11 @@
   line-height: 1.4;
 }
 
+.form-actions.qrm-actions button {
+  min-height: 42px;
+  font-size: 14px;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 480px) {
   .qrm-card {
@@ -91,5 +96,14 @@
   .qrm-member-name {
     font-size: 14px;
     margin-top: 12px;
+  }
+
+  .form-actions.qrm-actions {
+    gap: 8px;
+  }
+
+  .form-actions.qrm-actions button {
+    height: 42px;
+    font-size: 14px;
   }
 }

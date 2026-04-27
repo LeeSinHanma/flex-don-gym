@@ -209,9 +209,9 @@ const MembershipPage: React.FC = () => {
   return (
     <div className="admin-dashboard-container">
       <div className="main-container product-main-container">
-        <div className="admin-top-header">
+        <div className="status-header-row">
           <BackButton
-            className="btn"
+            className="status-page-back"
             type="button"
             onClick={() => history.push("/admin-dashboard")}
           >

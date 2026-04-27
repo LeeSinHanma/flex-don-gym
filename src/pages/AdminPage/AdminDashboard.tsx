@@ -398,9 +398,9 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="admin-dashboard-container">
       <div className="admin-main-container">
-        <div className="admin-top-header">
+        <div className="status-header-row">
           <BackButton
-            className="btn"
+            className="status-page-back"
             onClick={() => history.push("/admin-page")}
           >
             <IonIcon icon={arrowBack} />

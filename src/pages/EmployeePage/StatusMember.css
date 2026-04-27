@@ -44,38 +44,6 @@
 
 
 
-.status-header-row .icon-button {
-  position: absolute;
-  right: 0;
-  background: transparent;
-  border: none;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #04354f;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.status-header-row .icon-button:hover {
-  background-color: rgba(4, 53, 79, 0.1);
-}
-
-.status-header-row .icon-button ion-icon {
-  width: 32px;
-  height: 32px;
-}
-
-.top-header h2 {
-  margin-bottom: 8px;
-  font-size: 18px;
-  font-family: "Inter", sans-serif;
-  color: #04354f;
-}
-
 /* ✅ added — was missing, causing layout miscalculation */
 .search-bar {
   width: 100%;
@@ -380,11 +348,6 @@ h3 {
     width: 100%;
     box-sizing: border-box;
     align-items: stretch;
-  }
-
-  .top-header h2 {
-    font-size: 24px;
-    text-align: center;
   }
 
   .search-input {

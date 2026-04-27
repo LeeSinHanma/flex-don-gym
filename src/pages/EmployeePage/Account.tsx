@@ -108,28 +108,26 @@ const AccountPage: React.FC = () => {
   return (
     <div className="manage-member-container account-page-wrapper">
       <div className="main-container account-main-content">
-        <div className="top-header account-header">
-          <div className="status-header-row account-header-row">
-            <BackButton
-              className="status-page-back account-back-btn"
+        <div className="status-header-row">
+          <BackButton
+            className="status-page-back"
+            type="button"
+            onClick={() => history.goBack()}
+          >
+            <IonIcon icon={arrowBack} />
+          </BackButton>
+
+          <h2>My Account</h2>
+
+          {isMobileView && (
+            <button
               type="button"
-              onClick={() => history.goBack()}
+              className="icon-button"
+              onClick={() => setShowEmployeeMenu(true)}
             >
-              <IonIcon icon={arrowBack} />
-            </BackButton>
-
-            <h2 className="account-title">My Account</h2>
-
-            {isMobileView && (
-              <button
-                type="button"
-                className="icon-button account-menu-btn"
-                onClick={() => setShowEmployeeMenu(true)}
-              >
-                <IonIcon icon={menu} />
-              </button>
-            )}
-          </div>
+              <IonIcon icon={menu} />
+            </button>
+          )}
         </div>
 
         <div className="cards-container account-cards">

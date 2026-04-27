@@ -23,9 +23,9 @@ const PrepaidMenu: React.FC = () => {
       />
       <div className="member-menu-container">
         <div className="main-container">
-          <div className="top-container">
+          <div className="status-header-row">
             <BackButton
-              className="btn-back"
+              className="status-page-back"
               type="submit"
               onClick={() => history.push("/menu")}
             >

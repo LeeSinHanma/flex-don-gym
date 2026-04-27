@@ -132,9 +132,9 @@ const EditMemberPage: React.FC = () => {
       />
       <div className="member-menu-container">
         <div className="main-container">
-          <div className="admin-top-header">
+          <div className="status-header-row">
             <BackButton
-              className="btn"
+              className="status-page-back"
               onClick={() => history.goBack()}
             >
               <IonIcon icon={arrowBack} />
