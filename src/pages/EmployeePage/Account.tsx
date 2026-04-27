@@ -46,8 +46,11 @@ const AccountPage: React.FC = () => {
     status: "Members Page",
   };
 
+  const normalizeAccessKey = (key: string) => key.trim().toLowerCase();
+
   const formatAccess = (key: string) => {
-    return accessNames[key] || key;
+    const normalizedKey = normalizeAccessKey(key);
+    return accessNames[normalizedKey] || key;
   };
 
   const showStatus = (title: string, message: string, type: "success" | "error" | "warning" | "info") => {
@@ -164,11 +167,15 @@ const AccountPage: React.FC = () => {
             <h4 className="account-info-label">Access List</h4>
             <div className="account-access-tags">
               {(() => {
-                const arr = Array.isArray(user.accessList) && user.accessList.length > 0 
-                  ? user.accessList 
-                  : Array.isArray(user.access_list) && user.access_list.length > 0 
+                const rawAccessList = Array.isArray(user.accessList)
+                  ? user.accessList
+                  : Array.isArray(user.access_list)
                       ? user.access_list
                       : [];
+
+                const arr = rawAccessList
+                  .map((item: string) => normalizeAccessKey(item))
+                  .filter((item: string, index: number, list: string[]) => item && list.indexOf(item) === index);
                 
                 if (arr.length === 0) {
                   return <p className="account-info-value">None</p>;

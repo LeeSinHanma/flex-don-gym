@@ -252,6 +252,23 @@
   line-height: 1.5;
 }
 
+@media (min-width: 481px) {
+  .email-container .main-container {
+    max-width: 1100px;
+  }
+
+  .email-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    align-items: start;
+  }
+
+  .preview-section {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 480px) {
   .email-container .main-container {
