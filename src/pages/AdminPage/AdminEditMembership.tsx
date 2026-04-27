@@ -200,26 +200,24 @@ const AdminEditMembership: React.FC = () => {
       />
       <div className="member-menu-container">
         <div className="main-container">
-          <div className="top-container">
-            <div className="top-item-container">
-              <BackButton
-                className="btn btn-back"
-                onClick={() => history.goBack()}
+          <div className="admin-top-header">
+            <BackButton
+              className="btn"
+              onClick={() => history.goBack()}
+            >
+              <IonIcon icon={arrowBack} />
+            </BackButton>
+            <h1>Edit Membership</h1>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
               >
-                <IonIcon icon={arrowBack} />
-              </BackButton>
-              <h1>Edit Membership</h1>
-              {isMobileView && (
-                <button
-                  type="button"
-                  className="icon-button"
-                  onClick={() => setShowEmployeeMenu(true)}
-                  aria-label="Open menu"
-                >
-                  <IonIcon icon={menu} />
-                </button>
-              )}
-            </div>
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
 
           <div className="form-container">

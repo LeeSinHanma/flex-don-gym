@@ -29,45 +29,6 @@
   }
 }
 
-.admin-top-header {
-  width: 100%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.8rem 1rem;
-}
-
-.admin-transactions-container .admin-top-header h1 {
-  margin: 0;
-  color: #0f172a;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.admin-top-header .btn {
-  position: absolute;
-  left: 0;
-  z-index: 10;
-}
-
-.admin-transactions-container .admin-top-header .menu-icon {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  height: 32px;
-  width: 32px;
-  transform: translateY(-50%);
-  border-radius: 8px;
-  font-size: 1.3rem;
-  cursor: pointer;
-  color: #04354f;
-}
-
-.admin-transactions-container .admin-top-header .menu-icon:hover {
-  background-color: rgba(4, 53, 79, 0.1);
-}
-
 .admin-transactions-container .admin-main-content {
   flex: 1;
   min-height: 0;
@@ -185,31 +146,6 @@
 @media (max-width: 480px) {
   .admin-transactions-container {
     padding: 0.5rem;
-  }
-
-  .admin-top-header {
-    padding: 0.75rem 0.5rem;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .admin-transactions-container .admin-top-header h1 {
-    margin: 0;
-    font-size: 1.15rem;
-  }
-
-  .admin-top-header .btn {
-    position: absolute;
-    left: 0;
-  }
-
-  .admin-transactions-container .admin-top-header .menu-icon {
-    position: absolute;
-    right: 0.5rem;
   }
 
   .admin-transactions-container .admin-main-content {
