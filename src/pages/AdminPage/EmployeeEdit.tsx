@@ -271,9 +271,9 @@ const EmployeeEdit: React.FC = () => {
       />
       <div className="manage-member-container">
       <div className="main-container">
-        <div className="status-top-header">
+        <div className="admin-top-header">
           <BackButton
-            className="btn status-btn-back"
+            className="btn"
             onClick={() => history.push("/employee-page")}
           >
             <IonIcon icon={arrowBack} />

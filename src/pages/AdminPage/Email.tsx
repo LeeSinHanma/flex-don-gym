@@ -145,9 +145,9 @@ const EmailPage: React.FC = () => {
       <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <div className="email-container">
         <div className="main-container">
-          <div className="email-header">
+          <div className="admin-top-header">
             <BackButton
-              className="btn email-btn-back"
+              className="btn"
               onClick={() => history.push("/admin-dashboard")}
             >
               <IonIcon icon={arrowBack} />

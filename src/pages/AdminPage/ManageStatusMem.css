@@ -52,34 +52,6 @@
   border-radius: 8px;
 }
 
-.status-top-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  position: relative;
-  margin-bottom: 1rem; /* Add spacing below header */
-}
-
-.status-top-header h2 {
-  font-size: 30px;
-  font-family: "Inter", sans-serif;
-  color: #04354f;
-  margin: 0;
-}
-
-.status-top-header .status-btn-back {
-  position: absolute;
-  left: 0;
-}
-
-.status-btn-back {
-  border-radius: 8px;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-}
 
 .member-container {
   width: 100%;

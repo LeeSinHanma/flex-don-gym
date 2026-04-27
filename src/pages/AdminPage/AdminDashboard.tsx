@@ -401,20 +401,22 @@ const AdminDashboard: React.FC = () => {
         <div className="admin-top-header">
           <BackButton
             className="btn"
-            type="button"
             onClick={() => history.push("/admin-page")}
           >
             <IonIcon icon={arrowBack} />
           </BackButton>
 
-          <h1>Dashboard</h1>
+          <h2>Dashboard</h2>
 
           {isMobileView && (
-            <IonIcon
-              icon={menu}
-              className="menu-icon"
+            <button
+              type="button"
+              className="icon-button"
               onClick={handleMenuClick}
-            />
+              aria-label="Open menu"
+            >
+              <IonIcon icon={menu} />
+            </button>
           )}
         </div>
 

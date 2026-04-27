@@ -130,7 +130,7 @@ const ItemInfoPage: React.FC = () => {
         <div className="main-container">
           <div className="admin-top-header">
             <BackButton
-              className="btn status-btn-back"
+              className="btn"
               onClick={() => history.push("/admin-product")}
             >
               <IonIcon icon={arrowBack} />
