@@ -214,26 +214,24 @@ const MemberMenu: React.FC = () => {
       />
       <div className="member-menu-container">
         <div className="main-container">
-          <div className="top-container">
-            <div className="top-item-container">
-              <BackButton
-                className="btn btn-back"
-                onClick={() => history.push("/status-member")}
+          <div className="status-header-row">
+            <BackButton
+              className="status-page-back"
+              onClick={() => history.push("/status-member")}
+            >
+              <IonIcon icon={arrowBack} />
+            </BackButton>
+            <h1>ADD MEMBER</h1>
+            {isMobileView && (
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setShowEmployeeMenu(true)}
+                aria-label="Open menu"
               >
-                <IonIcon icon={arrowBack} />
-              </BackButton>
-              <h1>ADD MEMBER</h1>
-              {isMobileView && (
-                <button
-                  type="button"
-                  className="icon-button"
-                  onClick={() => setShowEmployeeMenu(true)}
-                  aria-label="Open menu"
-                >
-                  <IonIcon icon={menu} />
-                </button>
-              )}
-            </div>
+                <IonIcon icon={menu} />
+              </button>
+            )}
           </div>
 
           <div className="form-container">

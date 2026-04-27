@@ -151,7 +151,7 @@ const QrCodeModal: React.FC<QrCodeModalProps> = ({
             <p className="qrm-member-name">{memberName || "No Name"}</p>
           </div>
 
-          <div className="form-actions">
+          <div className="form-actions qrm-actions">
             {showEmailButton && (
               <Button type="button" onClick={handleEmailQr}>
                 Email QR

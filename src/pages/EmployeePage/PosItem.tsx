@@ -131,9 +131,9 @@ const PosItemPage: React.FC = () => {
       />
       <div className="item-main-container">
         <div className="top-header">
-          <div className="top-top-header">
+          <div className="status-header-row">
             <BackButton
-              className="pos-btn-back"
+              className="status-page-back"
               type="submit"
               onClick={() =>
                 history.push("/pos", {

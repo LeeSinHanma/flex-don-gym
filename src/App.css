@@ -128,8 +128,7 @@ p {
   }
 }
 
-/* Global Admin Header Styles - Standardized for all pages */
-.admin-top-header,
+/* Global Header Styles - Standardized for all pages */
 .status-header-row {
   width: 100%;
   position: relative;
@@ -141,8 +140,6 @@ p {
   min-height: 60px;
 }
 
-.admin-top-header h1,
-.admin-top-header h2,
 .status-header-row h1,
 .status-header-row h2 {
   margin: 0;
@@ -154,8 +151,6 @@ p {
   line-height: 1.2;
 }
 
-.admin-top-header .btn,
-.status-header-row .btn,
 .status-header-row .status-page-back {
   position: absolute !important;
   left: 0.5rem !important; /* Standard offset */
@@ -173,22 +168,17 @@ p {
   justify-content: center !important;
 }
 
-.admin-top-header .btn ion-icon,
-.status-header-row .btn ion-icon,
 .status-header-row .status-page-back ion-icon {
   font-size: 30px !important;
   width: 30px !important;
   height: 30px !important;
 }
 
-.admin-top-header .btn:active,
-.status-header-row .btn:active,
 .status-header-row .status-page-back:active {
   transform: translateY(-50%) scale(0.9) !important;
 }
 
-.admin-top-header .menu-icon,
-.admin-top-header .icon-button,
+.status-header-row .menu-icon,
 .status-header-row .icon-button {
   position: absolute !important;
   right: 0.5rem !important; /* Standard offset */
@@ -206,8 +196,7 @@ p {
   padding: 0 !important;
 }
 
-.admin-top-header .menu-icon ion-icon,
-.admin-top-header .icon-button ion-icon,
+.status-header-row .menu-icon ion-icon,
 .status-header-row .icon-button ion-icon {
   font-size: 30px !important;
   width: 30px !important;
@@ -215,15 +204,12 @@ p {
 }
 
 @media (max-width: 480px) {
-  .admin-top-header,
   .status-header-row {
     padding: 0.5rem;
     margin-bottom: 0.5rem;
     min-height: 56px;
   }
 
-  .admin-top-header h1,
-  .admin-top-header h2,
   .status-header-row h1,
   .status-header-row h2 {
     font-size: 24px !important; /* Exact match from StatusMember.css mobile query */
@@ -231,15 +217,4 @@ p {
     max-width: 65%;
   }
 
-  .admin-top-header .btn,
-  .status-header-row .btn,
-  .status-header-row .status-page-back {
-    left: 0 !important; /* StatusMember uses 0 inside padded container, but we use 0.2rem for safety */
-  }
-
-  .admin-top-header .menu-icon,
-  .admin-top-header .icon-button,
-  .status-header-row .icon-button {
-    right: 0 !important;
-  }
 }
