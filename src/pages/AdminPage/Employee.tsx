@@ -3,10 +3,9 @@ import { Button } from "../../components/Reusable/Button";
 import { BackButton } from "../../components/Reusable/BackButton";
 import { Modal } from "../../components/Reusable/Modals";
 import { UsernameInput } from "../../components/Reusable/Username";
-import { PasswordInput } from "../../components/Reusable/Password";
 import { useHistory } from "react-router-dom";
 import { IonIcon, IonSkeletonText } from "@ionic/react";
-import { arrowBack, menu } from "ionicons/icons";
+import { arrowBack, menu, eyeOutline, eyeOffOutline } from "ionicons/icons";
 import Menu from "../../components/Reusable/Menu";
 import ConfirmModal from "../../components/Reusable/ConfirmModal";
 import StatusModal from "../../components/Reusable/StatusModal";
@@ -54,6 +53,8 @@ const EmployeeMenu: React.FC = () => {
     "success" | "error" | "warning" | "info"
   >("info");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const accessOptions = [
     { label: "Dashboard", value: "dashboard" },
@@ -417,24 +418,46 @@ const EmployeeMenu: React.FC = () => {
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <PasswordInput
-              id="password"
-              className="employee-input"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="password-wrapper">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="employee-input"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <IonIcon icon={showPassword ? eyeOffOutline : eyeOutline} />
+              </button>
+            </div>
           </div>
 
           <div className="form-group">
             <label htmlFor="confirm-password">Confirm Password</label>
-            <PasswordInput
-              id="confirm-password"
-              className="employee-input"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+            <div className="password-wrapper">
+              <input
+                id="confirm-password"
+                type={showConfirmPassword ? "text" : "password"}
+                className="employee-input"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                <IonIcon icon={showConfirmPassword ? eyeOffOutline : eyeOutline} />
+              </button>
+            </div>
           </div>
 
           <div className="form-group">
