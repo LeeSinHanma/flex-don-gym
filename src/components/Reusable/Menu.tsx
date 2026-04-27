@@ -13,6 +13,12 @@ interface MenuProps {
   onBeforeLogout?: () => Promise<void>;
 }
 
+type MenuItem = {
+  key: string;
+  label: string;
+  path: string;
+};
+
 const Menu: React.FC<MenuProps> = ({
   isOpen,
   onClose,
@@ -21,6 +27,12 @@ const Menu: React.FC<MenuProps> = ({
   const history = useHistory();
   const isMobileView = useResponsiveView();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    overview: true,
+    operations: true,
+    management: true,
+    settings: true,
+  });
 
   // Check if current route is an admin page
   const currentPath = window.location.pathname;
@@ -47,6 +59,13 @@ const Menu: React.FC<MenuProps> = ({
     return isAdmin || accessList.includes(key);
   };
 
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey],
+    }));
+  };
+
   const goTo = (path: string) => {
     onClose();
     history.push(path);
@@ -57,76 +76,113 @@ const Menu: React.FC<MenuProps> = ({
     setShowLogoutConfirm(true);
   };
 
+  const menuSections: Array<{ key: string; title: string; items: MenuItem[] }> = [
+    {
+      key: "overview",
+      title: "Overview",
+      items: [
+        hasAccess("dashboard")
+          ? { key: "dashboard", label: "DASHBOARD", path: "/admin-dashboard" }
+          : null,
+      ].filter(Boolean) as MenuItem[],
+    },
+    {
+      key: "operations",
+      title: "Daily Operations",
+      items: [
+        hasAccess("pos") ? { key: "pos", label: "POS", path: "/pos" } : null,
+        hasAccess("qr-scanner")
+          ? { key: "qr-scanner", label: "QR SCANNER", path: "/qr" }
+          : null,
+        hasAccess("status")
+          ? { key: "status", label: "STATUS / MEMBERS", path: "/status-member" }
+          : null,
+        hasAccess("transactions")
+          ? {
+              key: "transactions",
+              label: "TRANSACTIONS",
+              path: "/admin-transactions",
+            }
+          : null,
+      ].filter(Boolean) as MenuItem[],
+    },
+    {
+      key: "management",
+      title: "Management",
+      items: [
+        hasAccess("employees")
+          ? { key: "employees", label: "EMPLOYEE", path: "/employee-page" }
+          : null,
+        hasAccess("products")
+          ? { key: "products", label: "PRODUCTS", path: "/admin-product" }
+          : null,
+        hasAccess("membership-plans")
+          ? {
+              key: "membership-plans",
+              label: "MEMBERSHIP PLANS",
+              path: "/admin-membership",
+            }
+          : null,
+      ].filter(Boolean) as MenuItem[],
+    },
+    {
+      key: "settings",
+      title: "Settings",
+      items: [
+        { key: "account", label: "ACCOUNT", path: "/account" },
+        isAdmin
+          ? { key: "email-settings", label: "EMAIL SETTINGS", path: "/admin-email" }
+          : null,
+      ].filter(Boolean) as MenuItem[],
+    },
+  ].filter((section) => section.items.length > 0);
+
   // Menu items that appear in both modal and sidebar
   const menuContent = (
-    <div className="menu-buttons">
-      {hasAccess("dashboard") && (
-        <Button className="menu-btn" onClick={() => goTo("/admin-dashboard")}>
-          DASHBOARD
+    <div className="menu-shell">
+      <div className="menu-buttons">
+        {menuSections.map((section) => (
+          <div key={section.key} className="menu-section">
+            <button
+              type="button"
+              className="menu-section-header"
+              onClick={() => toggleSection(section.key)}
+              aria-expanded={!!expandedSections[section.key]}
+            >
+              <span className="menu-section-title">{section.title}</span>
+              <span className={`menu-section-caret ${expandedSections[section.key] ? "open" : ""}`}>
+                ▾
+              </span>
+            </button>
+
+            {expandedSections[section.key] && (
+              <div className="menu-submenu">
+                {section.items.map((item) => (
+                  <Button
+                    key={item.key}
+                    className={`menu-btn ${currentPath === item.path ? "menu-btn-active" : ""}`}
+                    onClick={() => goTo(item.path)}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="menu-actions">
+        <Button className="menu-btn menu-btn-logout" onClick={handleLogoutClick}>
+          LOGOUT
         </Button>
-      )}
 
-      {hasAccess("employees") && (
-        <Button className="menu-btn" onClick={() => goTo("/employee-page")}>
-          EMPLOYEE
-        </Button>
-      )}
-
-      {hasAccess("transactions") && (
-        <Button className="menu-btn" onClick={() => goTo("/admin-transactions")}>
-          TRANSACTIONS
-        </Button>
-      )}
-
-      {hasAccess("products") && (
-        <Button className="menu-btn" onClick={() => goTo("/admin-product")}>
-          PRODUCTS
-        </Button>
-      )}
-
-      {hasAccess("membership-plans") && (
-        <Button className="menu-btn" onClick={() => goTo("/admin-membership")}>
-          MEMBERSHIP PLANS
-        </Button>
-      )}
-
-      {hasAccess("pos") && (
-        <Button className="menu-btn" onClick={() => goTo("/pos")}>
-          POS
-        </Button>
-      )}
-
-      {hasAccess("qr-scanner") && (
-        <Button className="menu-btn" onClick={() => goTo("/qr")}>
-          QR SCANNER
-        </Button>
-      )}
-
-      {hasAccess("status") && (
-        <Button className="menu-btn" onClick={() => goTo("/status-member")}>
-          STATUS / MEMBERS
-        </Button>
-      )}
-
-      {isAdmin && (
-        <Button className="menu-btn" onClick={() => goTo("/admin-email")}>
-          EMAIL SETTINGS
-        </Button>
-      )}
-
-      <Button className="menu-btn" onClick={() => goTo("/account")}>
-        ACCOUNT
-      </Button>
-
-      <Button className="menu-btn" onClick={handleLogoutClick}>
-        LOGOUT
-      </Button>
-
-      {isMobileView && (
-        <Button className="menu-btn menu-btn-close" onClick={onClose}>
-          Close
-        </Button>
-      )}
+        {isMobileView && (
+          <Button className="menu-btn menu-btn-close" onClick={onClose}>
+            CLOSE
+          </Button>
+        )}
+      </div>
     </div>
   );
 
