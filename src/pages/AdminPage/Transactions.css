@@ -29,46 +29,6 @@
   }
 }
 
-.admin-transactions-container .admin-top-header {
-  padding: 0.8rem 1rem;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-
-.admin-transactions-container .admin-top-header h1 {
-  margin: 0;
-  color: #0f172a;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.admin-transactions-container .admin-top-header .btn {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.admin-transactions-container .admin-top-header .menu-icon {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  height: 32px;
-  width: 32px;
-  transform: translateY(-50%);
-  border-radius: 8px;
-  font-size: 1.3rem;
-  cursor: pointer;
-  color: #04354f;
-}
-
-.admin-transactions-container .admin-top-header .menu-icon:hover {
-  background-color: rgba(4, 53, 79, 0.1);
-}
-
 .admin-transactions-container .admin-main-content {
   flex: 1;
   min-height: 0;
