@@ -53,10 +53,17 @@ const Menu: React.FC<MenuProps> = ({
 
   const user = getCurrentUser();
   const isAdmin = user?.role === 0 || user?.userType === 0;
-  const accessList: string[] = user?.accessList || [];
+  const rawAccessList = Array.isArray(user?.accessList)
+    ? user.accessList
+    : Array.isArray(user?.access_list)
+      ? user.access_list
+      : [];
+  const accessList: string[] = rawAccessList.map((item: string) =>
+    String(item).trim().toLowerCase(),
+  );
 
   const hasAccess = (key: string) => {
-    return isAdmin || accessList.includes(key);
+    return isAdmin || accessList.includes(key.trim().toLowerCase());
   };
 
   const toggleSection = (sectionKey: string) => {
