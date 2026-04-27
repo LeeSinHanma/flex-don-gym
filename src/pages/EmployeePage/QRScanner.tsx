@@ -507,8 +507,7 @@ const QRScannerHome: React.FC = () => {
             </div>
 
             <div
-              className="form-actions"
-              style={{ marginTop: "16px", display: "flex", gap: "10px" }}
+              className="visit-result-actions"
             >
               {!visitResult.visit.access_granted &&
                 (visitResult.visit.denial_reason === "No remaining credits" ||
@@ -516,7 +515,7 @@ const QRScannerHome: React.FC = () => {
                     "Postpaid membership has expired") && (
                   <Button
                     type="button"
-                    className="renew-btn"
+                    className="visit-result-action-btn visit-result-cash-btn"
                     onClick={async () => {
                       setPaymentMethod("Cash");
                       setAmountGiven("");
@@ -535,7 +534,7 @@ const QRScannerHome: React.FC = () => {
 
               <Button
                 type="button"
-                className="btn-modal btn-submit-modal"
+                className="visit-result-action-btn visit-result-ok-btn"
                 onClick={async () => {
                   setShowModal(false);
                   setVisitResult(null);

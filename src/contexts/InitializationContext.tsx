@@ -121,6 +121,9 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({
     } catch (err: any) {
       console.error("App initialization failed:", err);
       setError(err.message || "Unknown initialization error");
+      // Keep the app usable even when initial sync fails.
+      // Data-fetching screens handle their own API/local fallback logic.
+      setIsReady(true);
     } finally {
       isRunning = false;
       setIsInitializing(false);
@@ -153,11 +156,15 @@ export const InitializationProvider: React.FC<{ children: ReactNode }> = ({
       let checkFailed = false;
 
       try {
+        setIsApiConnecting(true);
         await healthCheck();
+        setError(null);
       } catch (err: any) {
         console.warn("Backend Health Check failed:", err);
+        setError(err?.message || "Server unreachable");
         checkFailed = true;
       } finally {
+        setIsApiConnecting(false);
         if (isMounted) {
           // Retry in 30s if failed, else 5m
           scheduleNextCheck(checkFailed ? 30000 : 5 * 60 * 1000);
