@@ -141,6 +141,24 @@ const EmployeeMenu: React.FC = () => {
     }
   };
 
+  const pageGroupSize = 10;
+  const pageGroupStart =
+    Math.floor((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+  const pageGroupEnd = Math.min(pageGroupStart + pageGroupSize - 1, totalPages);
+  const visiblePages = Array.from(
+    { length: pageGroupEnd - pageGroupStart + 1 },
+    (_, index) => pageGroupStart + index,
+  );
+
+  const handlePageBlockChange = (direction: "prev" | "next") => {
+    if (direction === "prev") {
+      handlePageChange(pageGroupStart - pageGroupSize);
+      return;
+    }
+
+    handlePageChange(pageGroupStart + pageGroupSize);
+  };
+
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
@@ -331,15 +349,33 @@ const EmployeeMenu: React.FC = () => {
             <button
               type="button"
               className="pagination-arrow"
+              onClick={() => handlePageBlockChange("prev")}
+              disabled={pageGroupStart === 1}
+            >
+              &lt;&lt;
+            </button>
+
+            <button
+              type="button"
+              className="pagination-arrow"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             >
-              Prev
+              &lt;
             </button>
 
-            <span className="pagination-status">
-              Page {currentPage} of {totalPages}
-            </span>
+            <div className="pagination-pages" role="group" aria-label="Page numbers">
+              {visiblePages.map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  className={`pagination-number ${currentPage === pageNumber ? "active" : ""}`}
+                  onClick={() => handlePageChange(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+            </div>
 
             <button
               type="button"
@@ -347,7 +383,16 @@ const EmployeeMenu: React.FC = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
             >
-              Next
+              &gt;
+            </button>
+
+            <button
+              type="button"
+              className="pagination-arrow"
+              onClick={() => handlePageBlockChange("next")}
+              disabled={pageGroupEnd === totalPages}
+            >
+              &gt;&gt;
             </button>
           </div>
         )}
