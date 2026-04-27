@@ -62,47 +62,6 @@
   font-family: "Inter", sans-serif;
 }
 
-/* ✅ UNTOUCHED */
-.top-top-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  position: relative;
-}
-
-/* ✅ UNTOUCHED */
-.top-top-header h2 {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #04354f;
-}
-
-/* ✅ UNTOUCHED */
-.pos-btn-back {
-  border-radius: 8px;
-  width: 40px;
-  height: 40px;
-  left: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-  background-color: transparent;
-  border: none;
-  color: #04354f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.pos-btn-back:hover {
-  background-color: rgba(4, 53, 79, 0.1);
-}
-
 /* ✅ Added min-height: 0 so flex child can shrink and allow scroll */
 .pos-item-content {
   flex: 1;

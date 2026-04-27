@@ -332,9 +332,9 @@ const ManageStatusMemPage: React.FC = () => {
       />
       <div className="manage-member-container">
       <div className="main-container">
-        <div className="admin-top-header">
+        <div className="status-header-row">
           <BackButton
-            className="btn"
+            className="status-page-back"
             onClick={() => history.push("/status-member")}
           >
             <IonIcon icon={arrowBack} />

@@ -128,9 +128,9 @@ const ItemInfoPage: React.FC = () => {
       />
       <div className="admin-dashboard-container">
         <div className="main-container">
-          <div className="admin-top-header">
+          <div className="status-header-row">
             <BackButton
-              className="btn"
+              className="status-page-back"
               onClick={() => history.push("/admin-product")}
             >
               <IonIcon icon={arrowBack} />
