@@ -184,6 +184,9 @@ export const getCurrentUser = () => {
 };
 
 export const logout = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("token_type");
+  localStorage.removeItem("access_list");
   localStorage.removeItem("user");
   resetAppInitialization();
 };

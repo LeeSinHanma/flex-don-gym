@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./LoginRegister.css";
 import { UsernameInput } from "../../components/Reusable/Username";
-import { PasswordInput } from "../../components/Reusable/Password";
 import { Button } from "../../components/Reusable/Button";
 import { useHistory } from "react-router-dom";
 import { getUserByUsername, loginUser, setCurrentUser, getCurrentUser } from "../../logicHandlers/userServices";
-import { IonImg } from "@ionic/react";
+import { IonImg, IonIcon } from "@ionic/react";
+import { eyeOutline, eyeOffOutline } from "ionicons/icons";
 import dondonLogo from "../../resource/dondon-logo.png";
 
 import LoadingScreen from "../LoadingScreen";
@@ -15,6 +15,7 @@ const LoginRegister: React.FC = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine); // ✅
 
@@ -160,14 +161,25 @@ const LoginRegister: React.FC = () => {
               }
             />
 
-            <PasswordInput
-              className="input-password"
-              placeholder="Password"
-              value={password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setPassword(e.target.value)
-              }
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="input-password"
+                placeholder="Password"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <IonIcon icon={showPassword ? eyeOffOutline : eyeOutline} />
+              </button>
+            </div>
 
             {errorMessage && (
               <strong className="login-error">{errorMessage}</strong>
